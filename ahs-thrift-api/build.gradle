@@ -1,0 +1,23 @@
+plugins {
+    id 'org.jruyi.thrift' version '0.4.2'
+}
+
+dependencies {
+    implementation project(':ahs-domain')
+    implementation "org.apache.thrift:libthrift:${thriftVersion}"
+}
+
+compileThrift {
+    recurse true
+    generator 'java'
+    createGenFolder false
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+            srcDir 'build/generated-sources/thrift/java'
+        }
+    }
+}

@@ -1,0 +1,67 @@
+plugins {
+    id 'java'
+    id 'idea'
+}
+
+allprojects {
+    group = 'com.komatsu.ahs'
+    version = '1.0.0-SNAPSHOT'
+    
+    repositories {
+        mavenCentral()
+        maven { url 'https://packages.confluent.io/maven/' }
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+    
+    ext {
+        springBootVersion = '2.7.18'
+        flinkVersion = '1.17.2'
+        thriftVersion = '0.18.1'
+        kafkaVersion = '3.5.1'
+        lombokVersion = '1.18.30'
+        slf4jVersion = '1.7.36'
+        logbackVersion = '1.2.11'
+        junitVersion = '5.9.3'
+        jacksonVersion = '2.15.3'
+        awsSdkVersion = '2.20.162'
+    }
+    
+    dependencies {
+        // Lombok for reducing boilerplate
+        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+        
+        // Logging
+        implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+        implementation "ch.qos.logback:logback-classic:${logbackVersion}"
+        
+        // Testing
+        testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+        testImplementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+        testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
+        testImplementation 'org.mockito:mockito-core:5.5.0'
+        testImplementation 'org.mockito:mockito-junit-jupiter:5.5.0'
+        testImplementation 'org.assertj:assertj-core:3.24.2'
+    }
+    
+    test {
+        useJUnitPlatform()
+    }
+    
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+        options.compilerArgs << '-parameters'
+    }
+}
+
+wrapper {
+    gradleVersion = '8.4'
+    distributionType = Wrapper.DistributionType.ALL
+}

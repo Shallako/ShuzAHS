@@ -1,0 +1,9 @@
+rootProject.name = 'ShuzAHS'
+
+include 'ahs-domain'
+include 'ahs-thrift-api'
+include 'ahs-vehicle-service'
+include 'ahs-fleet-management'
+include 'ahs-telemetry-processor'
+include 'ahs-stream-analytics'
+include 'ahs-common'
