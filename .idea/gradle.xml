@@ -9,6 +9,13 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/ahs-common" />
+            <option value="$PROJECT_DIR$/ahs-domain" />
+            <option value="$PROJECT_DIR$/ahs-fleet-management" />
+            <option value="$PROJECT_DIR$/ahs-stream-analytics" />
+            <option value="$PROJECT_DIR$/ahs-telemetry-processor" />
+            <option value="$PROJECT_DIR$/ahs-thrift-api" />
+            <option value="$PROJECT_DIR$/ahs-vehicle-service" />
           </set>
         </option>
       </GradleProjectSettings>

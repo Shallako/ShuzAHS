@@ -1,16 +1,45 @@
-plugins {
-    id 'org.jruyi.thrift' version '0.4.2'
-}
-
 dependencies {
     implementation project(':ahs-domain')
     implementation "org.apache.thrift:libthrift:${thriftVersion}"
 }
 
-compileThrift {
-    recurse true
-    generator 'java'
-    createGenFolder false
+// Generate Java sources from Thrift IDL.
+// By default, uses 'thrift' from PATH, but you can override with -PthriftExe=/custom/path/to/thrift
+def thriftExe = project.findProperty('thriftExe') ?: 'thrift'
+def thriftSrc = file('src/main/thrift/ahs.thrift')
+def thriftOutDir = file("$buildDir/generated-sources/thrift/java")
+
+tasks.register('generateThrift', Exec) {
+    group = 'build'
+    description = 'Generates Java sources from Thrift IDL using the thrift compiler.'
+
+    inputs.file(thriftSrc)
+    outputs.dir(thriftOutDir)
+
+    // Skip the task gracefully if thrift compiler is not available
+    onlyIf {
+        try {
+            def p = new ProcessBuilder(thriftExe as String, '--version')
+                    .redirectErrorStream(true)
+                    .start()
+            p.waitFor()
+            if (p.exitValue() != 0) {
+                logger.warn("Thrift compiler not found or not executable: '${thriftExe}'. Skipping Thrift code generation. Install Thrift (e.g., 'brew install thrift') or pass -PthriftExe=/path/to/thrift.")
+                return false
+            }
+            return true
+        } catch (Exception ignored) {
+            logger.warn("Thrift compiler not found: '${thriftExe}'. Skipping Thrift code generation. Install Thrift (e.g., 'brew install thrift') or pass -PthriftExe=/path/to/thrift.")
+            return false
+        }
+    }
+
+    doFirst {
+        thriftOutDir.mkdirs()
+    }
+
+    // Use the configured thrift executable
+    commandLine thriftExe, '-r', '--gen', 'java', '-out', thriftOutDir.absolutePath, thriftSrc.absolutePath
 }
 
 sourceSets {
@@ -20,4 +49,9 @@ sourceSets {
             srcDir 'build/generated-sources/thrift/java'
         }
     }
+}
+
+// Ensure generated sources exist before compilation
+tasks.named('compileJava') {
+    dependsOn tasks.named('generateThrift')
 }
