@@ -7,7 +7,8 @@ dependencies {
 // By default, uses 'thrift' from PATH, but you can override with -PthriftExe=/custom/path/to/thrift
 def thriftExe = project.findProperty('thriftExe') ?: 'thrift'
 def thriftSrc = file('src/main/thrift/ahs.thrift')
-def thriftOutDir = file("$buildDir/generated-sources/thrift/java")
+// def thriftOutDir = file("$buildDir/generated-sources/thrift/java")
+def thriftOutDir = layout.buildDirectory.dir("generated-sources/thrift/java")
 
 tasks.register('generateThrift', Exec) {
     group = 'build'
@@ -35,11 +36,11 @@ tasks.register('generateThrift', Exec) {
     }
 
     doFirst {
-        thriftOutDir.mkdirs()
+        thriftOutDir.get().asFile.mkdirs()
     }
 
     // Use the configured thrift executable
-    commandLine thriftExe, '-r', '--gen', 'java', '-out', thriftOutDir.absolutePath, thriftSrc.absolutePath
+    commandLine thriftExe, '-r', '--gen', 'java', '-out', thriftOutDir.get().asFile.absolutePath, thriftSrc.absolutePath
 }
 
 sourceSets {
