@@ -47,16 +47,18 @@ kafka-console-consumer --bootstrap-server localhost:9092 \
 
 ## API Endpoints
 
-### Fleet Management (Port 8080)
+### Fleet Management (Port 8081, context-path: /fleet-management)
 ```bash
+# Base path: /fleet-management/api/v1/fleet
+
 # Get fleet statistics
-curl http://localhost:8080/api/fleet/statistics
+curl http://localhost:8081/fleet-management/api/v1/fleet/statistics
 
 # Get all vehicles
-curl http://localhost:8080/api/fleet/vehicles
+curl http://localhost:8081/fleet-management/api/v1/fleet/vehicles
 
 # Get vehicle by ID
-curl http://localhost:8080/api/fleet/vehicles/KOMATSU-930E-001
+curl http://localhost:8081/fleet-management/api/v1/fleet/vehicles/KOMATSU-930E-001
 ```
 
 ## Project Modules
@@ -85,6 +87,15 @@ curl http://localhost:8080/api/fleet/vehicles/KOMATSU-930E-001
 ./gradlew clean build -x test
 ```
 
+### Flink Kafka connector resolution
+- For Flink ≥ 1.15, connectors are versioned independently from core Flink.
+- With Flink 1.18.x use `org.apache.flink:flink-connector-kafka:3.x.y-1.18`.
+- Example (Gradle):
+```gradle
+implementation "org.apache.flink:flink-connector-kafka:${flinkKafkaConnectorVersion}" // e.g., 3.2.0-1.18
+```
+Do not force a separate `org.apache.kafka:kafka-clients` version; the connector brings the correct client transitively.
+
 ### Kafka not running
 ```bash
 docker-compose up -d kafka zookeeper
@@ -92,8 +103,8 @@ docker-compose up -d kafka zookeeper
 
 ### Port already in use
 ```bash
-# Fleet Management: Change in application.yml (default: 8080)
-# Vehicle Service: Change in application.yml (default: 8081)
+# Fleet Management: Change in application.yml (default: 8081, context-path: /fleet-management)
+# Vehicle Service: Change in application.yml (default: 8080)
 ```
 
 ## Success Indicators

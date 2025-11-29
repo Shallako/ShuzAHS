@@ -1,43 +1,63 @@
-# Git
+# Git files
 .git
 .gitignore
 .gitattributes
 
-# Gradle
-.gradle
-build/
-gradle-app.setting
-!gradle-wrapper.jar
-.gradletasknamecache
-
-# IDE
+# IDE files
 .idea
+.vscode
 *.iml
 *.iws
 *.ipr
-.vscode
-*.swp
-*.bak
-*~
-
-# OS
-.DS_Store
-Thumbs.db
+.classpath
+.project
+.settings
 
 # Build outputs
 **/build/
 **/target/
 **/out/
-**/bin/
+**/.gradle/
+
+# Test outputs
+**/test-results/
+**/test-reports/
+
+# Documentation
+*.md
+docs/
+DIAGRAMS.md
+README.md
+TEST_*.md
+DOCKER_*.md
+DIAGRAM_*.md
+DOCUMENTATION_*.md
+
+# Docker files
+docker-compose.yml
+**/Dockerfile
+.dockerignore
+
+# OS files
+.DS_Store
+Thumbs.db
 
 # Logs
 *.log
+logs/
 
-# Documentation
-README.md
-docs/
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
 
-# Docker
-docker-compose.yml
-Dockerfile
-.dockerignore
+# Node modules (if any)
+node_modules/
+
+# Python (if any)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/

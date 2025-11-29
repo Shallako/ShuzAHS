@@ -1,0 +1,150 @@
+{
+  "title": "Komatsu AHS - Fleet Overview",
+  "tags": ["ahs", "fleet", "komatsu"],
+  "timezone": "browser",
+  "schemaVersion": 16,
+  "version": 1,
+  "refresh": "5s",
+  "uid": "ahs-fleet-overview",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Total Fleet Size",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "ahs_fleet_vehicles_total",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" }
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 }
+    },
+    {
+      "id": 2,
+      "title": "Active Vehicles",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "ahs_fleet_vehicles_active",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "blue" },
+              { "value": 10, "color": "green" }
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 }
+    },
+    {
+      "id": 3,
+      "title": "Idle Vehicles",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "ahs_fleet_vehicles_idle",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "yellow" }
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 }
+    },
+    {
+      "id": 4,
+      "title": "Emergency Stops",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "ahs_fleet_vehicles_emergency",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 1, "color": "red" }
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 }
+    },
+    {
+      "id": 5,
+      "title": "Vehicle Status Distribution",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "ahs_fleet_vehicles_hauling", "refId": "A", "legendFormat": "Hauling" },
+        { "expr": "ahs_fleet_vehicles_loading", "refId": "B", "legendFormat": "Loading" },
+        { "expr": "ahs_fleet_vehicles_dumping", "refId": "C", "legendFormat": "Dumping" },
+        { "expr": "ahs_fleet_vehicles_routing", "refId": "D", "legendFormat": "Routing" },
+        { "expr": "ahs_fleet_vehicles_idle", "refId": "E", "legendFormat": "Idle" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "drawStyle": "line", "fillOpacity": 10 }
+        }
+      },
+      "gridPos": { "h": 8, "w": 16, "x": 0, "y": 4 }
+    },
+    {
+      "id": 6,
+      "title": "Alert Rate (per minute)",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "rate(ahs_fleet_alerts_critical_total[1m])", "refId": "A", "legendFormat": "Critical" },
+        { "expr": "rate(ahs_fleet_alerts_error_total[1m])", "refId": "B", "legendFormat": "Error" },
+        { "expr": "rate(ahs_fleet_alerts_warning_total[1m])", "refId": "C", "legendFormat": "Warning" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "drawStyle": "line", "fillOpacity": 20 },
+          "color": { "mode": "palette-classic" }
+        }
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 4 }
+    }
+  ]
+}

@@ -1,7 +1,9 @@
 package com.komatsu.ahs.stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.komatsu.ahs.domain.events.VehicleTelemetryEvent;
 import com.komatsu.ahs.domain.model.VehicleTelemetry;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -9,7 +11,8 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import java.io.IOException;
 
 /**
- * Kafka deserializer for VehicleTelemetry JSON messages
+ * Kafka deserializer for VehicleTelemetryEvent JSON messages
+ * Extracts the VehicleTelemetry from the event wrapper
  */
 public class TelemetryDeserializationSchema implements DeserializationSchema<VehicleTelemetry> {
     
@@ -20,6 +23,7 @@ public class TelemetryDeserializationSchema implements DeserializationSchema<Veh
     public void open(InitializationContext context) {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
     
     @Override
@@ -27,8 +31,11 @@ public class TelemetryDeserializationSchema implements DeserializationSchema<Veh
         if (objectMapper == null) {
             objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
+            objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         }
-        return objectMapper.readValue(message, VehicleTelemetry.class);
+        // Deserialize as VehicleTelemetryEvent, then extract the telemetry
+        VehicleTelemetryEvent event = objectMapper.readValue(message, VehicleTelemetryEvent.class);
+        return event.getTelemetry();
     }
     
     @Override

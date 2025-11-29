@@ -95,6 +95,11 @@ services:
         jobmanager.rpc.address: flink-jobmanager
         jobmanager.memory.process.size: 1600m
         parallelism.default: 2
+        state.backend: rocksdb
+        state.checkpoints.dir: file:///tmp/flink-checkpoints
+        state.savepoints.dir: file:///tmp/flink-savepoints
+        execution.checkpointing.interval: 60000
+        execution.checkpointing.mode: EXACTLY_ONCE
     volumes:
       - flink-checkpoints:/tmp/flink-checkpoints
       - flink-savepoints:/tmp/flink-savepoints
@@ -283,9 +288,8 @@ services:
       GF_INSTALL_PLUGINS: grafana-clock-panel
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
     networks:
       - ahs-network
     restart: unless-stopped

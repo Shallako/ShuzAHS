@@ -1,5 +1,6 @@
 plugins {
     id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 dependencies {
@@ -11,15 +12,14 @@ dependencies {
     // Flink dependencies
     implementation "org.apache.flink:flink-streaming-java:${flinkVersion}"
     implementation "org.apache.flink:flink-clients:${flinkVersion}"
-    implementation "org.apache.flink:flink-connector-kafka:${flinkVersion}"
+    implementation "org.apache.flink:flink-connector-kafka:${flinkKafkaConnectorVersion}"
     implementation "org.apache.flink:flink-connector-base:${flinkVersion}"
     implementation "org.apache.flink:flink-cep:${flinkVersion}"
     
     // Flink State Backend
     implementation "org.apache.flink:flink-statebackend-rocksdb:${flinkVersion}"
     
-    // Kafka
-    implementation "org.apache.kafka:kafka-clients:${kafkaVersion}"
+    // Kafka client is provided transitively by Flink Kafka connector; avoid forcing another version
     
     // Jackson for JSON serialization
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
@@ -36,6 +36,11 @@ dependencies {
 
 application {
     mainClass = 'com.komatsu.ahs.telemetry.TelemetryProcessorJob'
+}
+
+// Create a fat JAR suitable for submission to a Flink cluster
+shadowJar {
+    archiveClassifier.set('all')
 }
 
 test {

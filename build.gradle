@@ -1,6 +1,8 @@
 plugins {
     id 'java'
     id 'idea'
+    id 'org.springframework.boot' version '3.2.0' apply false
+    id 'io.spring.dependency-management' version '1.1.4' apply false
 }
 
 allprojects {
@@ -16,21 +18,26 @@ allprojects {
 subprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
     
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
     
     ext {
-        springBootVersion = '2.7.18'
-        flinkVersion = '1.17.2'
+        springBootVersion = '3.2.0'
+        flinkVersion = '1.18.0'
+        // Flink connectors (since 1.15) are versioned independently from core Flink
+        // Use a Kafka connector version compatible with Flink 1.18.x
+        flinkKafkaConnectorVersion = '3.2.0-1.18'
         thriftVersion = '0.22.0'
-        kafkaVersion = '3.5.1'
+        kafkaVersion = '3.6.0'
         lombokVersion = '1.18.30'
-        slf4jVersion = '1.7.36'
-        logbackVersion = '1.2.11'
-        junitVersion = '5.9.3'
-        jacksonVersion = '2.15.3'
-        awsSdkVersion = '2.20.162'
+        slf4jVersion = '2.0.9'
+        logbackVersion = '1.4.14'
+        junitVersion = '5.10.1'
+        jacksonVersion = '2.16.0'
+        awsSdkVersion = '2.21.0'
     }
     
     dependencies {
@@ -38,9 +45,10 @@ subprojects {
         compileOnly "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
         
-        // Logging
+        // Logging - force consistent versions
         implementation "org.slf4j:slf4j-api:${slf4jVersion}"
         implementation "ch.qos.logback:logback-classic:${logbackVersion}"
+        implementation "ch.qos.logback:logback-core:${logbackVersion}"
         
         // Testing
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
@@ -49,6 +57,13 @@ subprojects {
         testImplementation 'org.mockito:mockito-core:5.5.0'
         testImplementation 'org.mockito:mockito-junit-jupiter:5.5.0'
         testImplementation 'org.assertj:assertj-core:3.24.2'
+    }
+    
+    configurations.all {
+        resolutionStrategy {
+            force "ch.qos.logback:logback-core:${logbackVersion}"
+            force "ch.qos.logback:logback-classic:${logbackVersion}"
+        }
     }
     
     test {
@@ -61,7 +76,7 @@ subprojects {
     }
 }
 
-wrapper {
+tasks.wrapper {
     gradleVersion = '8.4'
     distributionType = Wrapper.DistributionType.ALL
 }

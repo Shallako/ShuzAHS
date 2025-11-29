@@ -40,7 +40,7 @@ graph TB
     subgraph "Stream Processing - Apache Flink"
         FS[Flink Source<br/>Kafka Consumer]
         AF[Alert Function<br/>Rule-Based Detection]
-        WA[Window Aggregator<br/>5-min Tumbling Windows]
+        WA[Window Aggregator<br/>1-min Tumbling Windows]
         FK[Flink Sink<br/>Kafka Producer]
     end
     
@@ -98,7 +98,7 @@ sequenceDiagram
     participant DB as PostgreSQL
     
     Note over VS: Vehicle State: HAULING
-    VS->>TDG: getCurrentStatus() → HAULING
+    VS->>TDG: getCurrentStatus() -> HAULING
     TDG->>TDG: generateTelemetry(vehicleId, HAULING)
     
     Note over TDG: Generate realistic data:<br/>Speed: 30-40 kph<br/>Payload: 240-300 tons (930E)<br/>Engine: 80-95°C
@@ -927,7 +927,7 @@ graph LR
     end
     
     subgraph "Deserialization"
-        DS[Telemetry Deserializer<br/>JSON → VehicleTelemetry<br/>Parallelism: 3]
+        DS[Telemetry Deserializer<br/>JSON -> VehicleTelemetry<br/>Parallelism: 3]
     end
     
     subgraph "Watermark Assignment"
@@ -941,11 +941,11 @@ graph LR
     subgraph "Processing Branches"
         subgraph "Alert Branch"
             AF[Alert Function<br/>FlatMap<br/>Parallelism: 3]
-            AK[Alert Sink<br/>Kafka: vehicle-alerts<br/>Parallelism: 2]
+            AK[Alert Sink<br/>Kafka: telemetry-alerts<br/>Parallelism: 2]
         end
         
         subgraph "Metrics Branch"
-            WD[Window<br/>Tumbling 5 min<br/>Parallelism: 3]
+            WD[Window<br/>Tumbling 1 min<br/>Parallelism: 3]
             AG[Aggregator<br/>Metrics Calculation<br/>Parallelism: 3]
             MK[Metrics Sink<br/>Kafka: vehicle-metrics<br/>Parallelism: 2]
         end
@@ -1031,14 +1031,14 @@ graph TB
     end
     
     subgraph "State Machine Execution"
-        VS1 -->|tick()| SM1[State: HAULING<br/>Duration: 120s<br/>Cycle: 5]
-        VS2 -->|tick()| SM2[State: LOADING<br/>Duration: 90s<br/>Cycle: 3]
-        VS3 -->|tick()| SM3[State: ROUTING<br/>Duration: 60s<br/>Cycle: 7]
+        VS1 -->|tick| SM1[State: HAULING<br/>Duration: 120s<br/>Cycle: 5]
+        VS2 -->|tick| SM2[State: LOADING<br/>Duration: 90s<br/>Cycle: 3]
+        VS3 -->|tick| SM3[State: ROUTING<br/>Duration: 60s<br/>Cycle: 7]
     end
     
-    SM1 -->|getCurrentStatus()| TDG
-    SM2 -->|getCurrentStatus()| TDG
-    SM3 -->|getCurrentStatus()| TDG
+    SM1 -->|getStatus| TDG
+    SM2 -->|getStatus| TDG
+    SM3 -->|getStatus| TDG
     
     subgraph "Telemetry Generation"
         TDG -->|generates| T1[Telemetry 1<br/>Speed: 35 kph<br/>Payload: 270 tons<br/>930E]
@@ -1151,4 +1151,3 @@ graph TB
 ```
 
 ---
-

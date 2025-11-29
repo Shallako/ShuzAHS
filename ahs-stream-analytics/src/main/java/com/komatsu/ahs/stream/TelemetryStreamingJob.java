@@ -19,16 +19,16 @@ public class TelemetryStreamingJob {
     
     private static final Logger LOG = LoggerFactory.getLogger(TelemetryStreamingJob.class);
     
-    private static final String KAFKA_BROKERS = "localhost:9092";
-    private static final String TELEMETRY_TOPIC = "ahs.telemetry";
+    private static final String KAFKA_BROKERS = "kafka:29092";
+    private static final String TELEMETRY_TOPIC = "ahs.telemetry.processed";
     private static final String CONSUMER_GROUP = "ahs-telemetry-processor";
     
     public static void main(String[] args) throws Exception {
         
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         
-        // Enable checkpointing for fault tolerance
-        env.enableCheckpointing(10000); // checkpoint every 10 seconds
+        // Disable checkpointing for now (enable later with proper configuration)
+        // env.enableCheckpointing(10000); // checkpoint every 10 seconds
         
         // Create Kafka source for telemetry data
         KafkaSource<VehicleTelemetry> telemetrySource = KafkaSource.<VehicleTelemetry>builder()

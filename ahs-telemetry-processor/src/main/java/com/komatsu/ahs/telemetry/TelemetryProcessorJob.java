@@ -40,13 +40,17 @@ public class TelemetryProcessorJob {
 
     private static final Logger LOG = LoggerFactory.getLogger(TelemetryProcessorJob.class);
     
-    // Kafka configuration
-    private static final String KAFKA_BOOTSTRAP_SERVERS = 
-        System.getenv().getOrDefault("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092");
-    private static final String INPUT_TOPIC = "vehicle-telemetry";
-    private static final String OUTPUT_METRICS_TOPIC = "vehicle-metrics";
-    private static final String OUTPUT_ALERTS_TOPIC = "telemetry-alerts";
-    private static final String CONSUMER_GROUP = "telemetry-processor-group";
+    // Kafka configuration (env-overridable for Docker and local runs)
+    private static final String KAFKA_BOOTSTRAP_SERVERS =
+        System.getenv().getOrDefault("KAFKA_BOOTSTRAP_SERVERS", "kafka:29092");
+    private static final String INPUT_TOPIC =
+        System.getenv().getOrDefault("INPUT_TOPIC", "ahs.telemetry.processed");
+    private static final String OUTPUT_METRICS_TOPIC =
+        System.getenv().getOrDefault("OUTPUT_METRICS_TOPIC", "ahs.fleet.metrics");
+    private static final String OUTPUT_ALERTS_TOPIC =
+        System.getenv().getOrDefault("OUTPUT_ALERTS_TOPIC", "ahs.vehicle.alerts");
+    private static final String CONSUMER_GROUP =
+        System.getenv().getOrDefault("CONSUMER_GROUP", "telemetry-processor-group");
     
     public static void main(String[] args) throws Exception {
         LOG.info("Starting AHS Telemetry Processor Job");

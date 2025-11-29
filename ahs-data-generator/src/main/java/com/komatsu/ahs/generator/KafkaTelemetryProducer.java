@@ -42,6 +42,7 @@ public class KafkaTelemetryProducer implements AutoCloseable {
         this.producer = new KafkaProducer<>(props);
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
+        this.objectMapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         this.dataGenerator = new TelemetryDataGenerator();
         
         LOG.info("Kafka telemetry producer initialized with bootstrap servers: {}", bootstrapServers);

@@ -1,7 +1,7 @@
 server:
-  port: 8081
+  port: 8080
   servlet:
-    context-path: /fleet-management
+    context-path: /
 
 spring:
   application:
@@ -32,11 +32,6 @@ kafka:
   consumer:
     group-id: fleet-management-consumer-group
 
-# Telemetry Simulator Configuration
-simulator:
-  enabled: true
-  vehicle-count: 10
-
 management:
   endpoints:
     web:
@@ -45,6 +40,10 @@ management:
   endpoint:
     health:
       show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
 
 logging:
   level:

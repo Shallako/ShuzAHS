@@ -1,0 +1,83 @@
+# Prometheus Configuration for Komatsu AHS
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'ahs-local'
+    environment: 'development'
+
+# Alertmanager configuration (optional)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+          # - 'alertmanager:9093'
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # Kafka JMX metrics
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka:9101']
+        labels:
+          service: 'kafka'
+          component: 'message-broker'
+
+  # Flink JobManager metrics
+  - job_name: 'flink-jobmanager'
+    static_configs:
+      - targets: ['flink-jobmanager:8081']
+        labels:
+          service: 'flink'
+          component: 'jobmanager'
+
+  # Fleet Management Service (Spring Boot Actuator)
+  - job_name: 'fleet-management'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['fleet-management:8080']
+        labels:
+          service: 'fleet-management'
+          component: 'application'
+
+  # Vehicle Service (Spring Boot Actuator)
+  - job_name: 'vehicle-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['vehicle-service:8080']
+        labels:
+          service: 'vehicle-service'
+          component: 'application'
+
+  # Data Generator (Spring Boot Actuator)
+  - job_name: 'data-generator'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['data-generator:8080']
+        labels:
+          service: 'data-generator'
+          component: 'simulation'
+
+  # PostgreSQL metrics (requires postgres_exporter)
+  # - job_name: 'postgres'
+  #   static_configs:
+  #     - targets: ['postgres-exporter:9187']
+  #       labels:
+  #         service: 'postgres'
+  #         component: 'database'
+
+  # Redis metrics (requires redis_exporter)
+  # - job_name: 'redis'
+  #   static_configs:
+  #     - targets: ['redis-exporter:9121']
+  #       labels:
+  #         service: 'redis'
+  #         component: 'cache'

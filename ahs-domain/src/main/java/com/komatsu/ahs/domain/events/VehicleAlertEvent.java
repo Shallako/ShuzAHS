@@ -20,14 +20,29 @@ public class VehicleAlertEvent {
     private boolean acknowledged;
 
     public enum AlertType {
+        // Safety Alerts
         COLLISION_WARNING,
         OBSTACLE_DETECTED,
+        SAFETY_ENVELOPE_BREACH,
+        
+        // Operational Alerts
+        LOW_FUEL,
+        ENGINE_OVERHEATING,
+        LOW_TIRE_PRESSURE,
+        EXCESSIVE_SPEED,
+        BRAKE_PRESSURE_LOW,
+        HYDRAULIC_PRESSURE_LOW,
+        
+        // System Alerts
         SYSTEM_FAULT,
         LOW_BATTERY,
         MAINTENANCE_REQUIRED,
-        ROUTE_DEVIATION,
         COMMUNICATION_LOSS,
-        SAFETY_ENVELOPE_BREACH
+        
+        // Navigation Alerts
+        ROUTE_DEVIATION,
+        STUCK_DETECTION,
+        POSITIONING_ERROR
     }
 
     public enum Severity {

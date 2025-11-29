@@ -54,13 +54,15 @@ A production-ready implementation of a real-time telemetry processing and fleet 
           ┌───────────────────┼───────────────────┐
           │                   │                   │
           ▼                   ▼                   ▼
-    Kafka: alerts      Kafka: metrics      Kafka: telemetry
+    Kafka: telemetry-   Kafka: vehicle-    Kafka: vehicle-
+           alerts               metrics             telemetry
           │                   │                   │
 ┌─────────┴───────────────────┴───────────────────┴───────────────┐
 │                    APPLICATION LAYER                              │
 │  ┌────────────────────────────────────────────────────────┐    │
 │  │ ahs-fleet-management (Spring Boot REST API)            │    │
-│  │ Port: 8080                                              │    │
+│  │ Port: 8081 (context-path: /fleet-management)            │    │
+│  │ Base API: /api/v1/fleet                                │    │
 │  │ • Consumes telemetry events via Kafka                  │    │
 │  │ • Tracks real-time vehicle state & location            │    │
 │  │ • Fleet-wide statistics & monitoring                    │    │
@@ -69,7 +71,7 @@ A production-ready implementation of a real-time telemetry processing and fleet 
 │                                                                   │
 │  ┌────────────────────────────────────────────────────────┐    │
 │  │ ahs-vehicle-service (Spring Boot + Thrift)             │    │
-│  │ Port: 8081 (REST), Thrift RPC                          │    │
+│  │ Port: 8080 (REST), Thrift RPC: 9090                    │    │
 │  │ • Vehicle CRUD operations                               │    │
 │  │ • Thrift RPC services for cross-service communication  │    │
 │  │ • Integration with DISPATCH FMS (simulated)            │    │
@@ -91,13 +93,17 @@ A production-ready implementation of a real-time telemetry processing and fleet 
 
 ### Data Flow
 
-1. **Generation**: Data generator simulates autonomous trucks publishing telemetry to Kafka
+1. **Generation**: Data generator simulates autonomous trucks publishing telemetry to Kafka (topic `vehicle-telemetry`)
 2. **Ingestion**: Flink consumes telemetry from Kafka topic `vehicle-telemetry`
-3. **Processing**: 
+3. **Processing**:
    - CEP patterns detect anomalies (rapid deceleration, overheating, low fuel)
    - Windowed aggregations compute per-vehicle metrics every minute
-4. **Output**: Alerts and metrics published to separate Kafka topics
-5. **Consumption**: Fleet management service consumes events and updates vehicle state
+4. **Output**: Alerts and metrics published to Kafka topics: `telemetry-alerts` and `vehicle-metrics`
+5. **Consumption**: Fleet management service consumes telemetry events and updates vehicle state
+   
+Note: Fleet telemetry consumer topic is configured via `kafka.topics.vehicle-telemetry`.
+- Local default: `ahs.telemetry.processed`
+- Docker profile: `vehicle-telemetry`
 6. **Exposure**: REST APIs provide access to fleet data for external systems
 
 ---
@@ -857,6 +863,16 @@ docker exec -it $(docker ps -qf "name=kafka") kafka-console-consumer \
 ```bash
 ./gradlew clean build -x test --refresh-dependencies
 ```
+
+**Problem:** Cannot resolve dependency `org.apache.flink:flink-connector-kafka:1.18.0`
+
+**Cause:** Starting with Flink 1.15, connectors are versioned independently from core Flink. The Kafka connector for Flink 1.18.x uses the pattern `3.x.y-1.18`.
+
+**Solution:** Use a compatible Kafka connector version, for example:
+```gradle
+implementation "org.apache.flink:flink-connector-kafka:${flinkKafkaConnectorVersion}" // e.g., 3.2.0-1.18
+```
+and do not force an explicit `org.apache.kafka:kafka-clients` version that may conflict; the connector brings the right client transitively.
 
 **Problem:** Out of memory during build
 
