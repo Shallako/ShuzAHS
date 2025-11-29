@@ -1,0 +1,41 @@
+# Application properties for Docker environment
+spring:
+  application:
+    name: ahs-fleet-management
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:29092}
+    consumer:
+      group-id: fleet-management-consumer
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+# Kafka Topics
+kafka:
+  topics:
+    vehicle-telemetry: vehicle-telemetry
+    vehicle-commands: vehicle-commands
+    vehicle-alerts: vehicle-alerts
+
+# Server Configuration  
+server:
+  port: 8080
+
+# Actuator for health checks
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    com.komatsu.ahs: DEBUG
+    org.springframework.kafka: INFO

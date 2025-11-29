@@ -20,8 +20,10 @@ public class Vehicle implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private String vehicleId;
-    private String vehicleType;  // e.g., "930E", "980E"
-    private String state;         // IDLE, LOADING, HAULING, etc.
+    private String model;         // e.g., "930E", "980E"
+    private String manufacturer;  // e.g., "Komatsu"
+    private Double capacity;      // Payload capacity in tons
+    private VehicleStatus status; // Current operational status
     private VehicleTelemetry currentTelemetry;
     
     private String assignedRouteId;

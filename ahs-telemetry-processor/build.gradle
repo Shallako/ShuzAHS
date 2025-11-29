@@ -1,0 +1,46 @@
+plugins {
+    id 'application'
+}
+
+dependencies {
+    // Project dependencies
+    implementation project(':ahs-common')
+    implementation project(':ahs-domain')
+    implementation project(':ahs-thrift-api')
+    
+    // Flink dependencies
+    implementation "org.apache.flink:flink-streaming-java:${flinkVersion}"
+    implementation "org.apache.flink:flink-clients:${flinkVersion}"
+    implementation "org.apache.flink:flink-connector-kafka:${flinkVersion}"
+    implementation "org.apache.flink:flink-connector-base:${flinkVersion}"
+    implementation "org.apache.flink:flink-cep:${flinkVersion}"
+    
+    // Flink State Backend
+    implementation "org.apache.flink:flink-statebackend-rocksdb:${flinkVersion}"
+    
+    // Kafka
+    implementation "org.apache.kafka:kafka-clients:${kafkaVersion}"
+    
+    // Jackson for JSON serialization
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+    
+    // Thrift
+    implementation "org.apache.thrift:libthrift:${thriftVersion}"
+    
+    // Testing
+    testImplementation "org.apache.flink:flink-test-utils:${flinkVersion}"
+    testImplementation "org.apache.flink:flink-runtime:${flinkVersion}:tests"
+    testImplementation "org.apache.flink:flink-streaming-java:${flinkVersion}:tests"
+}
+
+application {
+    mainClass = 'com.komatsu.ahs.telemetry.TelemetryProcessorJob'
+}
+
+task runTelemetryProcessor(type: JavaExec) {
+    group = 'application'
+    description = 'Run the Flink Telemetry Processor Job'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.komatsu.ahs.telemetry.TelemetryProcessorJob'
+}

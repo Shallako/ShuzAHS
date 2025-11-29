@@ -1,0 +1,43 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Gradle
+.gradle
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+
+# IDE
+.idea
+*.iml
+*.iws
+*.ipr
+.vscode
+*.swp
+*.bak
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+**/build/
+**/target/
+**/out/
+**/bin/
+
+# Logs
+*.log
+
+# Documentation
+README.md
+docs/
+
+# Docker
+docker-compose.yml
+Dockerfile
+.dockerignore

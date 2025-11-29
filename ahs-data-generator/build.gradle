@@ -1,0 +1,38 @@
+plugins {
+    id 'application'
+}
+
+dependencies {
+    // Project dependencies
+    implementation project(':ahs-common')
+    implementation project(':ahs-domain')
+    
+    // Kafka
+    implementation "org.apache.kafka:kafka-clients:${kafkaVersion}"
+    
+    // Jackson for JSON
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+    
+    // CLI
+    implementation 'info.picocli:picocli:4.7.5'
+    annotationProcessor 'info.picocli:picocli-codegen:4.7.5'
+    
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    
+    // Logging
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    implementation 'ch.qos.logback:logback-classic:1.4.14'
+}
+
+application {
+    mainClass = 'com.komatsu.ahs.generator.DataGeneratorApp'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.komatsu.ahs.generator.DataGeneratorApp'
+    }
+}

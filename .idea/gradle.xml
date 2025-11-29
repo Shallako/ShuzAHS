@@ -10,6 +10,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/ahs-common" />
+            <option value="$PROJECT_DIR$/ahs-data-generator" />
             <option value="$PROJECT_DIR$/ahs-domain" />
             <option value="$PROJECT_DIR$/ahs-fleet-management" />
             <option value="$PROJECT_DIR$/ahs-stream-analytics" />

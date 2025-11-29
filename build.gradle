@@ -23,7 +23,7 @@ subprojects {
     ext {
         springBootVersion = '2.7.18'
         flinkVersion = '1.17.2'
-        thriftVersion = '0.18.1'
+        thriftVersion = '0.22.0'
         kafkaVersion = '3.5.1'
         lombokVersion = '1.18.30'
         slf4jVersion = '1.7.36'
