@@ -33,6 +33,22 @@ for i in $(seq 1 $MAX_RETRIES); do
     sleep $RETRY_INTERVAL
 done
 
+# Ensure at least one TaskManager is registered before submission
+echo "⏳ Waiting for at least one TaskManager to register..."
+for i in $(seq 1 $MAX_RETRIES); do
+    TM_COUNT=$(curl -s "${FLINK_URL}/taskmanagers" | grep -o '"id"' | wc -l | tr -d ' ')
+    if [ "${TM_COUNT}" != "" ] && [ ${TM_COUNT} -ge 1 ]; then
+        echo "✅ TaskManagers registered: ${TM_COUNT}"
+        break
+    fi
+    if [ $i -eq $MAX_RETRIES ]; then
+        echo "❌ No TaskManagers registered after ${MAX_RETRIES} attempts"
+        exit 1
+    fi
+    echo "   Attempt $i/$MAX_RETRIES - waiting ${RETRY_INTERVAL}s... (registered: ${TM_COUNT:-0})"
+    sleep $RETRY_INTERVAL
+done
+
 # Check if job is already running
 echo ""
 echo "🔍 Checking for existing jobs..."
