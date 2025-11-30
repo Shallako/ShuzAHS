@@ -84,7 +84,7 @@ services:
   # Flink JobManager - Cluster coordinator
   flink-jobmanager:
     image: flink:1.18.0-scala_2.12-java17
-    container_name: ahs-flink-jobmanager
+    container_name: ahs-flink-ui
     hostname: flink-jobmanager
     ports:
       - "8081:8081"
@@ -252,7 +252,7 @@ services:
   # Prometheus - Metrics collection
   prometheus:
     image: prom/prometheus:latest
-    container_name: ahs-prometheus
+    container_name: ahs-prometheus-ui
     hostname: prometheus
     ports:
       - "9090:9090"
@@ -271,7 +271,7 @@ services:
   # Grafana - Metrics visualization
   grafana:
     image: grafana/grafana:latest
-    container_name: ahs-grafana
+    container_name: ahs-grafana-ui
     hostname: grafana
     depends_on:
       - prometheus
