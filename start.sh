@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Komatsu AHS Platform Startup Script
+# Starts all 13 containers (12 services, flink-taskmanager has 2 replicas)
 
 set -e
 
@@ -24,60 +25,138 @@ echo "📦 Building project..."
 echo "✅ Build complete"
 echo ""
 
-# Start Docker Compose services
-echo "🚀 Starting services..."
+# Start Docker Compose services (all 13 containers)
+echo "🚀 Starting all 13 containers..."
 docker-compose up -d
 
 echo ""
 echo "⏳ Waiting for services to be ready..."
-sleep 10
+sleep 15
 
-# Check service health
+# Check service health - All 13 containers
 echo ""
-echo "🔍 Service Status:"
-echo "===================="
+echo "🔍 Container Status (13 Total):"
+echo "================================"
+echo ""
 
-# Check Kafka
-if docker-compose ps | grep kafka | grep Up > /dev/null; then
-    echo "✅ Kafka: Running on localhost:9092"
+# Infrastructure Services
+echo "📦 Infrastructure:"
+
+# 1. Zookeeper
+if docker ps --format '{{.Names}}' | grep -q "ahs-zookeeper"; then
+    echo "  ✅ [1/13] Zookeeper: Running on localhost:2181"
 else
-    echo "❌ Kafka: Not running"
+    echo "  ❌ [1/13] Zookeeper: Not running"
 fi
 
-# Check Zookeeper
-if docker-compose ps | grep zookeeper | grep Up > /dev/null; then
-    echo "✅ Zookeeper: Running on localhost:2181"
+# 2. Kafka
+if docker ps --format '{{.Names}}' | grep -q "ahs-kafka$"; then
+    echo "  ✅ [2/13] Kafka: Running on localhost:9092"
 else
-    echo "❌ Zookeeper: Not running"
+    echo "  ❌ [2/13] Kafka: Not running"
 fi
 
-# Check Fleet Management
-if docker-compose ps | grep fleet-management | grep Up > /dev/null; then
-    echo "✅ Fleet Management: Running on http://localhost:8080"
+# 3. PostgreSQL
+if docker ps --format '{{.Names}}' | grep -q "ahs-postgres"; then
+    echo "  ✅ [3/13] PostgreSQL: Running on localhost:5432"
 else
-    echo "❌ Fleet Management: Not running"
+    echo "  ❌ [3/13] PostgreSQL: Not running"
 fi
 
-# Check Flink
-if docker-compose ps | grep flink-jobmanager | grep Up > /dev/null; then
-    echo "✅ Flink Dashboard: Running on http://localhost:8081"
+# 4. Redis
+if docker ps --format '{{.Names}}' | grep -q "ahs-redis"; then
+    echo "  ✅ [4/13] Redis: Running on localhost:6379"
 else
-    echo "❌ Flink: Not running"
+    echo "  ❌ [4/13] Redis: Not running"
 fi
+
+echo ""
+echo "🖥️  Web UIs:"
+
+# 5. Kafka UI
+if docker ps --format '{{.Names}}' | grep -q "ahs-kafka-ui"; then
+    echo "  ✅ [5/13] Kafka UI: http://localhost:8080"
+else
+    echo "  ❌ [5/13] Kafka UI: Not running"
+fi
+
+# 6. Flink JobManager (UI)
+if docker ps --format '{{.Names}}' | grep -q "ahs-flink-ui"; then
+    echo "  ✅ [6/13] Flink UI: http://localhost:8081"
+else
+    echo "  ❌ [6/13] Flink UI: Not running"
+fi
+
+# 7-8. Flink TaskManagers (2 replicas)
+TASKMANAGER_COUNT=$(docker ps --format '{{.Names}}' | grep -c "flink-taskmanager" || echo "0")
+if [ "$TASKMANAGER_COUNT" -eq 2 ]; then
+    echo "  ✅ [7-8/13] Flink TaskManagers: 2 workers running"
+else
+    echo "  ❌ [7-8/13] Flink TaskManagers: $TASKMANAGER_COUNT/2 running"
+fi
+
+# 9. Prometheus UI
+if docker ps --format '{{.Names}}' | grep -q "ahs-prometheus-ui"; then
+    echo "  ✅ [9/13] Prometheus UI: http://localhost:9090"
+else
+    echo "  ❌ [9/13] Prometheus UI: Not running"
+fi
+
+# 10. Grafana UI
+if docker ps --format '{{.Names}}' | grep -q "ahs-grafana-ui"; then
+    echo "  ✅ [10/13] Grafana UI: http://localhost:3000"
+else
+    echo "  ❌ [10/13] Grafana UI: Not running"
+fi
+
+echo ""
+echo "⚙️  Application Services:"
+
+# 11. Data Generator
+if docker ps --format '{{.Names}}' | grep -q "ahs-data-generator"; then
+    echo "  ✅ [11/13] Data Generator: Running on localhost:8082"
+else
+    echo "  ❌ [11/13] Data Generator: Not running"
+fi
+
+# 12. Fleet Management
+if docker ps --format '{{.Names}}' | grep -q "ahs-fleet-management"; then
+    echo "  ✅ [12/13] Fleet Management API: http://localhost:8083"
+else
+    echo "  ❌ [12/13] Fleet Management: Not running"
+fi
+
+# 13. Vehicle Service
+if docker ps --format '{{.Names}}' | grep -q "ahs-vehicle-service"; then
+    echo "  ✅ [13/13] Vehicle Service API: http://localhost:8084"
+else
+    echo "  ❌ [13/13] Vehicle Service: Not running"
+fi
+
+
+# Count running containers
+RUNNING=$(docker ps --format '{{.Names}}' | grep -E "ahs-|flink-taskmanager" | wc -l | tr -d ' ')
 
 echo ""
 echo "========================================="
-echo " Services Started Successfully!"
+if [ "$RUNNING" -eq 13 ]; then
+    echo " ✅ All 13 Containers Running!"
+else
+    echo " ⚠️  $RUNNING/13 Containers Running"
+fi
 echo "========================================="
 echo ""
-echo "Access Points:"
-echo "  • Fleet Management API: http://localhost:8080"
-echo "  • Flink Dashboard: http://localhost:8081"
-echo "  • Health Check: http://localhost:8080/actuator/health"
+echo "🌐 Access Points:"
+echo "  • Kafka UI:           http://localhost:8080"
+echo "  • Flink Dashboard:    http://localhost:8081"
+echo "  • Data Generator:     http://localhost:8082"
+echo "  • Fleet Management:   http://localhost:8083"
+echo "  • Vehicle Service:    http://localhost:8084"
+echo "  • Prometheus:         http://localhost:9090"
+echo "  • Grafana:            http://localhost:3000 (admin/admin)"
 echo ""
-echo "View Logs:"
-echo "  docker-compose logs -f"
-echo ""
-echo "Stop Services:"
-echo "  docker-compose down"
+echo "📋 Commands:"
+echo "  View logs:      docker-compose logs -f"
+echo "  View status:    docker-compose ps"
+echo "  Stop services:  docker-compose down"
 echo ""
