@@ -6,14 +6,13 @@ import com.komatsu.ahs.domain.model.VehicleStatus;
 import com.komatsu.ahs.domain.model.VehicleTelemetry;
 
 import java.time.Instant;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Telemetry Data Generator
  *
  * <p>Generates realistic telemetry data for autonomous haul trucks simulating various operational
- * scenarios in a mine environment.
+ * scenarios in a mine environment. Includes anomaly injection for CEP pattern testing.
  */
 public class TelemetryDataGenerator {
 
@@ -36,6 +35,11 @@ public class TelemetryDataGenerator {
   private static final double MIN_LOAD = 0.0;
   private static final double MAX_LOAD_930E = 300.0; // tons
   private static final double MAX_LOAD_980E = 400.0; // tons
+  
+  // Anomaly injection rates (percentage chance per telemetry generation)
+  private static final double LOW_FUEL_ANOMALY_RATE = 0.02;      // 2% chance
+  private static final double OVERHEATING_ANOMALY_RATE = 0.01;   // 1% chance
+  private static final double HIGH_SPEED_ANOMALY_RATE = 0.03;    // 3% chance (for rapid decel CEP)
 
   /** Generate realistic telemetry for a vehicle based on its current state */
   public VehicleTelemetry generateTelemetry(String vehicleId, VehicleStatus status) {
@@ -46,55 +50,75 @@ public class TelemetryDataGenerator {
     // Generate GPS coordinates
     GpsCoordinate gps = generateGpsCoordinate();
     telemetry.setLocation(gps);
+    
+    // Check for anomaly injection
+    boolean injectLowFuel = random.nextDouble() < LOW_FUEL_ANOMALY_RATE;
+    boolean injectOverheating = random.nextDouble() < OVERHEATING_ANOMALY_RATE;
+    boolean injectHighSpeed = random.nextDouble() < HIGH_SPEED_ANOMALY_RATE;
 
     // Generate metrics based on vehicle status
     switch (status) {
       case HAULING:
-        telemetry.setSpeedKph(randomDouble(20.0, MAX_SPEED_LOADED));
+        // High speed anomaly for rapid deceleration CEP pattern (>50 kph)
+        if (injectHighSpeed) {
+          telemetry.setSpeedKph(randomDouble(55.0, 65.0)); // Above normal loaded speed
+        } else {
+          telemetry.setSpeedKph(randomDouble(20.0, MAX_SPEED_LOADED));
+        }
         double maxLoad = vehicleId.contains("980E") ? MAX_LOAD_980E : MAX_LOAD_930E;
         telemetry.setPayloadTons(randomDouble(maxLoad * 0.8, maxLoad));
         telemetry.setLoaded(true);
-        telemetry.setFuelLevelPercent(randomDouble(40.0, MAX_FUEL));
+        telemetry.setFuelLevelPercent(injectLowFuel ? randomDouble(3.0, 12.0) : randomDouble(40.0, MAX_FUEL));
         break;
 
       case LOADING:
         telemetry.setSpeedKph(0.0);
-        // Load gradually increases
         telemetry.setPayloadTons(randomDouble(50.0, 250.0));
         telemetry.setLoaded(false);
-        telemetry.setFuelLevelPercent(randomDouble(50.0, MAX_FUEL));
+        telemetry.setFuelLevelPercent(injectLowFuel ? randomDouble(5.0, 14.0) : randomDouble(50.0, MAX_FUEL));
         break;
 
       case DUMPING:
         telemetry.setSpeedKph(0.0);
         telemetry.setPayloadTons(randomDouble(0.0, 50.0));
         telemetry.setLoaded(false);
-        telemetry.setFuelLevelPercent(randomDouble(40.0, MAX_FUEL));
+        telemetry.setFuelLevelPercent(injectLowFuel ? randomDouble(4.0, 13.0) : randomDouble(40.0, MAX_FUEL));
         break;
 
       case IDLE:
         telemetry.setSpeedKph(0.0);
         telemetry.setPayloadTons(0.0);
         telemetry.setLoaded(false);
-        telemetry.setFuelLevelPercent(randomDouble(MIN_FUEL, MAX_FUEL));
+        telemetry.setFuelLevelPercent(injectLowFuel ? randomDouble(2.0, 10.0) : randomDouble(MIN_FUEL, MAX_FUEL));
         break;
 
       case ROUTING:
-        telemetry.setSpeedKph(randomDouble(30.0, MAX_SPEED_EMPTY));
+        // High speed anomaly for rapid deceleration CEP pattern
+        if (injectHighSpeed) {
+          telemetry.setSpeedKph(randomDouble(52.0, 60.0)); // Above threshold
+        } else {
+          telemetry.setSpeedKph(randomDouble(30.0, MAX_SPEED_EMPTY));
+        }
         telemetry.setPayloadTons(0.0);
         telemetry.setLoaded(false);
-        telemetry.setFuelLevelPercent(randomDouble(30.0, MAX_FUEL));
+        telemetry.setFuelLevelPercent(injectLowFuel ? randomDouble(6.0, 14.0) : randomDouble(30.0, MAX_FUEL));
         break;
 
       default:
         telemetry.setSpeedKph(0.0);
         telemetry.setPayloadTons(0.0);
         telemetry.setLoaded(false);
-        telemetry.setFuelLevelPercent(randomDouble(MIN_FUEL, MAX_FUEL));
+        telemetry.setFuelLevelPercent(injectLowFuel ? randomDouble(3.0, 12.0) : randomDouble(MIN_FUEL, MAX_FUEL));
     }
 
-    // Add some realistic variations
-    telemetry.setEngineTemperatureCelsius(randomDouble(80.0, 95.0));
+
+    // Engine temperature - inject overheating anomaly (>95°C for CEP pattern)
+    if (injectOverheating) {
+      telemetry.setEngineTemperatureCelsius(randomDouble(96.0, 105.0)); // Above threshold
+    } else {
+      telemetry.setEngineTemperatureCelsius(randomDouble(80.0, 94.0));
+    }
+    
     telemetry.setEngineRpm(
         telemetry.getSpeedKph() > 0 ? randomDouble(1200.0, 1800.0) : randomDouble(600.0, 800.0));
     telemetry.setHeadingDegrees(randomDouble(0.0, 360.0));
@@ -124,6 +148,7 @@ public class TelemetryDataGenerator {
   private double randomDouble(double min, double max) {
     return min + (max - min) * random.nextDouble();
   }
+
 
   /** Generate a load location (shovel position) */
   public Location generateLoadLocation() {

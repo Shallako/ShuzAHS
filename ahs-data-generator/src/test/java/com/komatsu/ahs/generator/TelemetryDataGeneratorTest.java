@@ -130,14 +130,15 @@ class TelemetryDataGeneratorTest {
         VehicleTelemetry telemetry = generator.generateTelemetry(vehicleId, 
             VehicleStatus.HAULING);
         
-        assertTrue(telemetry.getTirePressureFrontLeftPsi() >= 80.0 
-            && telemetry.getTirePressureFrontLeftPsi() <= 100.0);
-        assertTrue(telemetry.getTirePressureFrontRightPsi() >= 80.0 
-            && telemetry.getTirePressureFrontRightPsi() <= 100.0);
-        assertTrue(telemetry.getTirePressureRearLeftPsi() >= 80.0 
-            && telemetry.getTirePressureRearLeftPsi() <= 100.0);
-        assertTrue(telemetry.getTirePressureRearRightPsi() >= 80.0 
-            && telemetry.getTirePressureRearRightPsi() <= 100.0);
+        // Mining haul trucks run at higher tire pressures (90-110 PSI)
+        assertTrue(telemetry.getTirePressureFrontLeftPsi() >= 90.0 
+            && telemetry.getTirePressureFrontLeftPsi() <= 110.0);
+        assertTrue(telemetry.getTirePressureFrontRightPsi() >= 90.0 
+            && telemetry.getTirePressureFrontRightPsi() <= 110.0);
+        assertTrue(telemetry.getTirePressureRearLeftPsi() >= 90.0 
+            && telemetry.getTirePressureRearLeftPsi() <= 110.0);
+        assertTrue(telemetry.getTirePressureRearRightPsi() >= 90.0 
+            && telemetry.getTirePressureRearRightPsi() <= 110.0);
     }
 
     @Test

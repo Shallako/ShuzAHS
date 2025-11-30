@@ -4,10 +4,16 @@ import com.komatsu.ahs.domain.model.GpsCoordinate;
 import com.komatsu.ahs.domain.model.Vehicle;
 import com.komatsu.ahs.domain.model.VehicleStatus;
 import com.komatsu.ahs.domain.model.VehicleTelemetry;
+import com.komatsu.ahs.fleet.kafka.producer.AlertProducer;
+import com.komatsu.ahs.fleet.kafka.producer.MetricsProducer;
+import com.komatsu.ahs.fleet.metrics.FleetMetricsExporter;
 import com.komatsu.ahs.fleet.service.FleetManagementService.FleetStatistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.util.List;
@@ -15,14 +21,24 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 @DisplayName("Fleet Management Service Tests")
 class FleetManagementServiceTest {
+
+    @Mock
+    private AlertProducer alertProducer;
+    
+    @Mock
+    private MetricsProducer metricsProducer;
+    
+    @Mock
+    private FleetMetricsExporter metricsExporter;
 
     private FleetManagementService service;
 
     @BeforeEach
     void setUp() {
-        service = new FleetManagementService();
+        service = new FleetManagementService(alertProducer, metricsProducer, metricsExporter);
         // Manually call initialize since @PostConstruct is not invoked in plain JUnit tests
         service.initialize();
     }
