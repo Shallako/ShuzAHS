@@ -102,7 +102,7 @@ public class TelemetryDataGenerator {
     telemetry.setTirePressureFrontRightPsi(randomDouble(80.0, 100.0));
     telemetry.setTirePressureRearLeftPsi(randomDouble(80.0, 100.0));
     telemetry.setTirePressureRearRightPsi(randomDouble(80.0, 100.0));
-    telemetry.setBrakePressurePsi(randomDouble(40.0, 60.0));
+    telemetry.setBrakePressurePsi(randomDouble(85.0, 120.0));
     telemetry.setHydraulicPressurePsi(randomDouble(2000.0, 3000.0));
 
     return telemetry;

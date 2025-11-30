@@ -32,13 +32,21 @@ public class TelemetryEventConsumer {
             VehicleTelemetryEvent event = objectMapper.readValue(
                 message, VehicleTelemetryEvent.class);
             
-            log.debug("Received telemetry for vehicle: {}", event.getVehicleId());
+            log.info("Received telemetry for vehicle: {}", event.getVehicleId());
             
             // Update vehicle telemetry in fleet management
             if (event.getTelemetry() != null) {
                 fleetService.updateVehicleTelemetry(
                     event.getVehicleId(), 
                     event.getTelemetry()
+                );
+            }
+            
+            // Update vehicle status if present
+            if (event.getVehicleStatus() != null) {
+                fleetService.updateVehicleStatus(
+                    event.getVehicleId(),
+                    event.getVehicleStatus()
                 );
             }
             

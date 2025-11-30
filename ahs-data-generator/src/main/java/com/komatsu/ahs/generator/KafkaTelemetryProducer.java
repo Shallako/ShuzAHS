@@ -56,6 +56,7 @@ public class KafkaTelemetryProducer implements AutoCloseable {
             VehicleTelemetry telemetry = dataGenerator.generateTelemetry(vehicleId, status);
             VehicleTelemetryEvent event = new VehicleTelemetryEvent(vehicleId, telemetry);
             event.setSource("data-generator");
+            event.setVehicleStatus(status);  // Include vehicle status in the event
             
             String json = objectMapper.writeValueAsString(event);
             ProducerRecord<String, String> record = new ProducerRecord<>(topic, vehicleId, json);

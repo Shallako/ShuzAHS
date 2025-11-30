@@ -22,19 +22,17 @@ public class VehicleSimulator {
     private long stateStartTime;
     
     // State duration ranges (in seconds)
-    // Use a large ROUTING duration to ensure after a cycle completes (DUMPING -> ROUTING),
-    // the simulator remains in ROUTING long enough for tests to observe it.
-    private static final int MIN_ROUTING_TIME = 1000;
-    private static final int MAX_ROUTING_TIME = 1000;
-    private static final int MIN_LOADING_TIME = 1;
-    private static final int MAX_LOADING_TIME = 1;
-    private static final int MIN_HAULING_TIME = 1;
-    private static final int MAX_HAULING_TIME = 1;
-    // Keep DUMPING very short to avoid multiple iterations in DUMPING during tests
-    private static final int MIN_DUMPING_TIME = 1;
-    private static final int MAX_DUMPING_TIME = 1;
-    private static final int MIN_IDLE_TIME = 1;
-    private static final int MAX_IDLE_TIME = 1;
+    // Realistic haul cycle durations for autonomous mining trucks
+    private static final int MIN_ROUTING_TIME = 20;
+    private static final int MAX_ROUTING_TIME = 45;
+    private static final int MIN_LOADING_TIME = 15;
+    private static final int MAX_LOADING_TIME = 30;
+    private static final int MIN_HAULING_TIME = 30;
+    private static final int MAX_HAULING_TIME = 60;
+    private static final int MIN_DUMPING_TIME = 10;
+    private static final int MAX_DUMPING_TIME = 20;
+    private static final int MIN_IDLE_TIME = 5;
+    private static final int MAX_IDLE_TIME = 15;
     
     private int stateDuration;
     private long accumulatedSeconds;

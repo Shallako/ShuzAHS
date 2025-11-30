@@ -1,5 +1,6 @@
 package com.komatsu.ahs.domain.events;
 
+import com.komatsu.ahs.domain.model.VehicleStatus;
 import com.komatsu.ahs.domain.model.VehicleTelemetry;
 
 import java.time.Instant;
@@ -14,6 +15,7 @@ public class VehicleTelemetryEvent {
     private String eventId;
     private String vehicleId;
     private VehicleTelemetry telemetry;
+    private VehicleStatus vehicleStatus;
     private Instant timestamp;
     private String source;
     private EventType eventType;
@@ -65,6 +67,14 @@ public class VehicleTelemetryEvent {
 
     public void setTelemetry(VehicleTelemetry telemetry) {
         this.telemetry = telemetry;
+    }
+
+    public VehicleStatus getVehicleStatus() {
+        return vehicleStatus;
+    }
+
+    public void setVehicleStatus(VehicleStatus vehicleStatus) {
+        this.vehicleStatus = vehicleStatus;
     }
 
     public Instant getTimestamp() {
