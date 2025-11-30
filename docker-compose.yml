@@ -187,6 +187,25 @@ services:
       - ahs-network
     restart: unless-stopped
 
+  # Telemetry Processor - Flink streaming job for real-time processing
+  telemetry-processor:
+    build:
+      context: .
+      dockerfile: ahs-telemetry-processor/Dockerfile
+    container_name: ahs-telemetry-processor
+    hostname: telemetry-processor
+    depends_on:
+      - kafka
+      - flink-jobmanager
+      - flink-taskmanager
+    environment:
+      FLINK_JOBMANAGER_HOST: flink-jobmanager
+      FLINK_JOBMANAGER_PORT: 8081
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    networks:
+      - ahs-network
+    restart: on-failure
+
   # Fleet Management Service - REST API for fleet operations
   fleet-management:
     build:

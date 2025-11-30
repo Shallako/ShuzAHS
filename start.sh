@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Komatsu AHS Platform Startup Script
-# Starts all 13 containers (12 services, flink-taskmanager has 2 replicas)
+# Starts all 14 containers (13 services, flink-taskmanager has 2 replicas)
 
 set -e
 
@@ -25,17 +25,17 @@ echo "📦 Building project..."
 echo "✅ Build complete"
 echo ""
 
-# Start Docker Compose services (all 13 containers)
-echo "🚀 Starting all 13 containers..."
+# Start Docker Compose services (all 14 containers)
+echo "🚀 Starting all 14 containers..."
 docker-compose up -d
 
 echo ""
 echo "⏳ Waiting for services to be ready..."
 sleep 15
 
-# Check service health - All 13 containers
+# Check service health - All 14 containers
 echo ""
-echo "🔍 Container Status (13 Total):"
+echo "🔍 Container Status (14 Total):"
 echo "================================"
 echo ""
 
@@ -97,40 +97,47 @@ fi
 
 # 9. Prometheus UI
 if docker ps --format '{{.Names}}' | grep -q "ahs-prometheus-ui"; then
-    echo "  ✅ [9/13] Prometheus UI: http://localhost:9090"
+    echo "  ✅ [9/14] Prometheus UI: http://localhost:9090"
 else
-    echo "  ❌ [9/13] Prometheus UI: Not running"
+    echo "  ❌ [9/14] Prometheus UI: Not running"
 fi
 
 # 10. Grafana UI
 if docker ps --format '{{.Names}}' | grep -q "ahs-grafana-ui"; then
-    echo "  ✅ [10/13] Grafana UI: http://localhost:3000"
+    echo "  ✅ [10/14] Grafana UI: http://localhost:3000"
 else
-    echo "  ❌ [10/13] Grafana UI: Not running"
+    echo "  ❌ [10/14] Grafana UI: Not running"
 fi
 
 echo ""
 echo "⚙️  Application Services:"
 
-# 11. Data Generator
+# 11. Telemetry Processor (Flink Job)
+if docker ps --format '{{.Names}}' | grep -q "ahs-telemetry-processor"; then
+    echo "  ✅ [11/14] Telemetry Processor: Flink job submitter"
+else
+    echo "  ❌ [11/14] Telemetry Processor: Not running"
+fi
+
+# 12. Data Generator
 if docker ps --format '{{.Names}}' | grep -q "ahs-data-generator"; then
-    echo "  ✅ [11/13] Data Generator: Running on localhost:8082"
+    echo "  ✅ [12/14] Data Generator: Running on localhost:8082"
 else
-    echo "  ❌ [11/13] Data Generator: Not running"
+    echo "  ❌ [12/14] Data Generator: Not running"
 fi
 
-# 12. Fleet Management
+# 13. Fleet Management
 if docker ps --format '{{.Names}}' | grep -q "ahs-fleet-management"; then
-    echo "  ✅ [12/13] Fleet Management API: http://localhost:8083"
+    echo "  ✅ [13/14] Fleet Management API: http://localhost:8083"
 else
-    echo "  ❌ [12/13] Fleet Management: Not running"
+    echo "  ❌ [13/14] Fleet Management: Not running"
 fi
 
-# 13. Vehicle Service
+# 14. Vehicle Service
 if docker ps --format '{{.Names}}' | grep -q "ahs-vehicle-service"; then
-    echo "  ✅ [13/13] Vehicle Service API: http://localhost:8084"
+    echo "  ✅ [14/14] Vehicle Service API: http://localhost:8084"
 else
-    echo "  ❌ [13/13] Vehicle Service: Not running"
+    echo "  ❌ [14/14] Vehicle Service: Not running"
 fi
 
 
@@ -139,10 +146,10 @@ RUNNING=$(docker ps --format '{{.Names}}' | grep -E "ahs-|flink-taskmanager" | w
 
 echo ""
 echo "========================================="
-if [ "$RUNNING" -eq 13 ]; then
-    echo " ✅ All 13 Containers Running!"
+if [ "$RUNNING" -eq 14 ]; then
+    echo " ✅ All 14 Containers Running!"
 else
-    echo " ⚠️  $RUNNING/13 Containers Running"
+    echo " ⚠️  $RUNNING/14 Containers Running"
 fi
 echo "========================================="
 echo ""

@@ -13,7 +13,8 @@ A production-ready implementation of a real-time telemetry processing and fleet 
 - [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
-- [Running Locally](#running-locally)
+- [Docker Deployment (Full Stack)](#-docker-deployment-full-stack)
+- [Running Locally (Development Mode)](#-running-locally-development-mode)
 - [API Documentation](#api-documentation)
 - [Configuration Guide](#configuration-guide)
 - [Testing Scenarios](#testing-scenarios)
@@ -198,7 +199,21 @@ ahs-common
 
 ## ⚡ Quick Start
 
-### 1. Build the Project
+### Option A: Full Stack with Docker (Recommended)
+
+```bash
+# Clone the repository
+cd ShuzAHS
+
+# Build and start all 13 containers
+./start.sh
+```
+
+This starts the complete platform with all services. See [Docker Deployment](#-docker-deployment-full-stack) for details.
+
+### Option B: Manual Setup
+
+#### 1. Build the Project
 
 ```bash
 # Clone the repository
@@ -214,7 +229,7 @@ BUILD SUCCESSFUL in 5s
 28 actionable tasks: 28 executed
 ```
 
-### 2. Start Kafka (Docker)
+#### 2. Start Kafka (Docker)
 
 Create `docker-compose.yml`:
 ```yaml
@@ -245,7 +260,7 @@ Start Kafka:
 docker-compose up -d
 ```
 
-### 3. Create Kafka Topics
+#### 3. Create Kafka Topics
 
 ```bash
 # Create telemetry topic
@@ -270,7 +285,7 @@ docker exec -it $(docker ps -qf "name=kafka") kafka-topics \
   --replication-factor 1
 ```
 
-### 4. Start Services
+#### 4. Start Services
 
 Open separate terminals for each service:
 
@@ -296,7 +311,7 @@ java -jar ahs-data-generator/build/libs/ahs-data-generator.jar -v 15 -i 5000
 ./gradlew :ahs-vehicle-service:bootRun
 ```
 
-### 5. Verify System is Running
+#### 5. Verify System is Running
 
 ```bash
 # Check fleet statistics
@@ -312,15 +327,112 @@ docker exec -it $(docker ps -qf "name=kafka") kafka-console-consumer \
 
 ---
 
-## 🚀 Running Locally
+## 🐳 Docker Deployment (Full Stack)
+
+### All 13 Containers
+
+The complete platform runs **13 containers** (12 services, with Flink TaskManager having 2 replicas):
+
+| # | Container Name | Service | Port | Description |
+|---|----------------|---------|------|-------------|
+| **Infrastructure** |
+| 1 | `ahs-zookeeper` | Zookeeper | 2181 | Kafka coordination |
+| 2 | `ahs-kafka` | Kafka Broker | 9092 | Message streaming |
+| 3 | `ahs-postgres` | PostgreSQL | 5432 | Vehicle registry DB |
+| 4 | `ahs-redis` | Redis | 6379 | Cache & session store |
+| **Web UIs** |
+| 5 | `ahs-kafka-ui` | Kafka UI | 8080 | Kafka management interface |
+| 6 | `ahs-flink-ui` | Flink JobManager | 8081 | Flink dashboard |
+| 7-8 | `flink-taskmanager` (x2) | Flink Workers | - | Stream processing workers |
+| 9 | `ahs-prometheus-ui` | Prometheus | 9090 | Metrics collection |
+| 10 | `ahs-grafana-ui` | Grafana | 3000 | Metrics visualization |
+| **Application Services** |
+| 11 | `ahs-data-generator` | Data Generator | 8082 | Vehicle simulation |
+| 12 | `ahs-fleet-management` | Fleet Management API | 8083 | Fleet operations |
+| 13 | `ahs-vehicle-service` | Vehicle Service API | 8084 | Vehicle CRUD |
+
+### Quick Start with Docker
+
+**Option 1: Using start.sh (Recommended)**
+```bash
+# Build and start all 13 containers
+./start.sh
+```
+
+The script will:
+1. ✅ Verify Docker is running
+2. 📦 Build the project with Gradle
+3. 🚀 Start all 13 containers
+4. 🔍 Verify each container status
+5. 🌐 Display all access points
+
+**Option 2: Manual Docker Compose**
+```bash
+# Build the project first
+./gradlew build -x test
+
+# Start all services
+docker-compose up -d
+
+# Verify all 13 containers are running
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "ahs-|flink"
+```
+
+### Web UI Access Points
+
+| Service | URL | Credentials |
+|---------|-----|-------------|
+| Kafka UI | http://localhost:8080 | - |
+| Flink Dashboard | http://localhost:8081 | - |
+| Prometheus | http://localhost:9090 | - |
+| Grafana | http://localhost:3000 | admin / admin |
+| Data Generator | http://localhost:8082 | - |
+| Fleet Management API | http://localhost:8083 | - |
+| Vehicle Service API | http://localhost:8084 | - |
+
+### Container Management
+
+```bash
+# View all running containers
+docker-compose ps
+
+# View logs for all services
+docker-compose logs -f
+
+# View logs for specific service
+docker-compose logs -f kafka-ui
+
+# Stop all containers
+docker-compose down
+
+# Stop and remove volumes (clean reset)
+docker-compose down -v
+```
+
+### Verify Container Health
+
+```bash
+# Count running AHS containers (should be 13)
+docker ps --format '{{.Names}}' | grep -E "ahs-|flink-taskmanager" | wc -l
+
+# Check individual service health
+curl http://localhost:8083/actuator/health  # Fleet Management
+curl http://localhost:8084/actuator/health  # Vehicle Service
+```
+
+---
+
+## 🚀 Running Locally (Development Mode)
 
 ### Development Workflow
+
+For development without Docker (running services individually):
 
 #### 1. Start Infrastructure
 
 ```bash
-# Start Kafka + Zookeeper
-docker-compose up -d
+# Start only Kafka + Zookeeper (minimal)
+docker-compose up -d zookeeper kafka
 
 # Verify Kafka is running
 docker ps | grep kafka
@@ -985,8 +1097,10 @@ java -jar ahs-data-generator.jar -v 1 -i 1000
 ## 📖 Additional Resources
 
 - [Architecture Overview](PROJECT_COMPLETE.md)
+- [Docker Setup Guide](DOCKER_SETUP_GUIDE.md)
 - [Data Generator Guide](ahs-data-generator/README.md)
 - [Quick Reference](QUICK_REFERENCE.md)
+- [System Diagrams](DIAGRAMS.md)
 - [Apache Flink Documentation](https://flink.apache.org)
 - [Spring Boot Documentation](https://spring.io/projects/spring-boot)
 - [Apache Kafka Documentation](https://kafka.apache.org/documentation/)
