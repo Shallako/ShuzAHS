@@ -98,12 +98,12 @@ public class TelemetryDataGenerator {
     telemetry.setEngineRpm(
         telemetry.getSpeedKph() > 0 ? randomDouble(1200.0, 1800.0) : randomDouble(600.0, 800.0));
     telemetry.setHeadingDegrees(randomDouble(0.0, 360.0));
-    telemetry.setTirePressureFrontLeftPsi(randomDouble(80.0, 100.0));
-    telemetry.setTirePressureFrontRightPsi(randomDouble(80.0, 100.0));
-    telemetry.setTirePressureRearLeftPsi(randomDouble(80.0, 100.0));
-    telemetry.setTirePressureRearRightPsi(randomDouble(80.0, 100.0));
+    telemetry.setTirePressureFrontLeftPsi(randomDouble(90.0, 110.0));
+    telemetry.setTirePressureFrontRightPsi(randomDouble(90.0, 110.0));
+    telemetry.setTirePressureRearLeftPsi(randomDouble(90.0, 110.0));
+    telemetry.setTirePressureRearRightPsi(randomDouble(90.0, 110.0));
     telemetry.setBrakePressurePsi(randomDouble(85.0, 120.0));
-    telemetry.setHydraulicPressurePsi(randomDouble(2000.0, 3000.0));
+    telemetry.setHydraulicPressurePsi(randomDouble(2200.0, 3200.0));
 
     return telemetry;
   }
