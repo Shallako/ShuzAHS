@@ -38,10 +38,11 @@ public class AlertConsumer {
         try {
             JsonNode alertNode = objectMapper.readTree(message);
             
-            String vehicleId = alertNode.path("vehicleId").asText();
-            String alertType = alertNode.path("alertType").asText();
-            String severity = alertNode.path("severity").asText();
-            String alertMessage = alertNode.path("message").asText();
+            // Handle both snake_case (from Flink) and camelCase (legacy) field names
+            String vehicleId = getFieldValue(alertNode, "vehicle_id", "vehicleId");
+            String alertType = getFieldValue(alertNode, "alert_type", "alertType");
+            String severity = getFieldValue(alertNode, "severity", "severity");
+            String alertMessage = getFieldValue(alertNode, "message", "message");
             
             log.info("CEP Alert received - Vehicle: {}, Type: {}, Severity: {}, Message: {}",
                 vehicleId, alertType, severity, alertMessage);
@@ -72,5 +73,18 @@ public class AlertConsumer {
         } catch (Exception e) {
             log.error("Error processing CEP alert: {}", message, e);
         }
+    }
+    
+    /**
+     * Get field value trying multiple possible field names (snake_case and camelCase)
+     */
+    private String getFieldValue(JsonNode node, String... fieldNames) {
+        for (String fieldName : fieldNames) {
+            JsonNode valueNode = node.get(fieldName);
+            if (valueNode != null && !valueNode.isNull() && !valueNode.asText().isEmpty()) {
+                return valueNode.asText();
+            }
+        }
+        return "";
     }
 }

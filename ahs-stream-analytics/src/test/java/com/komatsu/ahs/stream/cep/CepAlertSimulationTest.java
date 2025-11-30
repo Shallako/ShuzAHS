@@ -37,11 +37,11 @@ class CepAlertSimulationTest {
     void testCollisionWarningPattern() throws Exception {
         // Simulate rapid deceleration from 45 kph to 5 kph
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .speedKph(45.0).build(),
-                createBaseTelemetry(TEST_VEHICLE_ID, 1000).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 1000)
                         .speedKph(30.0).build(),
-                createBaseTelemetry(TEST_VEHICLE_ID, 2000).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 2000)
                         .speedKph(5.0).build()
         );
         
@@ -64,9 +64,9 @@ class CepAlertSimulationTest {
     @DisplayName("OBSTACLE_DETECTED: Simulate sudden stop from speed")
     void testObstacleDetectedPattern() throws Exception {
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .speedKph(25.0).build(),
-                createBaseTelemetry(TEST_VEHICLE_ID, 2000).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 2000)
                         .speedKph(0.2).build()
         );
         
@@ -76,6 +76,8 @@ class CepAlertSimulationTest {
                 CepPatternFactory.createObstacleDetectedPattern()
         );
         
+        patternStream.select(map -> map.toString()).print();
+        
         env.execute("Obstacle Detected Test");
     }
     
@@ -84,7 +86,7 @@ class CepAlertSimulationTest {
     void testSafetyEnvelopeBreachPattern() throws Exception {
         // Loaded truck at 50 kph (> MAX_SPEED_LOADED_KPH of 45)
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .speedKph(50.0)
                         .isLoaded(true)
                         .payloadTons(250.0)
@@ -97,6 +99,8 @@ class CepAlertSimulationTest {
                 CepPatternFactory.createSafetyEnvelopeBreachPattern()
         );
         
+        patternStream.select(map -> map.toString()).print();
+        
         env.execute("Safety Envelope Breach Test");
     }
 
@@ -106,7 +110,7 @@ class CepAlertSimulationTest {
     @DisplayName("LOW_FUEL: Fuel level below 20%")
     void testLowFuelPattern() throws Exception {
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .fuelLevelPercent(15.0) // Below LOW_FUEL_WARNING_PERCENT (20%)
                         .build()
         );
@@ -117,6 +121,8 @@ class CepAlertSimulationTest {
                 CepPatternFactory.createLowFuelPattern()
         );
         
+        patternStream.select(map -> map.toString()).print();
+        
         env.execute("Low Fuel Test");
     }
     
@@ -124,10 +130,10 @@ class CepAlertSimulationTest {
     @DisplayName("ENGINE_OVERHEATING: Rising engine temperature")
     void testEngineOverheatingPattern() throws Exception {
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .engineTemperatureCelsius(92.0) // Near warning
                         .build(),
-                createBaseTelemetry(TEST_VEHICLE_ID, 30000).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 30000)
                         .engineTemperatureCelsius(98.0) // Above ENGINE_TEMP_WARNING_CELSIUS (95)
                         .build()
         );
@@ -138,6 +144,8 @@ class CepAlertSimulationTest {
                 CepPatternFactory.createEngineOverheatingPattern()
         );
         
+        patternStream.select(map -> map.toString()).print();
+        
         env.execute("Engine Overheating Test");
     }
     
@@ -145,7 +153,7 @@ class CepAlertSimulationTest {
     @DisplayName("LOW_TIRE_PRESSURE: Tire below 95 PSI threshold")
     void testLowTirePressurePattern() throws Exception {
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .tirePressureFrontLeftPsi(90.0) // Below TIRE_PRESSURE_MIN_WARNING_PSI (95)
                         .tirePressureFrontRightPsi(105.0)
                         .tirePressureRearLeftPsi(105.0)
@@ -159,6 +167,8 @@ class CepAlertSimulationTest {
                 CepPatternFactory.createLowTirePressurePattern()
         );
         
+        patternStream.select(map -> map.toString()).print();
+        
         env.execute("Low Tire Pressure Test");
     }
     
@@ -166,7 +176,7 @@ class CepAlertSimulationTest {
     @DisplayName("EXCESSIVE_SPEED: Speed above 60 kph critical threshold")
     void testExcessiveSpeedPattern() throws Exception {
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .speedKph(65.0) // Above CRITICAL_SPEED_KPH (60)
                         .build()
         );
@@ -177,6 +187,8 @@ class CepAlertSimulationTest {
                 CepPatternFactory.createExcessiveSpeedPattern()
         );
         
+        patternStream.select(map -> map.toString()).print();
+        
         env.execute("Excessive Speed Test");
     }
     
@@ -184,7 +196,7 @@ class CepAlertSimulationTest {
     @DisplayName("BRAKE_PRESSURE_LOW: Brake pressure below 90 PSI")
     void testBrakePressureLowPattern() throws Exception {
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .brakePressurePsi(80.0) // Below BRAKE_PRESSURE_MIN_WARNING_PSI (90)
                         .build()
         );
@@ -195,6 +207,8 @@ class CepAlertSimulationTest {
                 CepPatternFactory.createBrakePressureLowPattern()
         );
         
+        patternStream.select(map -> map.toString()).print();
+        
         env.execute("Brake Pressure Low Test");
     }
     
@@ -202,7 +216,7 @@ class CepAlertSimulationTest {
     @DisplayName("HYDRAULIC_PRESSURE_LOW: Hydraulic pressure below 2500 PSI")
     void testHydraulicPressureLowPattern() throws Exception {
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .hydraulicPressurePsi(2200.0) // Below HYDRAULIC_PRESSURE_MIN_WARNING_PSI (2500)
                         .build()
         );
@@ -213,6 +227,8 @@ class CepAlertSimulationTest {
                 CepPatternFactory.createHydraulicPressureLowPattern()
         );
         
+        patternStream.select(map -> map.toString()).print();
+        
         env.execute("Hydraulic Pressure Low Test");
     }
 
@@ -222,7 +238,7 @@ class CepAlertSimulationTest {
     @DisplayName("SYSTEM_FAULT: Multiple diagnostic codes")
     void testSystemFaultPattern() throws Exception {
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .diagnosticCodeCount(5) // Above MAX_DIAGNOSTIC_CODES_WARNING (3)
                         .checkEngineLight(true)
                         .build()
@@ -234,6 +250,8 @@ class CepAlertSimulationTest {
                 CepPatternFactory.createSystemFaultPattern()
         );
         
+        patternStream.select(map -> map.toString()).print();
+        
         env.execute("System Fault Test");
     }
     
@@ -241,7 +259,7 @@ class CepAlertSimulationTest {
     @DisplayName("LOW_BATTERY: Battery below 30%")
     void testLowBatteryPattern() throws Exception {
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .batteryLevelPercent(25.0) // Below LOW_BATTERY_WARNING_PERCENT (30)
                         .build()
         );
@@ -252,6 +270,8 @@ class CepAlertSimulationTest {
                 CepPatternFactory.createLowBatteryPattern()
         );
         
+        patternStream.select(map -> map.toString()).print();
+        
         env.execute("Low Battery Test");
     }
     
@@ -259,7 +279,7 @@ class CepAlertSimulationTest {
     @DisplayName("MAINTENANCE_REQUIRED: Operating hours at service interval")
     void testMaintenanceRequiredPattern() throws Exception {
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .operatingHours(505L) // Near MAINTENANCE_INTERVAL_HOURS (500)
                         .build()
         );
@@ -270,6 +290,8 @@ class CepAlertSimulationTest {
                 CepPatternFactory.createMaintenanceRequiredPattern()
         );
         
+        patternStream.select(map -> map.toString()).print();
+        
         env.execute("Maintenance Required Test");
     }
     
@@ -277,7 +299,7 @@ class CepAlertSimulationTest {
     @DisplayName("COMMUNICATION_LOSS: Warning light triggered")
     void testCommunicationLossPattern() throws Exception {
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .warningLight(true)
                         .build()
         );
@@ -288,6 +310,8 @@ class CepAlertSimulationTest {
                 CepPatternFactory.createCommunicationLossPattern()
         );
         
+        patternStream.select(map -> map.toString()).print();
+        
         env.execute("Communication Loss Test");
     }
 
@@ -297,11 +321,11 @@ class CepAlertSimulationTest {
     @DisplayName("ROUTE_DEVIATION: Significant heading change while moving")
     void testRouteDeviationPattern() throws Exception {
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .speedKph(25.0)
                         .headingDegrees(90.0)
                         .build(),
-                createBaseTelemetry(TEST_VEHICLE_ID, 5000).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 5000)
                         .speedKph(20.0)
                         .headingDegrees(180.0) // 90 degree change
                         .build()
@@ -313,6 +337,8 @@ class CepAlertSimulationTest {
                 CepPatternFactory.createRouteDeviationPattern()
         );
         
+        patternStream.select(map -> map.toString()).print();
+        
         env.execute("Route Deviation Test");
     }
     
@@ -321,19 +347,19 @@ class CepAlertSimulationTest {
     void testStuckDetectionPattern() throws Exception {
         // 3+ consecutive readings with speed near 0 but engine RPM > idle
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .speedKph(0.2)
                         .engineRpm(1200.0) // Above ENGINE_MIN_IDLE_RPM (650)
                         .build(),
-                createBaseTelemetry(TEST_VEHICLE_ID, 5000).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 5000)
                         .speedKph(0.3)
                         .engineRpm(1100.0)
                         .build(),
-                createBaseTelemetry(TEST_VEHICLE_ID, 10000).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 10000)
                         .speedKph(0.1)
                         .engineRpm(1150.0)
                         .build(),
-                createBaseTelemetry(TEST_VEHICLE_ID, 15000).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 15000)
                         .speedKph(0.2)
                         .engineRpm(1180.0)
                         .build()
@@ -345,6 +371,8 @@ class CepAlertSimulationTest {
                 CepPatternFactory.createStuckDetectionPattern()
         );
         
+        patternStream.select(map -> map.toString()).print();
+        
         env.execute("Stuck Detection Test");
     }
     
@@ -352,13 +380,13 @@ class CepAlertSimulationTest {
     @DisplayName("POSITIONING_ERROR: GPS coordinate jump at low speed")
     void testPositioningErrorPattern() throws Exception {
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .speedKph(10.0)
-                        .location(new GpsCoordinate(-22.500, 118.300, 450.0))
+                        .location(new GpsCoordinate(-22.500, 118.300, 450.0, 0.0, 0.0, 0.0, Instant.now()))
                         .build(),
-                createBaseTelemetry(TEST_VEHICLE_ID, 2000).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 2000)
                         .speedKph(10.0)
-                        .location(new GpsCoordinate(-22.510, 118.310, 450.0)) // Large jump
+                        .location(new GpsCoordinate(-22.510, 118.310, 450.0, 0.0, 0.0, 0.0, Instant.now())) // Large jump
                         .build()
         );
         
@@ -367,6 +395,8 @@ class CepAlertSimulationTest {
                 stream.keyBy(VehicleTelemetry::getVehicleId),
                 CepPatternFactory.createPositioningErrorPattern()
         );
+        
+        patternStream.select(map -> map.toString()).print();
         
         env.execute("Positioning Error Test");
     }
@@ -377,7 +407,7 @@ class CepAlertSimulationTest {
     @DisplayName("CRITICAL_ENGINE: Temperature above 105°C")
     void testCriticalEnginePattern() throws Exception {
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .engineTemperatureCelsius(110.0) // Above ENGINE_TEMP_CRITICAL_CELSIUS (105)
                         .build()
         );
@@ -388,6 +418,8 @@ class CepAlertSimulationTest {
                 CepPatternFactory.createCriticalEnginePattern()
         );
         
+        patternStream.select(map -> map.toString()).print();
+        
         env.execute("Critical Engine Test");
     }
     
@@ -395,7 +427,7 @@ class CepAlertSimulationTest {
     @DisplayName("CRITICAL_BRAKE_FAILURE: Brake pressure below 70 PSI")
     void testCriticalBrakeFailurePattern() throws Exception {
         List<VehicleTelemetry> events = Arrays.asList(
-                createBaseTelemetry(TEST_VEHICLE_ID, 0).toBuilder()
+                createBaseTelemetry(TEST_VEHICLE_ID, 0)
                         .brakePressurePsi(60.0) // Below BRAKE_PRESSURE_CRITICAL_PSI (70)
                         .build()
         );
@@ -406,6 +438,8 @@ class CepAlertSimulationTest {
                 CepPatternFactory.createCriticalBrakeFailurePattern()
         );
         
+        patternStream.select(map -> map.toString()).print();
+        
         env.execute("Critical Brake Failure Test");
     }
 
@@ -414,11 +448,11 @@ class CepAlertSimulationTest {
     /**
      * Creates a base VehicleTelemetry with normal operating values
      */
-    private VehicleTelemetry createBaseTelemetry(String vehicleId, long offsetMillis) {
+    private VehicleTelemetry.VehicleTelemetryBuilder createBaseTelemetry(String vehicleId, long offsetMillis) {
         return VehicleTelemetry.builder()
                 .vehicleId(vehicleId)
                 .timestamp(Instant.now().plusMillis(offsetMillis))
-                .location(new GpsCoordinate(-22.500, 118.300, 450.0))
+                .location(new GpsCoordinate(-22.500, 118.300, 450.0, 0.0, 0.0, 0.0, Instant.now()))
                 // Navigation
                 .speedKph(25.0)
                 .headingDegrees(90.0)
@@ -447,7 +481,6 @@ class CepAlertSimulationTest {
                 // Operational
                 .totalDistanceMeters(50000L)
                 .operatingHours(250L)
-                .tripCount(100)
-                .build();
+                .tripCount(100);
     }
 }

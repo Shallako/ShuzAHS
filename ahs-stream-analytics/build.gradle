@@ -23,6 +23,16 @@ dependencies {
     testImplementation "org.apache.flink:flink-streaming-java:${flinkVersion}:tests"
 }
 
+test {
+    useJUnitPlatform()
+    jvmArgs '--add-opens', 'java.base/java.util=ALL-UNNAMED',
+            '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+            '--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED',
+            '--add-opens', 'java.base/java.io=ALL-UNNAMED',
+            '--add-opens', 'java.base/java.time=ALL-UNNAMED',
+            '--add-opens', 'java.base/java.nio=ALL-UNNAMED'
+}
+
 // Create fat JAR for Flink deployment
 jar {
     archiveBaseName = 'ahs-stream-analytics'

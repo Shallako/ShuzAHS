@@ -13,10 +13,24 @@ import java.util.concurrent.ThreadLocalRandom;
  *
  * <p>Generates realistic telemetry data for autonomous haul trucks simulating various operational
  * scenarios in a mine environment. Includes anomaly injection for CEP pattern testing.
+ * 
+ * <p>Supports all 16 VehicleAlertEvent types:
+ * <ul>
+ *   <li>Safety: COLLISION_WARNING, OBSTACLE_DETECTED, SAFETY_ENVELOPE_BREACH</li>
+ *   <li>Operational: LOW_FUEL, ENGINE_OVERHEATING, LOW_TIRE_PRESSURE, EXCESSIVE_SPEED, 
+ *       BRAKE_PRESSURE_LOW, HYDRAULIC_PRESSURE_LOW</li>
+ *   <li>System: SYSTEM_FAULT, LOW_BATTERY, MAINTENANCE_REQUIRED, COMMUNICATION_LOSS</li>
+ *   <li>Navigation: ROUTE_DEVIATION, STUCK_DETECTION, POSITIONING_ERROR</li>
+ * </ul>
  */
 public class TelemetryDataGenerator {
 
   private final ThreadLocalRandom random = ThreadLocalRandom.current();
+  
+  // Track previous values for pattern detection
+  private double previousHeading = 0.0;
+  private GpsCoordinate previousLocation = null;
+  private long operatingHoursBase = 480; // Start near maintenance threshold
 
   // Mine site boundaries (simulated coordinates for a large open-pit mine)
   private static final double MIN_LATITUDE = -23.5;
@@ -36,10 +50,30 @@ public class TelemetryDataGenerator {
   private static final double MAX_LOAD_930E = 300.0; // tons
   private static final double MAX_LOAD_980E = 400.0; // tons
   
-  // Anomaly injection rates (percentage chance per telemetry generation)
-  private static final double LOW_FUEL_ANOMALY_RATE = 0.02;      // 2% chance
-  private static final double OVERHEATING_ANOMALY_RATE = 0.01;   // 1% chance
-  private static final double HIGH_SPEED_ANOMALY_RATE = 0.03;    // 3% chance (for rapid decel CEP)
+  // ==================== ANOMALY INJECTION RATES ====================
+  // Safety Alerts (higher rates for safety-critical patterns)
+  private static final double COLLISION_WARNING_RATE = 0.02;      // 2% - rapid deceleration
+  private static final double OBSTACLE_DETECTED_RATE = 0.015;     // 1.5% - sudden stop
+  private static final double SAFETY_ENVELOPE_BREACH_RATE = 0.02; // 2% - overspeed for load state
+  
+  // Operational Alerts
+  private static final double LOW_FUEL_RATE = 0.02;               // 2% - fuel < 20%
+  private static final double ENGINE_OVERHEATING_RATE = 0.015;    // 1.5% - temp > 95°C
+  private static final double LOW_TIRE_PRESSURE_RATE = 0.02;      // 2% - tire < 95 PSI
+  private static final double EXCESSIVE_SPEED_RATE = 0.02;        // 2% - speed > 60 kph
+  private static final double BRAKE_PRESSURE_LOW_RATE = 0.015;    // 1.5% - brake < 90 PSI
+  private static final double HYDRAULIC_PRESSURE_LOW_RATE = 0.015;// 1.5% - hydraulic < 2500 PSI
+  
+  // System Alerts
+  private static final double SYSTEM_FAULT_RATE = 0.01;           // 1% - diagnostic codes
+  private static final double LOW_BATTERY_RATE = 0.015;           // 1.5% - battery < 30%
+  private static final double MAINTENANCE_REQUIRED_RATE = 0.01;   // 1% - hours near 500
+  private static final double COMMUNICATION_LOSS_RATE = 0.01;     // 1% - warning light
+  
+  // Navigation Alerts
+  private static final double ROUTE_DEVIATION_RATE = 0.02;        // 2% - heading change > 45°
+  private static final double STUCK_DETECTION_RATE = 0.01;        // 1% - no movement + high RPM
+  private static final double POSITIONING_ERROR_RATE = 0.015;     // 1.5% - GPS jump
 
   /** Generate realistic telemetry for a vehicle based on its current state */
   public VehicleTelemetry generateTelemetry(String vehicleId, VehicleStatus status) {
@@ -47,87 +81,198 @@ public class TelemetryDataGenerator {
     telemetry.setVehicleId(vehicleId);
     telemetry.setTimestamp(Instant.now());
 
-    // Generate GPS coordinates
-    GpsCoordinate gps = generateGpsCoordinate();
-    telemetry.setLocation(gps);
+    // ==================== ANOMALY INJECTION FLAGS ====================
+    // Safety Alerts
+    boolean injectCollisionWarning = random.nextDouble() < COLLISION_WARNING_RATE;
+    boolean injectObstacleDetected = random.nextDouble() < OBSTACLE_DETECTED_RATE;
+    boolean injectSafetyEnvelopeBreach = random.nextDouble() < SAFETY_ENVELOPE_BREACH_RATE;
     
-    // Check for anomaly injection
-    boolean injectLowFuel = random.nextDouble() < LOW_FUEL_ANOMALY_RATE;
-    boolean injectOverheating = random.nextDouble() < OVERHEATING_ANOMALY_RATE;
-    boolean injectHighSpeed = random.nextDouble() < HIGH_SPEED_ANOMALY_RATE;
+    // Operational Alerts
+    boolean injectLowFuel = random.nextDouble() < LOW_FUEL_RATE;
+    boolean injectOverheating = random.nextDouble() < ENGINE_OVERHEATING_RATE;
+    boolean injectLowTirePressure = random.nextDouble() < LOW_TIRE_PRESSURE_RATE;
+    boolean injectExcessiveSpeed = random.nextDouble() < EXCESSIVE_SPEED_RATE;
+    boolean injectLowBrakePressure = random.nextDouble() < BRAKE_PRESSURE_LOW_RATE;
+    boolean injectLowHydraulicPressure = random.nextDouble() < HYDRAULIC_PRESSURE_LOW_RATE;
+    
+    // System Alerts
+    boolean injectSystemFault = random.nextDouble() < SYSTEM_FAULT_RATE;
+    boolean injectLowBattery = random.nextDouble() < LOW_BATTERY_RATE;
+    boolean injectMaintenanceRequired = random.nextDouble() < MAINTENANCE_REQUIRED_RATE;
+    boolean injectCommunicationLoss = random.nextDouble() < COMMUNICATION_LOSS_RATE;
+    
+    // Navigation Alerts
+    boolean injectRouteDeviation = random.nextDouble() < ROUTE_DEVIATION_RATE;
+    boolean injectStuckDetection = random.nextDouble() < STUCK_DETECTION_RATE;
+    boolean injectPositioningError = random.nextDouble() < POSITIONING_ERROR_RATE;
 
-    // Generate metrics based on vehicle status
+    // ==================== GPS & LOCATION ====================
+    GpsCoordinate gps;
+    if (injectPositioningError && previousLocation != null) {
+      // Create a GPS jump (positioning error) - sudden location shift > 100m at low speed
+      gps = GpsCoordinate.builder()
+          .latitude(previousLocation.getLatitude() + randomDouble(0.002, 0.005))
+          .longitude(previousLocation.getLongitude() + randomDouble(0.002, 0.005))
+          .altitude(randomDouble(MIN_ALTITUDE, MAX_ALTITUDE))
+          .accuracy(randomDouble(5.0, 15.0)) // Poor accuracy
+          .heading(randomDouble(0, 359))
+          .speed(randomDouble(0.0, 15.0)) // Low speed during GPS error
+          .build();
+    } else {
+      gps = generateGpsCoordinate();
+    }
+    telemetry.setLocation(gps);
+    previousLocation = gps;
+
+    // ==================== SPEED & MOVEMENT ====================
+    double speed;
     switch (status) {
       case HAULING:
-        // High speed anomaly for rapid deceleration CEP pattern (>50 kph)
-        if (injectHighSpeed) {
-          telemetry.setSpeedKph(randomDouble(55.0, 65.0)); // Above normal loaded speed
+        if (injectExcessiveSpeed || injectSafetyEnvelopeBreach) {
+          speed = randomDouble(55.0, 68.0); // Above critical speed
+        } else if (injectCollisionWarning) {
+          speed = randomDouble(50.0, 60.0); // High speed before rapid decel
         } else {
-          telemetry.setSpeedKph(randomDouble(20.0, MAX_SPEED_LOADED));
+          speed = randomDouble(20.0, MAX_SPEED_LOADED);
         }
         double maxLoad = vehicleId.contains("980E") ? MAX_LOAD_980E : MAX_LOAD_930E;
         telemetry.setPayloadTons(randomDouble(maxLoad * 0.8, maxLoad));
         telemetry.setLoaded(true);
-        telemetry.setFuelLevelPercent(injectLowFuel ? randomDouble(3.0, 12.0) : randomDouble(40.0, MAX_FUEL));
         break;
 
       case LOADING:
-        telemetry.setSpeedKph(0.0);
+        speed = injectStuckDetection ? 0.0 : 0.0; // Always 0 when loading
         telemetry.setPayloadTons(randomDouble(50.0, 250.0));
         telemetry.setLoaded(false);
-        telemetry.setFuelLevelPercent(injectLowFuel ? randomDouble(5.0, 14.0) : randomDouble(50.0, MAX_FUEL));
         break;
 
       case DUMPING:
-        telemetry.setSpeedKph(0.0);
+        speed = 0.0;
         telemetry.setPayloadTons(randomDouble(0.0, 50.0));
         telemetry.setLoaded(false);
-        telemetry.setFuelLevelPercent(injectLowFuel ? randomDouble(4.0, 13.0) : randomDouble(40.0, MAX_FUEL));
         break;
 
       case IDLE:
-        telemetry.setSpeedKph(0.0);
+        speed = injectStuckDetection ? 0.0 : 0.0;
         telemetry.setPayloadTons(0.0);
         telemetry.setLoaded(false);
-        telemetry.setFuelLevelPercent(injectLowFuel ? randomDouble(2.0, 10.0) : randomDouble(MIN_FUEL, MAX_FUEL));
         break;
 
       case ROUTING:
-        // High speed anomaly for rapid deceleration CEP pattern
-        if (injectHighSpeed) {
-          telemetry.setSpeedKph(randomDouble(52.0, 60.0)); // Above threshold
+        if (injectExcessiveSpeed || injectSafetyEnvelopeBreach) {
+          speed = randomDouble(58.0, 68.0); // Above empty threshold
+        } else if (injectObstacleDetected) {
+          speed = randomDouble(15.0, 25.0); // Moving before sudden stop
         } else {
-          telemetry.setSpeedKph(randomDouble(30.0, MAX_SPEED_EMPTY));
+          speed = randomDouble(30.0, MAX_SPEED_EMPTY);
         }
         telemetry.setPayloadTons(0.0);
         telemetry.setLoaded(false);
-        telemetry.setFuelLevelPercent(injectLowFuel ? randomDouble(6.0, 14.0) : randomDouble(30.0, MAX_FUEL));
         break;
 
       default:
-        telemetry.setSpeedKph(0.0);
+        speed = 0.0;
         telemetry.setPayloadTons(0.0);
         telemetry.setLoaded(false);
-        telemetry.setFuelLevelPercent(injectLowFuel ? randomDouble(3.0, 12.0) : randomDouble(MIN_FUEL, MAX_FUEL));
+    }
+    telemetry.setSpeedKph(speed);
+
+    // ==================== FUEL ====================
+    if (injectLowFuel) {
+      telemetry.setFuelLevelPercent(randomDouble(3.0, 18.0)); // Below 20% threshold
+    } else {
+      telemetry.setFuelLevelPercent(randomDouble(35.0, MAX_FUEL));
     }
 
-
-    // Engine temperature - inject overheating anomaly (>95°C for CEP pattern)
+    // ==================== ENGINE TEMPERATURE ====================
     if (injectOverheating) {
-      telemetry.setEngineTemperatureCelsius(randomDouble(96.0, 105.0)); // Above threshold
+      telemetry.setEngineTemperatureCelsius(randomDouble(96.0, 108.0)); // Above 95°C threshold
     } else {
-      telemetry.setEngineTemperatureCelsius(randomDouble(80.0, 94.0));
+      telemetry.setEngineTemperatureCelsius(randomDouble(78.0, 92.0));
     }
     
-    telemetry.setEngineRpm(
-        telemetry.getSpeedKph() > 0 ? randomDouble(1200.0, 1800.0) : randomDouble(600.0, 800.0));
-    telemetry.setHeadingDegrees(randomDouble(0.0, 360.0));
-    telemetry.setTirePressureFrontLeftPsi(randomDouble(90.0, 110.0));
-    telemetry.setTirePressureFrontRightPsi(randomDouble(90.0, 110.0));
-    telemetry.setTirePressureRearLeftPsi(randomDouble(90.0, 110.0));
-    telemetry.setTirePressureRearRightPsi(randomDouble(90.0, 110.0));
-    telemetry.setBrakePressurePsi(randomDouble(85.0, 120.0));
-    telemetry.setHydraulicPressurePsi(randomDouble(2200.0, 3200.0));
+    // ==================== ENGINE RPM ====================
+    if (injectStuckDetection && speed < 0.5) {
+      // High RPM but not moving = stuck
+      telemetry.setEngineRpm(randomDouble(1000.0, 1600.0));
+    } else {
+      telemetry.setEngineRpm(speed > 0.5 ? randomDouble(1200.0, 1800.0) : randomDouble(600.0, 800.0));
+    }
+
+    // ==================== HEADING (for route deviation) ====================
+    double newHeading;
+    if (injectRouteDeviation && speed > 5.0) {
+      // Large heading change > 45° to trigger route deviation
+      newHeading = (previousHeading + randomDouble(50.0, 120.0)) % 360;
+    } else {
+      // Normal heading with small variations
+      newHeading = (previousHeading + randomDouble(-10.0, 10.0) + 360) % 360;
+    }
+    telemetry.setHeadingDegrees(newHeading);
+    previousHeading = newHeading;
+
+    // ==================== TIRE PRESSURE ====================
+    if (injectLowTirePressure) {
+      // At least one tire below 95 PSI threshold
+      telemetry.setTirePressureFrontLeftPsi(randomDouble(82.0, 93.0));
+      telemetry.setTirePressureFrontRightPsi(randomDouble(96.0, 108.0));
+      telemetry.setTirePressureRearLeftPsi(randomDouble(96.0, 108.0));
+      telemetry.setTirePressureRearRightPsi(randomDouble(96.0, 108.0));
+    } else {
+      telemetry.setTirePressureFrontLeftPsi(randomDouble(98.0, 115.0));
+      telemetry.setTirePressureFrontRightPsi(randomDouble(98.0, 115.0));
+      telemetry.setTirePressureRearLeftPsi(randomDouble(98.0, 115.0));
+      telemetry.setTirePressureRearRightPsi(randomDouble(98.0, 115.0));
+    }
+    telemetry.setTireTemperatureAvgCelsius(randomDouble(40.0, 75.0));
+
+    // ==================== BRAKE PRESSURE ====================
+    if (injectLowBrakePressure) {
+      telemetry.setBrakePressurePsi(randomDouble(72.0, 88.0)); // Below 90 PSI threshold
+    } else {
+      telemetry.setBrakePressurePsi(randomDouble(95.0, 125.0));
+    }
+
+    // ==================== HYDRAULIC PRESSURE ====================
+    if (injectLowHydraulicPressure) {
+      telemetry.setHydraulicPressurePsi(randomDouble(2100.0, 2450.0)); // Below 2500 PSI threshold
+    } else {
+      telemetry.setHydraulicPressurePsi(randomDouble(2600.0, 3200.0));
+    }
+    telemetry.setHydraulicFluidTempCelsius(randomDouble(50.0, 80.0));
+
+    // ==================== BATTERY ====================
+    if (injectLowBattery) {
+      telemetry.setBatteryLevelPercent(randomDouble(12.0, 28.0)); // Below 30% threshold
+    } else {
+      telemetry.setBatteryLevelPercent(randomDouble(70.0, 100.0));
+    }
+
+    // ==================== DIAGNOSTICS (System Fault & Maintenance) ====================
+    if (injectSystemFault) {
+      telemetry.setDiagnosticCodeCount(random.nextInt(4, 8)); // Above 3 threshold
+      telemetry.setCheckEngineLight(true);
+    } else {
+      telemetry.setDiagnosticCodeCount(random.nextInt(0, 2));
+      telemetry.setCheckEngineLight(false);
+    }
+
+    // ==================== WARNING LIGHT (Communication Loss) ====================
+    telemetry.setWarningLight(injectCommunicationLoss);
+
+    // ==================== OPERATING HOURS (Maintenance Required) ====================
+    if (injectMaintenanceRequired) {
+      // Near or past 500-hour maintenance interval
+      telemetry.setOperatingHours(500 + random.nextLong(-5, 15));
+    } else {
+      // Normal operating hours, increment slowly
+      operatingHoursBase += random.nextLong(0, 2);
+      telemetry.setOperatingHours(operatingHoursBase % 490); // Keep below threshold normally
+    }
+
+    // ==================== OPERATIONAL METRICS ====================
+    telemetry.setTotalDistanceMeters(random.nextLong(100000, 5000000));
+    telemetry.setTripCount(random.nextInt(100, 2000));
 
     return telemetry;
   }
@@ -138,7 +283,7 @@ public class TelemetryDataGenerator {
         .latitude(randomDouble(MIN_LATITUDE, MAX_LATITUDE))
         .longitude(randomDouble(MIN_LONGITUDE, MAX_LONGITUDE))
         .altitude(randomDouble(MIN_ALTITUDE, MAX_ALTITUDE))
-        .accuracy(randomDouble(0.0, 10.0))
+        .accuracy(randomDouble(0.5, 3.0))
         .heading(randomDouble(0, 359))
         .speed(randomDouble(0.0, MAX_SPEED_EMPTY))
         .build();

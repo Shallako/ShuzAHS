@@ -66,6 +66,7 @@ public class FleetMetricsExporter {
     private Counter overheatingAlerts;
     private Counter highTemperatureAlerts;
     private Counter tirePressureAlerts;
+    private Counter legacyLowFuelAlerts;
     
     public FleetMetricsExporter(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
@@ -209,7 +210,7 @@ public class FleetMetricsExporter {
             .register(meterRegistry);
             
         // Keep low fuel for legacy compatibility
-        Counter.builder("ahs_cep_alerts_low_fuel_total")
+        legacyLowFuelAlerts = Counter.builder("ahs_cep_alerts_low_fuel_total")
             .description("CEP: Low fuel alerts")
             .register(meterRegistry);
             
@@ -237,7 +238,10 @@ public class FleetMetricsExporter {
     
     // Legacy CEP methods for backward compatibility
     public void incrementRapidDecelerationAlert() { rapidDecelerationAlerts.increment(); }
-    public void incrementLowFuelAlert() { lowFuelAlerts.increment(); }
+    public void incrementLowFuelAlert() { 
+        lowFuelAlerts.increment(); 
+        legacyLowFuelAlerts.increment();
+    }
     public void incrementOverheatingAlert() { overheatingAlerts.increment(); }
     public void incrementHighTemperatureAlert() { highTemperatureAlerts.increment(); }
     public void incrementTirePressureAlert() { tirePressureAlerts.increment(); }
@@ -265,6 +269,7 @@ public class FleetMetricsExporter {
             // Operational Alerts
             case "LOW_FUEL":
                 lowFuelAlerts.increment();
+                legacyLowFuelAlerts.increment(); // backward compatibility
                 break;
             case "ENGINE_OVERHEATING":
                 engineOverheatingAlerts.increment();
@@ -287,6 +292,7 @@ public class FleetMetricsExporter {
                 
             // System Alerts
             case "SYSTEM_FAULT":
+            case "DIAGNOSTIC_ERROR":  // Alias from stream analytics
                 systemFaultAlerts.increment();
                 break;
             case "LOW_BATTERY":

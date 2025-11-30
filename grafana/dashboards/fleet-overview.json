@@ -3,7 +3,7 @@
   "tags": ["ahs", "fleet", "komatsu", "cep", "alerts"],
   "timezone": "browser",
   "schemaVersion": 39,
-  "version": 3,
+  "version": 4,
   "refresh": "5s",
   "uid": "ahs-fleet-overview",
   "panels": [
@@ -69,13 +69,15 @@
       "targets": [
         { "expr": "rate(ahs_fleet_alerts_critical_total[1m])", "refId": "A", "legendFormat": "Critical" },
         { "expr": "rate(ahs_fleet_alerts_error_total[1m])", "refId": "B", "legendFormat": "Error" },
-        { "expr": "rate(ahs_fleet_alerts_warning_total[1m])", "refId": "C", "legendFormat": "Warning" }
+        { "expr": "rate(ahs_fleet_alerts_warning_total[1m])", "refId": "C", "legendFormat": "Warning" },
+        { "expr": "rate(ahs_fleet_alerts_info_total[1m])", "refId": "D", "legendFormat": "Info" }
       ],
       "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "linear", "fillOpacity": 20, "pointSize": 5 }, "color": { "mode": "palette-classic" } },
         "overrides": [
           { "matcher": { "id": "byName", "options": "Critical" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] },
           { "matcher": { "id": "byName", "options": "Error" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
-          { "matcher": { "id": "byName", "options": "Warning" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] }
+          { "matcher": { "id": "byName", "options": "Warning" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Info" }, "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }] }
         ]
       },
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
@@ -115,42 +117,42 @@
       "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_alert_low_fuel_total", "refId": "A" }],
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "yellow" }] }, "unit": "short" } },
-      "gridPos": { "h": 4, "w": 3, "x": 0, "y": 18 }
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 18 }
     },
     {
       "id": 41, "title": "Engine Overheating", "description": "VehicleAlertEvent.ENGINE_OVERHEATING",
       "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_alert_engine_overheating_total", "refId": "A" }],
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "red" }] }, "unit": "short" } },
-      "gridPos": { "h": 4, "w": 3, "x": 3, "y": 18 }
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 18 }
     },
     {
       "id": 42, "title": "Low Tire Pressure", "description": "VehicleAlertEvent.LOW_TIRE_PRESSURE",
       "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_alert_low_tire_pressure_total", "refId": "A" }],
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "yellow" }] }, "unit": "short" } },
-      "gridPos": { "h": 4, "w": 3, "x": 6, "y": 18 }
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 18 }
     },
     {
       "id": 43, "title": "Excessive Speed", "description": "VehicleAlertEvent.EXCESSIVE_SPEED",
       "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_alert_excessive_speed_total", "refId": "A" }],
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "orange" }] }, "unit": "short" } },
-      "gridPos": { "h": 4, "w": 3, "x": 9, "y": 18 }
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 18 }
     },
     {
       "id": 44, "title": "Brake Pressure Low", "description": "VehicleAlertEvent.BRAKE_PRESSURE_LOW",
       "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_alert_brake_pressure_low_total", "refId": "A" }],
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "red" }] }, "unit": "short" } },
-      "gridPos": { "h": 4, "w": 3, "x": 12, "y": 18 }
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 18 }
     },
     {
       "id": 45, "title": "Hydraulic Pressure Low", "description": "VehicleAlertEvent.HYDRAULIC_PRESSURE_LOW",
       "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_alert_hydraulic_pressure_low_total", "refId": "A" }],
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "orange" }] }, "unit": "short" } },
-      "gridPos": { "h": 4, "w": 3, "x": 15, "y": 18 }
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 18 }
     },
     {
       "id": 9, "title": "💻 VehicleAlertEvent - System Alerts", "type": "row", "collapsed": false,
@@ -161,28 +163,28 @@
       "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_alert_system_fault_total", "refId": "A" }],
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "red" }] }, "unit": "short" } },
-      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 23 }
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 23 }
     },
     {
       "id": 51, "title": "Low Battery", "description": "VehicleAlertEvent.LOW_BATTERY",
       "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_alert_low_battery_total", "refId": "A" }],
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "yellow" }] }, "unit": "short" } },
-      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 23 }
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 23 }
     },
     {
       "id": 52, "title": "Maintenance Required", "description": "VehicleAlertEvent.MAINTENANCE_REQUIRED",
       "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_alert_maintenance_required_total", "refId": "A" }],
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "blue" }] }, "unit": "short" } },
-      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 23 }
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 23 }
     },
     {
       "id": 53, "title": "Communication Loss", "description": "VehicleAlertEvent.COMMUNICATION_LOSS",
       "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_alert_communication_loss_total", "refId": "A" }],
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "red" }] }, "unit": "short" } },
-      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 23 }
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 23 }
     },
     {
       "id": 12, "title": "🗺️ VehicleAlertEvent - Navigation Alerts", "type": "row", "collapsed": false,
@@ -193,37 +195,83 @@
       "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_alert_route_deviation_total", "refId": "A" }],
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "orange" }] }, "unit": "short" } },
-      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 28 }
+      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 28 }
     },
     {
       "id": 61, "title": "Stuck Detection", "description": "VehicleAlertEvent.STUCK_DETECTION",
       "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_alert_stuck_detection_total", "refId": "A" }],
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "red" }] }, "unit": "short" } },
-      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 28 }
+      "gridPos": { "h": 4, "w": 8, "x": 8, "y": 28 }
     },
     {
       "id": 62, "title": "Positioning Error", "description": "VehicleAlertEvent.POSITIONING_ERROR",
       "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_alert_positioning_error_total", "refId": "A" }],
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "yellow" }] }, "unit": "short" } },
-      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 28 }
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 28 }
     },
     {
-      "id": 70, "title": "VehicleAlertEvent Rate by Type", "description": "All alert types over time",
+      "id": 70, "title": "All VehicleAlertEvent Types - Rate Over Time", "description": "Complete view of all 16 alert types",
       "type": "timeseries", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
-        { "expr": "rate(ahs_alert_collision_warning_total[1m])", "refId": "A", "legendFormat": "Collision Warning" },
-        { "expr": "rate(ahs_alert_obstacle_detected_total[1m])", "refId": "B", "legendFormat": "Obstacle Detected" },
-        { "expr": "rate(ahs_alert_low_fuel_total[1m])", "refId": "C", "legendFormat": "Low Fuel" },
-        { "expr": "rate(ahs_alert_engine_overheating_total[1m])", "refId": "D", "legendFormat": "Engine Overheating" },
-        { "expr": "rate(ahs_alert_excessive_speed_total[1m])", "refId": "E", "legendFormat": "Excessive Speed" },
-        { "expr": "rate(ahs_alert_system_fault_total[1m])", "refId": "F", "legendFormat": "System Fault" },
-        { "expr": "rate(ahs_alert_communication_loss_total[1m])", "refId": "G", "legendFormat": "Communication Loss" }
+        { "expr": "rate(ahs_alert_collision_warning_total[1m])", "refId": "A", "legendFormat": "🚨 Collision Warning" },
+        { "expr": "rate(ahs_alert_obstacle_detected_total[1m])", "refId": "B", "legendFormat": "🚨 Obstacle Detected" },
+        { "expr": "rate(ahs_alert_safety_envelope_breach_total[1m])", "refId": "C", "legendFormat": "🚨 Safety Breach" },
+        { "expr": "rate(ahs_alert_low_fuel_total[1m])", "refId": "D", "legendFormat": "⚙️ Low Fuel" },
+        { "expr": "rate(ahs_alert_engine_overheating_total[1m])", "refId": "E", "legendFormat": "⚙️ Engine Overheating" },
+        { "expr": "rate(ahs_alert_low_tire_pressure_total[1m])", "refId": "F", "legendFormat": "⚙️ Low Tire Pressure" },
+        { "expr": "rate(ahs_alert_excessive_speed_total[1m])", "refId": "G", "legendFormat": "⚙️ Excessive Speed" },
+        { "expr": "rate(ahs_alert_brake_pressure_low_total[1m])", "refId": "H", "legendFormat": "⚙️ Brake Pressure Low" },
+        { "expr": "rate(ahs_alert_hydraulic_pressure_low_total[1m])", "refId": "I", "legendFormat": "⚙️ Hydraulic Low" },
+        { "expr": "rate(ahs_alert_system_fault_total[1m])", "refId": "J", "legendFormat": "💻 System Fault" },
+        { "expr": "rate(ahs_alert_low_battery_total[1m])", "refId": "K", "legendFormat": "💻 Low Battery" },
+        { "expr": "rate(ahs_alert_maintenance_required_total[1m])", "refId": "L", "legendFormat": "💻 Maintenance Required" },
+        { "expr": "rate(ahs_alert_communication_loss_total[1m])", "refId": "M", "legendFormat": "💻 Communication Loss" },
+        { "expr": "rate(ahs_alert_route_deviation_total[1m])", "refId": "N", "legendFormat": "🗺️ Route Deviation" },
+        { "expr": "rate(ahs_alert_stuck_detection_total[1m])", "refId": "O", "legendFormat": "🗺️ Stuck Detection" },
+        { "expr": "rate(ahs_alert_positioning_error_total[1m])", "refId": "P", "legendFormat": "🗺️ Positioning Error" }
       ],
-      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "smooth", "fillOpacity": 15, "pointSize": 5, "showPoints": "auto" }, "color": { "mode": "palette-classic" } } },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "right" } },
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 32 }
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "smooth", "fillOpacity": 10, "pointSize": 5, "showPoints": "auto" }, "color": { "mode": "palette-classic" } } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "right", "showLegend": true } },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 32 }
+    },
+    {
+      "id": 80, "title": "Alert Type Distribution (Totals)", "description": "Total count of each alert type",
+      "type": "piechart", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "ahs_alert_collision_warning_total", "refId": "A", "legendFormat": "Collision Warning" },
+        { "expr": "ahs_alert_obstacle_detected_total", "refId": "B", "legendFormat": "Obstacle Detected" },
+        { "expr": "ahs_alert_safety_envelope_breach_total", "refId": "C", "legendFormat": "Safety Breach" },
+        { "expr": "ahs_alert_low_fuel_total", "refId": "D", "legendFormat": "Low Fuel" },
+        { "expr": "ahs_alert_engine_overheating_total", "refId": "E", "legendFormat": "Engine Overheating" },
+        { "expr": "ahs_alert_low_tire_pressure_total", "refId": "F", "legendFormat": "Low Tire Pressure" },
+        { "expr": "ahs_alert_excessive_speed_total", "refId": "G", "legendFormat": "Excessive Speed" },
+        { "expr": "ahs_alert_brake_pressure_low_total", "refId": "H", "legendFormat": "Brake Pressure Low" },
+        { "expr": "ahs_alert_hydraulic_pressure_low_total", "refId": "I", "legendFormat": "Hydraulic Low" },
+        { "expr": "ahs_alert_system_fault_total", "refId": "J", "legendFormat": "System Fault" },
+        { "expr": "ahs_alert_low_battery_total", "refId": "K", "legendFormat": "Low Battery" },
+        { "expr": "ahs_alert_maintenance_required_total", "refId": "L", "legendFormat": "Maintenance Required" },
+        { "expr": "ahs_alert_communication_loss_total", "refId": "M", "legendFormat": "Communication Loss" },
+        { "expr": "ahs_alert_route_deviation_total", "refId": "N", "legendFormat": "Route Deviation" },
+        { "expr": "ahs_alert_stuck_detection_total", "refId": "O", "legendFormat": "Stuck Detection" },
+        { "expr": "ahs_alert_positioning_error_total", "refId": "P", "legendFormat": "Positioning Error" }
+      ],
+      "options": { "legend": { "displayMode": "table", "placement": "right" }, "pieType": "pie", "tooltip": { "mode": "multi" } },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 42 }
+    },
+    {
+      "id": 81, "title": "Alert Heatmap by Category", "description": "Alerts grouped by category",
+      "type": "bargauge", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        { "expr": "ahs_alert_collision_warning_total + ahs_alert_obstacle_detected_total + ahs_alert_safety_envelope_breach_total", "refId": "A", "legendFormat": "🚨 Safety Alerts" },
+        { "expr": "ahs_alert_low_fuel_total + ahs_alert_engine_overheating_total + ahs_alert_low_tire_pressure_total + ahs_alert_excessive_speed_total + ahs_alert_brake_pressure_low_total + ahs_alert_hydraulic_pressure_low_total", "refId": "B", "legendFormat": "⚙️ Operational Alerts" },
+        { "expr": "ahs_alert_system_fault_total + ahs_alert_low_battery_total + ahs_alert_maintenance_required_total + ahs_alert_communication_loss_total", "refId": "C", "legendFormat": "💻 System Alerts" },
+        { "expr": "ahs_alert_route_deviation_total + ahs_alert_stuck_detection_total + ahs_alert_positioning_error_total", "refId": "D", "legendFormat": "🗺️ Navigation Alerts" }
+      ],
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 5, "color": "yellow" }, { "value": 20, "color": "red" }] } } },
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "showUnfilled": true },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 42 }
     }
   ]
 }
