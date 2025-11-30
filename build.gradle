@@ -24,6 +24,23 @@ subprojects {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
     
+    // Library modules don't have main classes - disable bootJar, enable jar
+    def libraryModules = ['ahs-common', 'ahs-domain', 'ahs-thrift-api']
+    // Flink modules use shadow JAR or custom fat JAR, not Spring Boot bootJar
+    def flinkModules = ['ahs-stream-analytics', 'ahs-telemetry-processor']
+    if (libraryModules.contains(project.name) || flinkModules.contains(project.name)) {
+        bootJar {
+            enabled = false
+        }
+        jar {
+            enabled = true
+        }
+        // Also disable bootRun and related tasks for non-Spring Boot modules
+        tasks.matching { it.name in ['bootRun', 'resolveMainClassName'] }.configureEach {
+            enabled = false
+        }
+    }
+    
     ext {
         springBootVersion = '3.2.0'
         flinkVersion = '1.18.0'
