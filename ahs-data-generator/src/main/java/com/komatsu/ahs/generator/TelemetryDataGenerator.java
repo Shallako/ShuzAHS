@@ -65,7 +65,7 @@ public class TelemetryDataGenerator {
   private static final double HYDRAULIC_PRESSURE_LOW_RATE = 0.015;// 1.5% - hydraulic < 2500 PSI
   
   // System Alerts
-  private static final double SYSTEM_FAULT_RATE = 0.01;           // 1% - diagnostic codes
+  private static final double SYSTEM_FAULT_RATE = 0.005;           // 0.05% - diagnostic codes
   private static final double LOW_BATTERY_RATE = 0.015;           // 1.5% - battery < 30%
   private static final double MAINTENANCE_REQUIRED_RATE = 0.01;   // 1% - hours near 500
   private static final double COMMUNICATION_LOSS_RATE = 0.01;     // 1% - warning light
