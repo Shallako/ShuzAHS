@@ -1,118 +1,56 @@
 {
   "title": "Komatsu AHS - Fleet Overview",
-  "tags": ["ahs", "fleet", "komatsu", "cep"],
+  "tags": ["ahs", "fleet", "komatsu", "cep", "alerts"],
   "timezone": "browser",
   "schemaVersion": 39,
-  "version": 2,
+  "version": 3,
   "refresh": "5s",
   "uid": "ahs-fleet-overview",
   "panels": [
     {
-      "id": 1,
-      "title": "Total Fleet Size",
-      "type": "stat",
+      "id": 1, "title": "Total Fleet Size", "type": "stat",
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_fleet_vehicles_total", "refId": "A" }],
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }] },
-          "unit": "short"
-        }
-      },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }] }, "unit": "short" } },
       "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 }
     },
     {
-      "id": 2,
-      "title": "Active Vehicles",
-      "type": "stat",
+      "id": 2, "title": "Active Vehicles", "type": "stat",
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_fleet_vehicles_active", "refId": "A" }],
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "value": null, "color": "blue" },
-            { "value": 10, "color": "green" }
-          ]},
-          "unit": "short"
-        }
-      },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "blue" }, { "value": 10, "color": "green" }] }, "unit": "short" } },
       "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 }
     },
     {
-      "id": 3,
-      "title": "Idle Vehicles",
-      "type": "stat",
+      "id": 3, "title": "Idle Vehicles", "type": "stat",
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_fleet_vehicles_idle", "refId": "A" }],
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "yellow" }] },
-          "unit": "short"
-        }
-      },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "yellow" }] }, "unit": "short" } },
       "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 }
     },
     {
-      "id": 4,
-      "title": "Emergency Stops",
-      "type": "stat",
+      "id": 4, "title": "Emergency Stops", "type": "stat",
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_fleet_vehicles_emergency", "refId": "A" }],
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "value": null, "color": "green" },
-            { "value": 1, "color": "red" }
-          ]},
-          "unit": "short"
-        }
-      },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "red" }] }, "unit": "short" } },
       "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 }
     },
     {
-      "id": 10,
-      "title": "Critical Alerts",
-      "type": "stat",
+      "id": 10, "title": "Critical Alerts", "type": "stat",
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_fleet_alerts_critical_total", "refId": "A" }],
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "value": null, "color": "green" },
-            { "value": 1, "color": "red" }
-          ]},
-          "unit": "short"
-        }
-      },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "red" }] }, "unit": "short" } },
       "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 }
     },
     {
-      "id": 11,
-      "title": "Warning Alerts",
-      "type": "stat",
+      "id": 11, "title": "Warning Alerts", "type": "stat",
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [{ "expr": "ahs_fleet_alerts_warning_total", "refId": "A" }],
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "value": null, "color": "green" },
-            { "value": 1, "color": "yellow" }
-          ]},
-          "unit": "short"
-        }
-      },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "yellow" }] }, "unit": "short" } },
       "gridPos": { "h": 4, "w": 4, "x": 20, "y": 0 }
     },
     {
-      "id": 5,
-      "title": "Vehicle Status Distribution",
-      "type": "timeseries",
+      "id": 5, "title": "Vehicle Status Distribution", "type": "timeseries",
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         { "expr": "ahs_fleet_vehicles_hauling", "refId": "A", "legendFormat": "Hauling" },
@@ -121,29 +59,19 @@
         { "expr": "ahs_fleet_vehicles_routing", "refId": "D", "legendFormat": "Routing" },
         { "expr": "ahs_fleet_vehicles_idle", "refId": "E", "legendFormat": "Idle" }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "custom": { "drawStyle": "line", "lineInterpolation": "linear", "fillOpacity": 10, "pointSize": 5, "showPoints": "auto" }
-        }
-      },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "linear", "fillOpacity": 10, "pointSize": 5, "showPoints": "auto" } } },
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 }
     },
     {
-      "id": 6,
-      "title": "Alert Rate by Severity (per minute)",
-      "type": "timeseries",
+      "id": 6, "title": "Alert Rate by Severity", "type": "timeseries",
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         { "expr": "rate(ahs_fleet_alerts_critical_total[1m])", "refId": "A", "legendFormat": "Critical" },
         { "expr": "rate(ahs_fleet_alerts_error_total[1m])", "refId": "B", "legendFormat": "Error" },
         { "expr": "rate(ahs_fleet_alerts_warning_total[1m])", "refId": "C", "legendFormat": "Warning" }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "custom": { "drawStyle": "line", "lineInterpolation": "linear", "fillOpacity": 20, "pointSize": 5 },
-          "color": { "mode": "palette-classic" }
-        },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "linear", "fillOpacity": 20, "pointSize": 5 }, "color": { "mode": "palette-classic" } },
         "overrides": [
           { "matcher": { "id": "byName", "options": "Critical" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] },
           { "matcher": { "id": "byName", "options": "Error" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
@@ -154,135 +82,148 @@
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 }
     },
     {
-      "id": 7,
-      "title": "🚨 Flink CEP Alerts",
-      "type": "row",
-      "collapsed": false,
+      "id": 7, "title": "🚨 VehicleAlertEvent - Safety Alerts", "type": "row", "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 12 }
     },
     {
-      "id": 20,
-      "title": "Rapid Deceleration Events",
-      "description": "CEP Pattern: Speed drops from >50 kph to <10 kph within 5 seconds (potential collision avoidance)",
-      "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [{ "expr": "ahs_cep_alerts_rapid_deceleration_total", "refId": "A" }],
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "value": null, "color": "green" },
-            { "value": 1, "color": "orange" },
-            { "value": 5, "color": "red" }
-          ]},
-          "unit": "short"
-        }
-      },
+      "id": 30, "title": "Collision Warning", "description": "VehicleAlertEvent.COLLISION_WARNING - Rapid deceleration or collision avoidance",
+      "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "ahs_alert_collision_warning_total", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "red" }] }, "unit": "short" } },
       "gridPos": { "h": 4, "w": 4, "x": 0, "y": 13 }
     },
     {
-      "id": 21,
-      "title": "Low Fuel Alerts",
-      "description": "CEP Pattern: Fuel level below 15%",
-      "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [{ "expr": "ahs_cep_alerts_low_fuel_total", "refId": "A" }],
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "value": null, "color": "green" },
-            { "value": 1, "color": "yellow" },
-            { "value": 10, "color": "orange" }
-          ]},
-          "unit": "short"
-        }
-      },
+      "id": 31, "title": "Obstacle Detected", "description": "VehicleAlertEvent.OBSTACLE_DETECTED",
+      "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "ahs_alert_obstacle_detected_total", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "orange" }] }, "unit": "short" } },
       "gridPos": { "h": 4, "w": 4, "x": 4, "y": 13 }
     },
     {
-      "id": 22,
-      "title": "Overheating Alerts",
-      "description": "CEP Pattern: Engine temperature >95°C for 3 consecutive readings within 2 minutes",
-      "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [{ "expr": "ahs_cep_alerts_overheating_total", "refId": "A" }],
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "value": null, "color": "green" },
-            { "value": 1, "color": "red" }
-          ]},
-          "unit": "short"
-        }
-      },
+      "id": 32, "title": "Safety Envelope Breach", "description": "VehicleAlertEvent.SAFETY_ENVELOPE_BREACH",
+      "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "ahs_alert_safety_envelope_breach_total", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "red" }] }, "unit": "short" } },
       "gridPos": { "h": 4, "w": 4, "x": 8, "y": 13 }
     },
     {
-      "id": 23,
-      "title": "High Temperature Alerts",
-      "description": "CEP Pattern: Engine temperature threshold exceeded",
-      "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [{ "expr": "ahs_cep_alerts_high_temperature_total", "refId": "A" }],
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "value": null, "color": "green" },
-            { "value": 1, "color": "orange" }
-          ]},
-          "unit": "short"
-        }
-      },
-      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 13 }
+      "id": 8, "title": "⚙️ VehicleAlertEvent - Operational Alerts", "type": "row", "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 17 }
     },
     {
-      "id": 24,
-      "title": "Tire Pressure Alerts",
-      "description": "CEP Pattern: Low tire pressure detected",
-      "type": "stat",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [{ "expr": "ahs_cep_alerts_tire_pressure_total", "refId": "A" }],
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "value": null, "color": "green" },
-            { "value": 1, "color": "yellow" }
-          ]},
-          "unit": "short"
-        }
-      },
-      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 13 }
+      "id": 40, "title": "Low Fuel", "description": "VehicleAlertEvent.LOW_FUEL",
+      "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "ahs_alert_low_fuel_total", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "yellow" }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 3, "x": 0, "y": 18 }
     },
     {
-      "id": 25,
-      "title": "CEP Alert Rate by Type (per minute)",
-      "description": "Rate of Flink CEP pattern detections over time",
-      "type": "timeseries",
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "id": 41, "title": "Engine Overheating", "description": "VehicleAlertEvent.ENGINE_OVERHEATING",
+      "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "ahs_alert_engine_overheating_total", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "red" }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 3, "x": 3, "y": 18 }
+    },
+    {
+      "id": 42, "title": "Low Tire Pressure", "description": "VehicleAlertEvent.LOW_TIRE_PRESSURE",
+      "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "ahs_alert_low_tire_pressure_total", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "yellow" }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 3, "x": 6, "y": 18 }
+    },
+    {
+      "id": 43, "title": "Excessive Speed", "description": "VehicleAlertEvent.EXCESSIVE_SPEED",
+      "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "ahs_alert_excessive_speed_total", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "orange" }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 3, "x": 9, "y": 18 }
+    },
+    {
+      "id": 44, "title": "Brake Pressure Low", "description": "VehicleAlertEvent.BRAKE_PRESSURE_LOW",
+      "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "ahs_alert_brake_pressure_low_total", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "red" }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 3, "x": 12, "y": 18 }
+    },
+    {
+      "id": 45, "title": "Hydraulic Pressure Low", "description": "VehicleAlertEvent.HYDRAULIC_PRESSURE_LOW",
+      "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "ahs_alert_hydraulic_pressure_low_total", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "orange" }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 3, "x": 15, "y": 18 }
+    },
+    {
+      "id": 9, "title": "💻 VehicleAlertEvent - System Alerts", "type": "row", "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 }
+    },
+    {
+      "id": 50, "title": "System Fault", "description": "VehicleAlertEvent.SYSTEM_FAULT",
+      "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "ahs_alert_system_fault_total", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "red" }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 23 }
+    },
+    {
+      "id": 51, "title": "Low Battery", "description": "VehicleAlertEvent.LOW_BATTERY",
+      "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "ahs_alert_low_battery_total", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "yellow" }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 23 }
+    },
+    {
+      "id": 52, "title": "Maintenance Required", "description": "VehicleAlertEvent.MAINTENANCE_REQUIRED",
+      "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "ahs_alert_maintenance_required_total", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "blue" }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 23 }
+    },
+    {
+      "id": 53, "title": "Communication Loss", "description": "VehicleAlertEvent.COMMUNICATION_LOSS",
+      "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "ahs_alert_communication_loss_total", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "red" }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 23 }
+    },
+    {
+      "id": 12, "title": "🗺️ VehicleAlertEvent - Navigation Alerts", "type": "row", "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 27 }
+    },
+    {
+      "id": 60, "title": "Route Deviation", "description": "VehicleAlertEvent.ROUTE_DEVIATION",
+      "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "ahs_alert_route_deviation_total", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "orange" }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 28 }
+    },
+    {
+      "id": 61, "title": "Stuck Detection", "description": "VehicleAlertEvent.STUCK_DETECTION",
+      "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "ahs_alert_stuck_detection_total", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "red" }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 28 }
+    },
+    {
+      "id": 62, "title": "Positioning Error", "description": "VehicleAlertEvent.POSITIONING_ERROR",
+      "type": "stat", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "expr": "ahs_alert_positioning_error_total", "refId": "A" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "yellow" }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 28 }
+    },
+    {
+      "id": 70, "title": "VehicleAlertEvent Rate by Type", "description": "All alert types over time",
+      "type": "timeseries", "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
-        { "expr": "rate(ahs_cep_alerts_rapid_deceleration_total[1m])", "refId": "A", "legendFormat": "Rapid Deceleration" },
-        { "expr": "rate(ahs_cep_alerts_low_fuel_total[1m])", "refId": "B", "legendFormat": "Low Fuel" },
-        { "expr": "rate(ahs_cep_alerts_overheating_total[1m])", "refId": "C", "legendFormat": "Overheating" },
-        { "expr": "rate(ahs_cep_alerts_high_temperature_total[1m])", "refId": "D", "legendFormat": "High Temperature" },
-        { "expr": "rate(ahs_cep_alerts_tire_pressure_total[1m])", "refId": "E", "legendFormat": "Tire Pressure" }
+        { "expr": "rate(ahs_alert_collision_warning_total[1m])", "refId": "A", "legendFormat": "Collision Warning" },
+        { "expr": "rate(ahs_alert_obstacle_detected_total[1m])", "refId": "B", "legendFormat": "Obstacle Detected" },
+        { "expr": "rate(ahs_alert_low_fuel_total[1m])", "refId": "C", "legendFormat": "Low Fuel" },
+        { "expr": "rate(ahs_alert_engine_overheating_total[1m])", "refId": "D", "legendFormat": "Engine Overheating" },
+        { "expr": "rate(ahs_alert_excessive_speed_total[1m])", "refId": "E", "legendFormat": "Excessive Speed" },
+        { "expr": "rate(ahs_alert_system_fault_total[1m])", "refId": "F", "legendFormat": "System Fault" },
+        { "expr": "rate(ahs_alert_communication_loss_total[1m])", "refId": "G", "legendFormat": "Communication Loss" }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "custom": { "drawStyle": "line", "lineInterpolation": "smooth", "fillOpacity": 15, "pointSize": 5, "showPoints": "auto" },
-          "color": { "mode": "palette-classic" }
-        },
-        "overrides": [
-          { "matcher": { "id": "byName", "options": "Rapid Deceleration" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] },
-          { "matcher": { "id": "byName", "options": "Overheating" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
-          { "matcher": { "id": "byName", "options": "Low Fuel" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] }
-        ]
-      },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 17 }
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "smooth", "fillOpacity": 15, "pointSize": 5, "showPoints": "auto" }, "color": { "mode": "palette-classic" } } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "right" } },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 32 }
     }
   ]
 }

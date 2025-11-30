@@ -8,6 +8,9 @@ dependencies {
     implementation "org.apache.flink:flink-connector-kafka:${flinkKafkaConnectorVersion}"
     implementation "org.apache.flink:flink-connector-base:${flinkVersion}"
     
+    // Flink CEP for Complex Event Processing
+    implementation "org.apache.flink:flink-cep:${flinkVersion}"
+    
     // Kafka client is provided transitively by Flink Kafka connector
     
     // JSON

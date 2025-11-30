@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Prometheus Metrics Exporter for Fleet Management
  * 
  * Exposes fleet metrics to Prometheus for visualization in Grafana.
- * Includes CEP (Complex Event Processing) alert metrics from Flink.
+ * Includes all VehicleAlertEvent types from Flink CEP processing.
  */
 @Component
 @Slf4j
@@ -35,10 +35,34 @@ public class FleetMetricsExporter {
     private Counter criticalAlerts;
     private Counter warningAlerts;
     private Counter errorAlerts;
+    private Counter infoAlerts;
     
-    // CEP Pattern-specific alert counters
-    private Counter rapidDecelerationAlerts;
+    // Safety Alert counters
+    private Counter collisionWarningAlerts;
+    private Counter obstacleDetectedAlerts;
+    private Counter safetyEnvelopeBreachAlerts;
+    
+    // Operational Alert counters
     private Counter lowFuelAlerts;
+    private Counter engineOverheatingAlerts;
+    private Counter lowTirePressureAlerts;
+    private Counter excessiveSpeedAlerts;
+    private Counter brakePressureLowAlerts;
+    private Counter hydraulicPressureLowAlerts;
+    
+    // System Alert counters
+    private Counter systemFaultAlerts;
+    private Counter lowBatteryAlerts;
+    private Counter maintenanceRequiredAlerts;
+    private Counter communicationLossAlerts;
+    
+    // Navigation Alert counters
+    private Counter routeDeviationAlerts;
+    private Counter stuckDetectionAlerts;
+    private Counter positioningErrorAlerts;
+    
+    // Legacy CEP counters (for backward compatibility with existing dashboards)
+    private Counter rapidDecelerationAlerts;
     private Counter overheatingAlerts;
     private Counter highTemperatureAlerts;
     private Counter tirePressureAlerts;
@@ -82,7 +106,7 @@ public class FleetMetricsExporter {
             .description("Number of vehicles in emergency stop")
             .register(meterRegistry);
         
-        // Register alert severity counters
+        // Alert severity counters
         criticalAlerts = Counter.builder("ahs_fleet_alerts_critical_total")
             .description("Total count of critical severity alerts")
             .register(meterRegistry);
@@ -94,29 +118,102 @@ public class FleetMetricsExporter {
         errorAlerts = Counter.builder("ahs_fleet_alerts_error_total")
             .description("Total count of error severity alerts")
             .register(meterRegistry);
+            
+        infoAlerts = Counter.builder("ahs_fleet_alerts_info_total")
+            .description("Total count of info severity alerts")
+            .register(meterRegistry);
 
-        // Register CEP pattern-specific alert counters
-        rapidDecelerationAlerts = Counter.builder("ahs_cep_alerts_rapid_deceleration_total")
-            .description("CEP: Rapid deceleration events (>50 to <10 kph in 5s)")
+        // Safety Alert counters
+        collisionWarningAlerts = Counter.builder("ahs_alert_collision_warning_total")
+            .description("Collision warning alerts")
             .register(meterRegistry);
             
-        lowFuelAlerts = Counter.builder("ahs_cep_alerts_low_fuel_total")
-            .description("CEP: Low fuel alerts (<15%)")
+        obstacleDetectedAlerts = Counter.builder("ahs_alert_obstacle_detected_total")
+            .description("Obstacle detected alerts")
+            .register(meterRegistry);
+            
+        safetyEnvelopeBreachAlerts = Counter.builder("ahs_alert_safety_envelope_breach_total")
+            .description("Safety envelope breach alerts")
+            .register(meterRegistry);
+
+        // Operational Alert counters
+        lowFuelAlerts = Counter.builder("ahs_alert_low_fuel_total")
+            .description("Low fuel alerts")
+            .register(meterRegistry);
+            
+        engineOverheatingAlerts = Counter.builder("ahs_alert_engine_overheating_total")
+            .description("Engine overheating alerts")
+            .register(meterRegistry);
+            
+        lowTirePressureAlerts = Counter.builder("ahs_alert_low_tire_pressure_total")
+            .description("Low tire pressure alerts")
+            .register(meterRegistry);
+            
+        excessiveSpeedAlerts = Counter.builder("ahs_alert_excessive_speed_total")
+            .description("Excessive speed alerts")
+            .register(meterRegistry);
+            
+        brakePressureLowAlerts = Counter.builder("ahs_alert_brake_pressure_low_total")
+            .description("Brake pressure low alerts")
+            .register(meterRegistry);
+            
+        hydraulicPressureLowAlerts = Counter.builder("ahs_alert_hydraulic_pressure_low_total")
+            .description("Hydraulic pressure low alerts")
+            .register(meterRegistry);
+
+        // System Alert counters
+        systemFaultAlerts = Counter.builder("ahs_alert_system_fault_total")
+            .description("System fault alerts")
+            .register(meterRegistry);
+            
+        lowBatteryAlerts = Counter.builder("ahs_alert_low_battery_total")
+            .description("Low battery alerts")
+            .register(meterRegistry);
+            
+        maintenanceRequiredAlerts = Counter.builder("ahs_alert_maintenance_required_total")
+            .description("Maintenance required alerts")
+            .register(meterRegistry);
+            
+        communicationLossAlerts = Counter.builder("ahs_alert_communication_loss_total")
+            .description("Communication loss alerts")
+            .register(meterRegistry);
+
+        // Navigation Alert counters
+        routeDeviationAlerts = Counter.builder("ahs_alert_route_deviation_total")
+            .description("Route deviation alerts")
+            .register(meterRegistry);
+            
+        stuckDetectionAlerts = Counter.builder("ahs_alert_stuck_detection_total")
+            .description("Stuck detection alerts")
+            .register(meterRegistry);
+            
+        positioningErrorAlerts = Counter.builder("ahs_alert_positioning_error_total")
+            .description("Positioning error alerts")
+            .register(meterRegistry);
+
+        // Legacy CEP counters (backward compatibility)
+        rapidDecelerationAlerts = Counter.builder("ahs_cep_alerts_rapid_deceleration_total")
+            .description("CEP: Rapid deceleration events")
             .register(meterRegistry);
             
         overheatingAlerts = Counter.builder("ahs_cep_alerts_overheating_total")
-            .description("CEP: Engine overheating (>95°C sustained)")
+            .description("CEP: Engine overheating")
             .register(meterRegistry);
             
         highTemperatureAlerts = Counter.builder("ahs_cep_alerts_high_temperature_total")
-            .description("CEP: High engine temperature threshold alerts")
+            .description("CEP: High engine temperature")
             .register(meterRegistry);
             
         tirePressureAlerts = Counter.builder("ahs_cep_alerts_tire_pressure_total")
-            .description("CEP: Low tire pressure alerts")
+            .description("CEP: Low tire pressure")
             .register(meterRegistry);
             
-        log.info("Prometheus metrics initialized for fleet management (including CEP alerts)");
+        // Keep low fuel for legacy compatibility
+        Counter.builder("ahs_cep_alerts_low_fuel_total")
+            .description("CEP: Low fuel alerts")
+            .register(meterRegistry);
+            
+        log.info("Prometheus metrics initialized for fleet management (including all VehicleAlertEvent types)");
     }
     
     // Vehicle count update methods
@@ -133,62 +230,99 @@ public class FleetMetricsExporter {
     }
 
     // Alert severity increment methods
-    public void incrementCriticalAlert() {
-        criticalAlerts.increment();
-    }
+    public void incrementCriticalAlert() { criticalAlerts.increment(); }
+    public void incrementWarningAlert() { warningAlerts.increment(); }
+    public void incrementErrorAlert() { errorAlerts.increment(); }
+    public void incrementInfoAlert() { infoAlerts.increment(); }
     
-    public void incrementWarningAlert() {
-        warningAlerts.increment();
-    }
-    
-    public void incrementErrorAlert() {
-        errorAlerts.increment();
-    }
-    
-    // CEP alert type increment methods
-    public void incrementRapidDecelerationAlert() {
-        rapidDecelerationAlerts.increment();
-    }
-    
-    public void incrementLowFuelAlert() {
-        lowFuelAlerts.increment();
-    }
-    
-    public void incrementOverheatingAlert() {
-        overheatingAlerts.increment();
-    }
-    
-    public void incrementHighTemperatureAlert() {
-        highTemperatureAlerts.increment();
-    }
-    
-    public void incrementTirePressureAlert() {
-        tirePressureAlerts.increment();
-    }
+    // Legacy CEP methods for backward compatibility
+    public void incrementRapidDecelerationAlert() { rapidDecelerationAlerts.increment(); }
+    public void incrementLowFuelAlert() { lowFuelAlerts.increment(); }
+    public void incrementOverheatingAlert() { overheatingAlerts.increment(); }
+    public void incrementHighTemperatureAlert() { highTemperatureAlerts.increment(); }
+    public void incrementTirePressureAlert() { tirePressureAlerts.increment(); }
     
     /**
-     * Increment CEP alert counter by alert type string
+     * Increment CEP alert counter by alert type string.
+     * Handles all VehicleAlertEvent.AlertType values.
      */
     public void incrementCepAlertByType(String alertType) {
         if (alertType == null) return;
         
         switch (alertType.toUpperCase()) {
-            case "RAPID_DECELERATION":
-                incrementRapidDecelerationAlert();
+            // Safety Alerts
+            case "COLLISION_WARNING":
+                collisionWarningAlerts.increment();
+                rapidDecelerationAlerts.increment(); // backward compatibility
                 break;
+            case "OBSTACLE_DETECTED":
+                obstacleDetectedAlerts.increment();
+                break;
+            case "SAFETY_ENVELOPE_BREACH":
+                safetyEnvelopeBreachAlerts.increment();
+                break;
+                
+            // Operational Alerts
             case "LOW_FUEL":
-                incrementLowFuelAlert();
+                lowFuelAlerts.increment();
+                break;
+            case "ENGINE_OVERHEATING":
+                engineOverheatingAlerts.increment();
+                overheatingAlerts.increment(); // backward compatibility
+                break;
+            case "LOW_TIRE_PRESSURE":
+            case "TIRE_PRESSURE_LOW":
+                lowTirePressureAlerts.increment();
+                tirePressureAlerts.increment(); // backward compatibility
+                break;
+            case "EXCESSIVE_SPEED":
+                excessiveSpeedAlerts.increment();
+                break;
+            case "BRAKE_PRESSURE_LOW":
+                brakePressureLowAlerts.increment();
+                break;
+            case "HYDRAULIC_PRESSURE_LOW":
+                hydraulicPressureLowAlerts.increment();
+                break;
+                
+            // System Alerts
+            case "SYSTEM_FAULT":
+                systemFaultAlerts.increment();
+                break;
+            case "LOW_BATTERY":
+                lowBatteryAlerts.increment();
+                break;
+            case "MAINTENANCE_REQUIRED":
+                maintenanceRequiredAlerts.increment();
+                break;
+            case "COMMUNICATION_LOSS":
+                communicationLossAlerts.increment();
+                break;
+                
+            // Navigation Alerts
+            case "ROUTE_DEVIATION":
+                routeDeviationAlerts.increment();
+                break;
+            case "STUCK_DETECTION":
+                stuckDetectionAlerts.increment();
+                break;
+            case "POSITIONING_ERROR":
+                positioningErrorAlerts.increment();
+                break;
+                
+            // Legacy mappings
+            case "RAPID_DECELERATION":
+                rapidDecelerationAlerts.increment();
+                collisionWarningAlerts.increment();
                 break;
             case "OVERHEATING":
-                incrementOverheatingAlert();
+                overheatingAlerts.increment();
+                engineOverheatingAlerts.increment();
                 break;
             case "HIGH_TEMPERATURE":
-                incrementHighTemperatureAlert();
+                highTemperatureAlerts.increment();
                 break;
-            case "TIRE_PRESSURE_LOW":
-            case "LOW_TIRE_PRESSURE":
-                incrementTirePressureAlert();
-                break;
+                
             default:
                 log.debug("Unknown CEP alert type: {}", alertType);
         }

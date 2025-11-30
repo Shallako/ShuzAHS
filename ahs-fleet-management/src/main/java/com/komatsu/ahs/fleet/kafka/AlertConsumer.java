@@ -59,6 +59,9 @@ public class AlertConsumer {
                 case "ERROR":
                     metricsExporter.incrementErrorAlert();
                     break;
+                case "INFO":
+                    metricsExporter.incrementInfoAlert();
+                    break;
                 default:
                     log.debug("Unknown severity: {}", severity);
             }
