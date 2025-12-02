@@ -47,18 +47,18 @@ kafka-console-consumer --bootstrap-server localhost:9092 \
 
 ## API Endpoints
 
-### Fleet Management (Port 8081, context-path: /fleet-management)
+### Fleet Management (Port 8080, context-path: /)
 ```bash
-# Base path: /fleet-management/api/v1/fleet
+# Base path: /api/v1/fleet
 
 # Get fleet statistics
-curl http://localhost:8081/fleet-management/api/v1/fleet/statistics
+curl http://localhost:8080/api/v1/fleet/statistics
 
 # Get all vehicles
-curl http://localhost:8081/fleet-management/api/v1/fleet/vehicles
+curl http://localhost:8080/api/v1/fleet/vehicles
 
 # Get vehicle by ID
-curl http://localhost:8081/fleet-management/api/v1/fleet/vehicles/KOMATSU-930E-001
+curl http://localhost:8080/api/v1/fleet/vehicles/KOMATSU-930E-001
 ```
 
 ## Project Modules
@@ -66,7 +66,7 @@ curl http://localhost:8081/fleet-management/api/v1/fleet/vehicles/KOMATSU-930E-0
 | Module | Purpose | Technology |
 |--------|---------|------------|
 | ahs-domain | Core models | POJOs, Lombok |
-| ahs-data-generator | Test data | Java 11, Kafka |
+| ahs-data-generator | Test data | Java 17, Kafka |
 | ahs-telemetry-processor | Stream processing | Apache Flink |
 | ahs-fleet-management | Fleet API | Spring Boot |
 | ahs-vehicle-service | Vehicle API | Spring Boot, Thrift |
@@ -103,7 +103,7 @@ docker-compose up -d kafka zookeeper
 
 ### Port already in use
 ```bash
-# Fleet Management: Change in application.yml (default: 8081, context-path: /fleet-management)
+# Fleet Management: Change in application.yml (default: 8080, context-path: /)
 # Vehicle Service: Change in application.yml (default: 8080)
 ```
 

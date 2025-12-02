@@ -25,7 +25,7 @@ subprojects {
     targetCompatibility = JavaVersion.VERSION_17
     
     // Library modules don't have main classes - disable bootJar, enable jar
-    def libraryModules = ['ahs-common', 'ahs-domain', 'ahs-thrift-api']
+    def libraryModules = ['ahs-common', 'ahs-domain', 'ahs-thrift-api', 'ahs-proto']
     // Flink modules use shadow JAR or custom fat JAR, not Spring Boot bootJar
     def flinkModules = ['ahs-stream-analytics', 'ahs-telemetry-processor']
     if (libraryModules.contains(project.name) || flinkModules.contains(project.name)) {

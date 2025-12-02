@@ -1,7 +1,7 @@
 # Komatsu AHS System Architecture Diagrams
 
 **Project**: Komatsu Autonomous Haulage System (AHS) Streaming Platform  
-**Date**: November 29, 2025
+**Date**: December 2, 2025
 
 This document contains comprehensive diagrams documenting the system architecture, data flows, and component interactions.
 
@@ -137,7 +137,7 @@ sequenceDiagram
     participant DB as PostgreSQL
     participant K as Kafka
     
-    C->>FM: GET /api/fleet/vehicles
+    C->>FM: GET /api/v1/fleet/vehicles
     FM->>Cache: get("all_active_vehicles")
     
     alt Cache Hit
@@ -150,7 +150,7 @@ sequenceDiagram
         FM-->>C: 200 OK [vehicles]
     end
     
-    C->>FM: PUT /api/fleet/vehicles/{id}/status
+    C->>FM: PUT /api/v1/fleet/vehicles/{id}/status
     Note over C: Request: status = "MAINTENANCE"
     
     FM->>DB: UPDATE vehicles<br/>SET status = 'MAINTENANCE'
@@ -162,7 +162,7 @@ sequenceDiagram
     
     FM-->>C: 200 OK
     
-    C->>FM: GET /api/fleet/statistics
+    C->>FM: GET /api/v1/fleet/statistics
     FM->>FM: calculateFleetStats()
     Note over FM: Aggregate:<br/>- Total Vehicles: 15<br/>- Active: 12<br/>- Idle: 3<br/>- Status Breakdown
     FM-->>C: 200 OK [statistics]
@@ -1075,7 +1075,7 @@ sequenceDiagram
     participant F as Flink Processor
     
     Note over UI: User requests fleet status
-    UI->>LB: GET /api/fleet/statistics
+    UI->>LB: GET /api/v1/fleet/statistics
     LB->>FM: route request
     
     FM->>Cache: GET fleet:statistics

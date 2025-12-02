@@ -8,6 +8,7 @@ dependencies {
     implementation project(':ahs-common')
     implementation project(':ahs-domain')
     implementation project(':ahs-thrift-api')
+    implementation project(':ahs-proto')
     
     // Flink dependencies
     implementation "org.apache.flink:flink-streaming-java:${flinkVersion}"
@@ -21,9 +22,12 @@ dependencies {
     
     // Kafka client is provided transitively by Flink Kafka connector; avoid forcing another version
     
-    // Jackson for JSON serialization
+    // Jackson for JSON serialization (fallback path)
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+
+    // Protobuf runtime
+    implementation 'com.google.protobuf:protobuf-java:3.25.3'
     
     // Thrift
     implementation "org.apache.thrift:libthrift:${thriftVersion}"

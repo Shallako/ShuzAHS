@@ -1,6 +1,6 @@
 # Dockerfile Base Image Fix
 
-**Date**: November 29, 2025  
+**Date**: December 2, 2025  
 **Issue**: Alpine image not available for Eclipse Temurin JRE 17  
 **Status**: ✅ FIXED
 

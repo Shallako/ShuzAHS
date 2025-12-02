@@ -46,6 +46,10 @@ bin/
 *.log
 logs/
 
+# Protobuf generated sources (legacy + build outputs)
+ahs-proto/src/generated/
+ahs-proto/build/generated/
+
 # Package Files
 *.jar
 *.war

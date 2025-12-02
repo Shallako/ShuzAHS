@@ -130,7 +130,7 @@ Complete implementation from scratch:
 
 ### Prerequisites
 ```bash
-# Java 11
+# Java 17
 java -version
 
 # Kafka (Docker)
@@ -179,7 +179,7 @@ kafka-console-consumer \
   --from-beginning
 
 # Or call fleet API
-curl http://localhost:8080/api/fleet/statistics
+curl http://localhost:8080/api/v1/fleet/statistics
 ```
 
 ---
@@ -272,7 +272,7 @@ java -jar ahs-data-generator.jar -v 200 -i 1000
 | **Jackson** | JSON serialization | All modules |
 | **Lombok** | Boilerplate reduction | All modules |
 | **PicoCLI** | CLI framework | ahs-data-generator |
-| **Java 11** | Language | All modules |
+| **Java 17** | Language | All modules |
 | **Gradle** | Build system | Root project |
 
 ---
@@ -314,7 +314,7 @@ java -jar ahs-data-generator.jar -v 200 -i 1000
 
 ## ✨ **Success Metrics**
 
-- ✅ Complete Java 11 implementation
+- ✅ Complete Java 17 implementation
 - ✅ Apache Thrift integration
 - ✅ Apache Flink stream processing
 - ✅ Kafka event streaming

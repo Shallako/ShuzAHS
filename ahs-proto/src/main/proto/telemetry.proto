@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package com.komatsu.ahs.proto;
+
+option java_multiple_files = true;
+option java_package = "com.komatsu.ahs.proto";
+option java_outer_classname = "TelemetryProtos";
+
+import "google/protobuf/timestamp.proto";
+
+// Vehicle operational status
+enum VehicleStatus {
+  VS_UNKNOWN = 0;
+  IDLE = 1;
+  ROUTING = 2;
+  LOADING = 3;
+  HAULING = 4;
+  DUMPING = 5;
+  RETURNING = 6;
+  MAINTENANCE = 7;
+  OFFLINE = 8;
+  EMERGENCY_STOP = 9;
+  ERROR = 10;
+}
+
+// GPS coordinate information
+message GpsCoordinate {
+  double latitude = 1;
+  double longitude = 2;
+  double altitude = 3;  // meters
+  double accuracy = 4;  // meters
+  double heading = 5;   // degrees
+  double speed = 6;     // m/s
+  google.protobuf.Timestamp timestamp = 7;
+}
+
+// Core vehicle telemetry
+message VehicleTelemetry {
+  string vehicle_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+
+  // Location and navigation
+  GpsCoordinate location = 3;
+  double speed_kph = 4;
+  double heading_degrees = 5;
+
+  // Powertrain
+  double engine_rpm = 6;
+  double fuel_level_percent = 7;
+  double battery_level_percent = 8;
+  double engine_temperature_celsius = 9;
+
+  // Payload and load
+  double payload_tons = 10;
+  bool is_loaded = 11;
+
+  // Brakes and tires
+  double brake_pressure_psi = 12;
+  double tire_pressure_front_left_psi = 13;
+  double tire_pressure_front_right_psi = 14;
+  double tire_pressure_rear_left_psi = 15;
+  double tire_pressure_rear_right_psi = 16;
+  double tire_temperature_avg_celsius = 17;
+
+  // Hydraulics
+  double hydraulic_pressure_psi = 18;
+  double hydraulic_fluid_temp_celsius = 19;
+
+  // Diagnostics
+  int32 diagnostic_code_count = 20;
+  bool warning_light = 21;
+  bool check_engine_light = 22;
+
+  // Operational metrics
+  int64 total_distance_meters = 23;
+  int64 operating_hours = 24;
+  int32 trip_count = 25;
+}
+
+// Wrapper for telemetry with status and metadata
+message VehicleTelemetryEvent {
+  string vehicle_id = 1;
+  VehicleTelemetry telemetry = 2;
+  VehicleStatus vehicle_status = 3;
+  string source = 4;
+}

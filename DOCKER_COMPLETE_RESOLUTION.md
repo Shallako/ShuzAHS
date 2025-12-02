@@ -1,7 +1,7 @@
 # All Docker Issues - Complete Resolution Summary
 
 **Project**: Komatsu AHS Streaming Platform  
-**Date**: November 29, 2025  
+**Date**: December 2, 2025  
 **Status**: ✅ ALL ISSUES RESOLVED
 
 ---
@@ -26,7 +26,9 @@
 flink-taskmanager:
   container_name: ahs-flink-taskmanager
   scale: 2
+```
 
+```yaml
 # After
 flink-taskmanager:
   deploy:

@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/ahs-data-generator" />
             <option value="$PROJECT_DIR$/ahs-domain" />
             <option value="$PROJECT_DIR$/ahs-fleet-management" />
+            <option value="$PROJECT_DIR$/ahs-proto" />
             <option value="$PROJECT_DIR$/ahs-stream-analytics" />
             <option value="$PROJECT_DIR$/ahs-telemetry-processor" />
             <option value="$PROJECT_DIR$/ahs-thrift-api" />

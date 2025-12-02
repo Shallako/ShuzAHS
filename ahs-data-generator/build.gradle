@@ -6,13 +6,17 @@ dependencies {
     // Project dependencies
     implementation project(':ahs-common')
     implementation project(':ahs-domain')
+    implementation project(':ahs-proto')
     
     // Kafka
     implementation "org.apache.kafka:kafka-clients:${kafkaVersion}"
     
-    // Jackson for JSON
+    // Jackson JSON
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+    
+    // Protobuf
+    implementation 'com.google.protobuf:protobuf-java:3.25.3'
     
     // CLI
     implementation 'info.picocli:picocli:4.7.5'

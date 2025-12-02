@@ -2,10 +2,10 @@
 
 A production-ready implementation of a real-time telemetry processing and fleet management system for Komatsu's autonomous mining trucks, built with Apache Flink, Apache Thrift, and Spring Boot.
 
-![Java](https://img.shields.io/badge/Java-11-orange)
-![Gradle](https://img.shields.io/badge/Gradle-8.14-blue)
+![Java](https://img.shields.io/badge/Java-17-orange)
+![Gradle](https://img.shields.io/badge/Gradle-8.4-blue)
 ![Flink](https://img.shields.io/badge/Apache%20Flink-1.18.0-red)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7.18-green)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-green)
 
 ## 📋 Table of Contents
 
@@ -14,6 +14,7 @@ A production-ready implementation of a real-time telemetry processing and fleet 
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
 - [Docker Deployment (Full Stack)](#-docker-deployment-full-stack)
+- [Grafana Dashboards](#-grafana-dashboards)
 - [Running Locally (Development Mode)](#-running-locally-development-mode)
 - [API Documentation](#api-documentation)
 - [Configuration Guide](#configuration-guide)
@@ -62,7 +63,7 @@ A production-ready implementation of a real-time telemetry processing and fleet 
 │                    APPLICATION LAYER                              │
 │  ┌────────────────────────────────────────────────────────┐    │
 │  │ ahs-fleet-management (Spring Boot REST API)            │    │
-│  │ Port: 8081 (context-path: /fleet-management)            │    │
+│  │ Port: 8080 (context-path: /)                           │    │
 │  │ Base API: /api/v1/fleet                                │    │
 │  │ • Consumes telemetry events via Kafka                  │    │
 │  │ • Tracks real-time vehicle state & location            │    │
@@ -86,11 +87,11 @@ A production-ready implementation of a real-time telemetry processing and fleet 
 |-----------|-----------|---------|
 | **Stream Processing** | Apache Flink 1.18.0 | Real-time telemetry processing, CEP, windowed aggregations |
 | **Message Broker** | Apache Kafka 3.6.0 | Event streaming, decoupling services |
-| **RPC Framework** | Apache Thrift 0.19.0 | Cross-service communication, API definitions |
-| **Backend Framework** | Spring Boot 2.7.18 | REST APIs, dependency injection, auto-configuration |
-| **Serialization** | Jackson 2.15.3 | JSON processing for events and APIs |
-| **Build Tool** | Gradle 8.14 | Multi-module build, dependency management |
-| **Language** | Java 11 | All modules |
+| **RPC Framework** | Apache Thrift 0.22.0 | Cross-service communication, API definitions |
+| **Backend Framework** | Spring Boot 3.2.0 | REST APIs, dependency injection, auto-configuration |
+| **Serialization** | Jackson 2.16.0 | JSON processing for events and APIs |
+| **Build Tool** | Gradle 8.4 | Multi-module build, dependency management |
+| **Language** | Java 17 | All modules |
 
 ### Data Flow
 
@@ -165,10 +166,10 @@ ahs-common
 
 ### Required
 
-- **Java 11** or higher
+- **Java 17**
   ```bash
   java -version
-  # openjdk version "11.0.x" or higher
+  # openjdk version "17.x"
   ```
 
 - **Gradle 8.x** (wrapper included)
@@ -315,7 +316,7 @@ java -jar ahs-data-generator/build/libs/ahs-data-generator.jar -v 15 -i 5000
 
 ```bash
 # Check fleet statistics
-curl http://localhost:8080/api/fleet/statistics
+curl http://localhost:8080/api/v1/fleet/statistics
 
 # Watch Kafka topic
 docker exec -it $(docker ps -qf "name=kafka") kafka-console-consumer \
@@ -419,6 +420,78 @@ docker ps --format '{{.Names}}' | grep -E "ahs-|flink-taskmanager" | wc -l
 curl http://localhost:8083/actuator/health  # Fleet Management
 curl http://localhost:8084/actuator/health  # Vehicle Service
 ```
+
+---
+
+## 📊 Grafana Dashboards
+
+This project ships with a pre-provisioned Grafana instance and dashboards for monitoring fleet metrics exported to Prometheus.
+
+### Access
+
+- URL: http://localhost:3000
+- Credentials: `admin` / `admin` (you will be prompted to change on first login)
+
+### How provisioning works
+
+Grafana is configured to auto-load the Prometheus datasource and dashboards on startup. See the Docker Compose mounts:
+
+```
+./grafana/provisioning/datasources -> /etc/grafana/provisioning/datasources
+./grafana/provisioning/dashboards  -> /etc/grafana/provisioning/dashboards
+./grafana/dashboards               -> /var/lib/grafana/dashboards
+```
+
+Key provisioning files:
+
+- Datasource: `grafana/provisioning/datasources/datasource.yml`
+  - Points to Prometheus at `http://prometheus:9090`
+  - Marks Prometheus as the default datasource
+- Dashboard provider: `grafana/provisioning/dashboards/dashboard.yml`
+  - Loads dashboards from `/var/lib/grafana/dashboards`
+  - Places them under Grafana folder: `Komatsu AHS`
+
+### Bundled dashboards
+
+- Fleet Overview: `grafana/dashboards/fleet-overview.json`
+  - High-level KPIs: total vehicles active, alerts per minute, throughput
+  - Panels for telemetry rates, windowed metrics, and alert trends
+
+After containers start, open Grafana → Dashboards → Browse → Folder `Komatsu AHS` to see the imported dashboards.
+
+### Importing dashboards manually (if needed)
+
+If auto-provisioning hasn’t loaded dashboards (e.g., first run before volumes were created), you can import manually:
+
+1. Log in to Grafana (http://localhost:3000)
+2. Left sidebar → Dashboards → New → Import
+3. Upload `grafana/dashboards/fleet-overview.json` (from this repo)
+4. Select datasource: `Prometheus`
+5. Click Import
+
+### Verifying data flow
+
+- Ensure Prometheus is up: http://localhost:9090
+- In Grafana, go to Explore → choose `Prometheus` → run a simple query like `up` or one of your exported metrics (e.g., `fleet_metrics_total` if applicable) to confirm samples are ingested.
+- Generate load with the data generator to see live updates:
+
+```
+./run-generator.sh
+```
+
+### Troubleshooting Grafana
+
+- No data in panels:
+  - Confirm Prometheus is running (http://localhost:9090)
+  - Verify the datasource exists in Grafana: Settings → Data sources → Prometheus (URL should be `http://prometheus:9090`)
+  - Make sure the data generator and processing jobs are running so metrics/alerts are emitted
+- Dashboards missing:
+  - In Grafana, check Dashboards → Browse → Folder `Komatsu AHS`
+  - If empty, re-import from `grafana/dashboards/*.json` or restart Grafana container to re-trigger provisioning
+- Provisioning files not applied:
+  - Remove Grafana volume to force a clean start: `docker-compose down -v` then `docker-compose up -d`
+
+Note: There is also a `monitoring/` folder in the repo for alternative setups, but the Docker Compose stack uses the `grafana/` directory shown above.
 
 ---
 
@@ -544,13 +617,13 @@ http://localhost:8081
 **Test REST APIs:**
 ```bash
 # Fleet statistics
-curl http://localhost:8080/api/fleet/statistics | jq
+curl http://localhost:8080/api/v1/fleet/statistics | jq
 
 # List vehicles
-curl http://localhost:8080/api/fleet/vehicles | jq
+curl http://localhost:8080/api/v1/fleet/vehicles | jq
 
 # Get specific vehicle
-curl http://localhost:8080/api/fleet/vehicles/KOMATSU-930E-001 | jq
+curl http://localhost:8080/api/v1/fleet/vehicles/KOMATSU-930E-001 | jq
 ```
 
 ---
@@ -559,12 +632,12 @@ curl http://localhost:8080/api/fleet/vehicles/KOMATSU-930E-001 | jq
 
 ### Fleet Management API
 
-**Base URL:** `http://localhost:8080/api/fleet`
+**Base URL:** `http://localhost:8080/api/v1/fleet`
 
 #### Get Fleet Statistics
 
 ```http
-GET /api/fleet/statistics
+GET /api/v1/fleet/statistics
 ```
 
 **Response:**
@@ -586,7 +659,7 @@ GET /api/fleet/statistics
 #### Get All Vehicles
 
 ```http
-GET /api/fleet/vehicles
+GET /api/v1/fleet/vehicles
 ```
 
 **Response:**
@@ -612,12 +685,12 @@ GET /api/fleet/vehicles
 #### Get Vehicle by ID
 
 ```http
-GET /api/fleet/vehicles/{vehicleId}
+GET /api/v1/fleet/vehicles/{vehicleId}
 ```
 
 **Example:**
 ```bash
-curl http://localhost:8080/api/fleet/vehicles/KOMATSU-930E-001
+curl http://localhost:8080/api/v1/fleet/vehicles/KOMATSU-930E-001
 ```
 
 **Response:**
@@ -646,7 +719,7 @@ curl http://localhost:8080/api/fleet/vehicles/KOMATSU-930E-001
 #### Get Vehicles by Status
 
 ```http
-GET /api/fleet/vehicles/status/{status}
+GET /api/v1/fleet/vehicles/status/{status}
 ```
 
 **Valid Status Values:**
@@ -660,7 +733,7 @@ GET /api/fleet/vehicles/status/{status}
 
 **Example:**
 ```bash
-curl http://localhost:8080/api/fleet/vehicles/status/HAULING
+curl http://localhost:8080/api/v1/fleet/vehicles/status/HAULING
 ```
 
 ### Telemetry Event Schema
@@ -904,7 +977,7 @@ docker-compose up -d
 java -jar ahs-data-generator.jar -v 5 -d 5
 
 # 3. Verify
-curl http://localhost:8080/api/fleet/statistics
+curl http://localhost:8080/api/v1/fleet/statistics
 ```
 
 **Expected:** All 5 vehicles tracked, telemetry updating
@@ -921,7 +994,7 @@ java -jar ahs-data-generator.jar -v 100 -i 2000 -d 30
 open http://localhost:8081
 
 # Monitor fleet API
-watch -n 5 'curl -s http://localhost:8080/api/fleet/statistics | jq'
+watch -n 5 'curl -s http://localhost:8080/api/v1/fleet/statistics | jq'
 ```
 
 **Expected:** 3,000 events/min processed, no backpressure

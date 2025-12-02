@@ -1,0 +1,58 @@
+plugins {
+    id 'java-library'
+    id 'com.google.protobuf' version '0.9.4'
+}
+
+ext {
+    protobufVersion = '3.25.3'
+}
+
+dependencies {
+    api "com.google.protobuf:protobuf-java:${protobufVersion}"
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${protobufVersion}"
+    }
+    // Generate into build directory to avoid committing generated sources
+    generatedFilesBaseDir = "$buildDir/generated"
+}
+
+sourceSets {
+    main {
+        proto {
+            srcDirs 'src/main/proto'
+        }
+    }
+}
+
+// For backward compatibility: ensure old generated directory is removed so
+// we don't compile duplicate sources if it was previously committed.
+tasks.register('purgeLegacyGenerated') {
+    group = 'build'
+    description = 'Deletes legacy src/generated directory if present.'
+    doLast {
+        def oldDir = file("$projectDir/src/generated")
+        if (oldDir.exists()) {
+            println "[INFO] Deleting legacy generated sources at ${oldDir}"
+            oldDir.deleteDir()
+        }
+    }
+}
+
+tasks.named('clean') {
+    dependsOn 'purgeLegacyGenerated'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+// Avoid failures from duplicate proto entries and don't package .proto as resources
+tasks.named('processResources') {
+    // Do not include .proto definitions in the runtime resources JAR
+    exclude '**/*.proto'
+    // If anything else duplicates, exclude the extra copies
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

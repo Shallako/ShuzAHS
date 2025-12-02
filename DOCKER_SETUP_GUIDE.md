@@ -1,7 +1,7 @@
 # Docker Setup and Startup Guide
 
 **Project**: Komatsu AHS Streaming Platform  
-**Date**: November 29, 2025  
+**Date**: December 2, 2025  
 **Status**: ✅ Ready for deployment
 
 ---
@@ -12,21 +12,21 @@ All Spring Boot services now have production-ready Dockerfiles:
 
 ### 1. ahs-data-generator/Dockerfile
 - **Multi-stage build**: Build stage + Runtime stage
-- **Base image**: Gradle 8.5 JDK 17 → Eclipse Temurin 17 JRE Alpine
+- **Base image**: Gradle 8.4 JDK 17 → Eclipse Temurin 17 JRE (Jammy)
 - **Port**: 8082
 - **Health check**: Actuator endpoint
 - **Size**: ~200 MB (optimized with Alpine)
 
 ### 2. ahs-fleet-management/Dockerfile
 - **Multi-stage build**: Build stage + Runtime stage
-- **Base image**: Gradle 8.5 JDK 17 → Eclipse Temurin 17 JRE Alpine
+- **Base image**: Gradle 8.4 JDK 17 → Eclipse Temurin 17 JRE (Jammy)
 - **Port**: 8083
 - **Health check**: Actuator endpoint
 - **Size**: ~200 MB (optimized with Alpine)
 
 ### 3. ahs-vehicle-service/Dockerfile
 - **Multi-stage build**: Build stage + Runtime stage
-- **Base image**: Gradle 8.5 JDK 17 → Eclipse Temurin 17 JRE Alpine
+- **Base image**: Gradle 8.4 JDK 17 → Eclipse Temurin 17 JRE (Jammy)
 - **Port**: 8084
 - **Health check**: Actuator endpoint
 - **Size**: ~200 MB (optimized with Alpine)
@@ -38,14 +38,17 @@ All Spring Boot services now have production-ready Dockerfiles:
 ### ✅ Multi-Stage Build
 ```dockerfile
 # Stage 1: Build
-FROM gradle:8.5-jdk17 AS builder
+FROM gradle:8.4-jdk17 AS builder
 WORKDIR /app
-COPY ... 
-RUN gradle bootJar --no-daemon
+COPY build.gradle settings.gradle ./
+COPY gradle ./gradle
+COPY ahs-fleet-management ./ahs-fleet-management
+RUN gradle :ahs-fleet-management:bootJar --no-daemon
 
 # Stage 2: Runtime
-FROM eclipse-temurin:17-jre-alpine
-COPY --from=builder /app/build/libs/*.jar app.jar
+FROM eclipse-temurin:17-jre-jammy
+WORKDIR /app
+COPY --from=builder /app/ahs-fleet-management/build/libs/*.jar app.jar
 ```
 
 **Benefits**:
