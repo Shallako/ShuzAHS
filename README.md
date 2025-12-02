@@ -9,7 +9,6 @@ A production-ready implementation of a real-time telemetry processing and fleet 
 
 ## 📋 Table of Contents
 
-- [Architecture Overview](#architecture-overview)
 - [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
@@ -1169,8 +1168,6 @@ java -jar ahs-data-generator.jar -v 1 -i 1000
 
 ## 📖 Additional Resources
 
-- [Architecture Overview](PROJECT_COMPLETE.md)
-- [Docker Setup Guide](DOCKER_SETUP_GUIDE.md)
 - [Data Generator Guide](ahs-data-generator/README.md)
 - [Quick Reference](QUICK_REFERENCE.md)
 - [System Diagrams](DIAGRAMS.md)
