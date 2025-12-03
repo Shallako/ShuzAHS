@@ -1,6 +1,6 @@
 # Komatsu Autonomous Haulage System (AHS) - Streaming Platform
 
-A production-ready implementation of a real-time telemetry processing and fleet management system for Komatsu's autonomous mining trucks, built with Hazelcast Jet (embedded), Apache Thrift, and Spring Boot.
+A production-ready implementation of a real-time telemetry processing and fleet management system for Komatsu's autonomous mining trucks, built with Hazelcast Jet (embedded), and Spring Boot.
 
 ![Java](https://img.shields.io/badge/Java-17-orange)
 ![Gradle](https://img.shields.io/badge/Gradle-8.4-blue)
