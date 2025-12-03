@@ -78,21 +78,26 @@ class FleetMetricsIntegrationTest {
         // Update metrics (simulating scheduled update)
         updateFleetMetrics();
         
-        // Verify total is 15 (mock fleet size)
-        assertEquals(15.0, meterRegistry.find("ahs_fleet_vehicles_total").gauge().value());
+        // Verify total reflects dynamically registered vehicles (4 above)
+        assertEquals(4.0, meterRegistry.find("ahs_fleet_vehicles_total").gauge().value());
     }
 
     @Test
     @DisplayName("Should track emergency stop vehicles")
     void testEmergencyStopMetrics() {
+        // Register some vehicles first, then trigger emergency stop for all
+        fleetService.updateVehicleStatus("KOMATSU-930E-001", VehicleStatus.IDLE);
+        fleetService.updateVehicleStatus("KOMATSU-930E-002", VehicleStatus.IDLE);
+        fleetService.updateVehicleStatus("KOMATSU-980E-001", VehicleStatus.IDLE);
+        
         // Trigger emergency stop for all vehicles
         fleetService.emergencyStopAll();
         
         // Update metrics
         updateFleetMetrics();
         
-        // All 15 vehicles should be in emergency stop
-        assertEquals(15.0, meterRegistry.find("ahs_fleet_vehicles_emergency").gauge().value());
+        // All registered vehicles (3) should be in emergency stop
+        assertEquals(3.0, meterRegistry.find("ahs_fleet_vehicles_emergency").gauge().value());
     }
 
     @Test
@@ -160,9 +165,24 @@ class FleetMetricsIntegrationTest {
     @Test
     @DisplayName("Should process fleet with mixed vehicle models")
     void testMixedVehicleModels() {
+        // Register a mix of vehicle models
+        fleetService.registerVehicle(Vehicle.builder()
+            .vehicleId("KOMATSU-930E-101")
+            .model("930E")
+            .manufacturer("Komatsu")
+            .capacity(300.0)
+            .build());
+
+        fleetService.registerVehicle(Vehicle.builder()
+            .vehicleId("KOMATSU-980E-201")
+            .model("980E")
+            .manufacturer("Komatsu")
+            .capacity(360.0)
+            .build());
+
         List<Vehicle> vehicles = fleetService.getAllActiveVehicles();
-        
-        // Should have mix of 930E and 980E
+
+        // Should have mix of 930E and 980E (1 each)
         long count930E = vehicles.stream()
             .filter(v -> v.getModel().equals("930E"))
             .count();
@@ -170,8 +190,8 @@ class FleetMetricsIntegrationTest {
             .filter(v -> v.getModel().equals("980E"))
             .count();
         
-        assertEquals(10, count930E);
-        assertEquals(5, count980E);
+        assertEquals(1, count930E);
+        assertEquals(1, count980E);
     }
 
     @Test

@@ -36,6 +36,10 @@ public class FleetManagementService {
     private final MetricsProducer metricsProducer;
     private final FleetMetricsExporter metricsExporter;
     
+    // In production, vehicles are discovered dynamically from incoming data
+    // (no demo seeding). The fleet starts empty and vehicles are registered
+    // on first sight via status/telemetry updates or explicit registration.
+    
     private final Map<String, Vehicle> activeFleet = new ConcurrentHashMap<>();
     private final Map<String, VehicleStatus> vehicleStatuses = new ConcurrentHashMap<>();
     private final Map<String, VehicleTelemetry> vehicleTelemetry = new ConcurrentHashMap<>();
@@ -50,9 +54,10 @@ public class FleetManagementService {
     
     @PostConstruct
     public void initialize() {
-        log.info("Initializing Fleet Management Service");
-        // Initialize with some mock vehicles for demo
-        initializeMockFleet();
+        log.info("Initializing Fleet Management Service (no demo seeding)");
+        // Intentionally empty: fleet starts with zero vehicles. Vehicles will
+        // be registered dynamically when telemetry or status events arrive, or
+        // via explicit API calls.
     }
     
     /**
@@ -68,9 +73,11 @@ public class FleetManagementService {
      * Update vehicle status
      */
     public void updateVehicleStatus(String vehicleId, VehicleStatus status) {
+        // Dynamically register vehicles seen via status updates
         if (!activeFleet.containsKey(vehicleId)) {
-            log.warn("Attempt to update unknown vehicle: {}", vehicleId);
-            return;
+            Vehicle v = new Vehicle();
+            v.setVehicleId(vehicleId);
+            registerVehicle(v);
         }
         vehicleStatuses.put(vehicleId, status);
         log.debug("Updated vehicle {} status to {}", vehicleId, status);
@@ -80,9 +87,11 @@ public class FleetManagementService {
      * Update vehicle telemetry and perform anomaly detection
      */
     public void updateVehicleTelemetry(String vehicleId, VehicleTelemetry telemetry) {
+        // Dynamically register vehicles seen via telemetry
         if (!activeFleet.containsKey(vehicleId)) {
-            log.warn("Attempt to update telemetry for unknown vehicle: {}", vehicleId);
-            return;
+            Vehicle v = new Vehicle();
+            v.setVehicleId(vehicleId);
+            registerVehicle(v);
         }
         vehicleTelemetry.put(vehicleId, telemetry);
         log.debug("Updated telemetry for vehicle {}", vehicleId);
@@ -253,34 +262,7 @@ public class FleetManagementService {
             updateVehicleStatus(vehicleId, VehicleStatus.EMERGENCY_STOP));
     }
     
-    /**
-     * Initialize mock fleet for demonstration
-     */
-    private void initializeMockFleet() {
-        // Create sample Komatsu 930E trucks
-        for (int i = 1; i <= 10; i++) {
-            Vehicle vehicle = Vehicle.builder()
-                .vehicleId("KOMATSU-930E-" + String.format("%03d", i))
-                .model("930E")
-                .manufacturer("Komatsu")
-                .capacity(300.0) // 300 ton capacity
-                .build();
-            registerVehicle(vehicle);
-        }
-        
-        // Create sample Komatsu 980E trucks
-        for (int i = 1; i <= 5; i++) {
-            Vehicle vehicle = Vehicle.builder()
-                .vehicleId("KOMATSU-980E-" + String.format("%03d", i))
-                .model("980E")
-                .manufacturer("Komatsu")
-                .capacity(400.0) // 400 ton capacity
-                .build();
-            registerVehicle(vehicle);
-        }
-        
-        log.info("Initialized mock fleet with {} vehicles", activeFleet.size());
-    }
+    // Mock fleet initialization removed – fleet is now fully dynamic
     
     /**
      * Aggregate and publish fleet metrics every 30 seconds

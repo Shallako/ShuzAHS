@@ -182,7 +182,7 @@ services:
       - kafka
     ports:
       - "8082:8082"
-    command: ["--bootstrap-servers", "kafka:29092", "--topic", "ahs.telemetry.processed", "--vehicles", "15", "--interval", "5000"]
+    command: ["--bootstrap-servers", "kafka:29092", "--topic", "ahs.telemetry.processed", "--vehicles", "25", "--interval", "5000"]
     networks:
       - ahs-network
     restart: unless-stopped

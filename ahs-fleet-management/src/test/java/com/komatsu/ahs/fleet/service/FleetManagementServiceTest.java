@@ -44,19 +44,25 @@ class FleetManagementServiceTest {
     }
 
     @Test
-    @DisplayName("Should initialize with mock fleet")
+    @DisplayName("Should initialize with empty dynamic fleet")
     void testInitialization() {
         List<Vehicle> vehicles = service.getAllActiveVehicles();
         
         assertNotNull(vehicles);
-        assertEquals(15, vehicles.size());
+        assertEquals(0, vehicles.size());
     }
 
     @Test
-    @DisplayName("Should get vehicle by ID")
+    @DisplayName("Should get vehicle by ID after registration")
     void testGetVehicleById() {
+        Vehicle newVehicle = new Vehicle();
+        newVehicle.setVehicleId("KOMATSU-930E-001");
+        newVehicle.setModel("930E");
+        newVehicle.setManufacturer("Komatsu");
+        newVehicle.setCapacity(300.0);
+        service.registerVehicle(newVehicle);
+
         Optional<Vehicle> vehicle = service.getVehicle("KOMATSU-930E-001");
-        
         assertTrue(vehicle.isPresent());
         assertEquals("KOMATSU-930E-001", vehicle.get().getVehicleId());
         assertEquals("930E", vehicle.get().getModel());
@@ -71,29 +77,21 @@ class FleetManagementServiceTest {
     }
 
     @Test
-    @DisplayName("Should get all active vehicles")
+    @DisplayName("Should get all active vehicles after registration")
     void testGetAllActiveVehicles() {
+        // Dynamically register a couple of vehicles
+        service.updateVehicleStatus("KOMATSU-930E-001", VehicleStatus.IDLE);
+        service.updateVehicleStatus("KOMATSU-980E-001", VehicleStatus.IDLE);
+
         List<Vehicle> vehicles = service.getAllActiveVehicles();
-        
         assertNotNull(vehicles);
-        assertEquals(15, vehicles.size());
-        
-        // Verify fleet composition: 10x 930E, 5x 980E
-        long count930E = vehicles.stream()
-            .filter(v -> v.getModel().equals("930E"))
-            .count();
-        long count980E = vehicles.stream()
-            .filter(v -> v.getModel().equals("980E"))
-            .count();
-        
-        assertEquals(10, count930E);
-        assertEquals(5, count980E);
+        assertEquals(2, vehicles.size());
     }
 
     @Test
     @DisplayName("Should get vehicles by status")
     void testGetVehiclesByStatus() {
-        // Update some vehicles to specific status
+        // Update some vehicles to specific status (auto-registers vehicles)
         service.updateVehicleStatus("KOMATSU-930E-001", VehicleStatus.ROUTING);
         service.updateVehicleStatus("KOMATSU-930E-002", VehicleStatus.ROUTING);
         
@@ -106,7 +104,7 @@ class FleetManagementServiceTest {
     @DisplayName("Should update vehicle status")
     void testUpdateVehicleStatus() {
         String vehicleId = "KOMATSU-930E-001";
-        
+        // Auto-registers and sets status
         service.updateVehicleStatus(vehicleId, VehicleStatus.MAINTENANCE);
         
         List<Vehicle> maintenanceVehicles = service.getVehiclesByStatus(VehicleStatus.MAINTENANCE);
@@ -119,17 +117,16 @@ class FleetManagementServiceTest {
     void testUpdateVehicleTelemetry() {
         String vehicleId = "KOMATSU-930E-001";
         
-        VehicleTelemetry telemetry = VehicleTelemetry.builder()
-            .vehicleId(vehicleId)
-            .speedKph(35.5)
-            .fuelLevelPercent(75.0)
-            .location(GpsCoordinate.builder()
-                .latitude(-23.4)
-                .longitude(-70.35)
-                .altitude(2900.0)
-                .build())
-            .timestamp(Instant.now())
-            .build();
+        VehicleTelemetry telemetry = new VehicleTelemetry();
+        telemetry.setVehicleId(vehicleId);
+        telemetry.setSpeedKph(35.5);
+        telemetry.setFuelLevelPercent(75.0);
+        GpsCoordinate coord = new GpsCoordinate();
+        coord.setLatitude(-23.4);
+        coord.setLongitude(-70.35);
+        coord.setAltitude(2900.0);
+        telemetry.setLocation(coord);
+        telemetry.setTimestamp(Instant.now());
         
         service.updateVehicleTelemetry(vehicleId, telemetry);
         
@@ -140,9 +137,9 @@ class FleetManagementServiceTest {
     }
 
     @Test
-    @DisplayName("Should get fleet statistics")
+    @DisplayName("Should get fleet statistics for dynamic fleet")
     void testGetFleetStatistics() {
-        // Set up some vehicles in different states
+        // Set up some vehicles in different states (auto-registers vehicles)
         service.updateVehicleStatus("KOMATSU-930E-001", VehicleStatus.HAULING);
         service.updateVehicleStatus("KOMATSU-930E-002", VehicleStatus.LOADING);
         service.updateVehicleStatus("KOMATSU-930E-003", VehicleStatus.IDLE);
@@ -151,14 +148,17 @@ class FleetManagementServiceTest {
         FleetStatistics stats = service.getFleetStatistics();
         
         assertNotNull(stats);
-        assertEquals(15, stats.getTotalVehicles());
+        assertTrue(stats.getTotalVehicles() >= 4);
         assertTrue(stats.getActiveVehicles() >= 0);
         assertTrue(stats.getIdleVehicles() >= 0);
     }
 
     @Test
-    @DisplayName("Should handle status breakdown in fleet statistics")
+    @DisplayName("Should handle status breakdown in fleet statistics for dynamic fleet")
     void testFleetStatisticsBreakdown() {
+        // Ensure we have some vehicles and statuses
+        service.updateVehicleStatus("KOMATSU-930E-001", VehicleStatus.HAULING);
+        service.updateVehicleStatus("KOMATSU-930E-002", VehicleStatus.IDLE);
         FleetStatistics stats = service.getFleetStatistics();
         
         assertNotNull(stats);
@@ -188,14 +188,13 @@ class FleetManagementServiceTest {
     }
 
     @Test
-    @DisplayName("Should register new vehicle")
+    @DisplayName("Should register new vehicle explicitly")
     void testRegisterVehicle() {
-        Vehicle newVehicle = Vehicle.builder()
-            .vehicleId("TEST-VEHICLE-001")
-            .model("930E")
-            .manufacturer("Komatsu")
-            .capacity(300.0)
-            .build();
+        Vehicle newVehicle = new Vehicle();
+        newVehicle.setVehicleId("TEST-VEHICLE-001");
+        newVehicle.setModel("930E");
+        newVehicle.setManufacturer("Komatsu");
+        newVehicle.setCapacity(300.0);
         
         service.registerVehicle(newVehicle);
         
@@ -205,12 +204,17 @@ class FleetManagementServiceTest {
     }
 
     @Test
-    @DisplayName("Should trigger emergency stop for all vehicles")
+    @DisplayName("Should trigger emergency stop for all vehicles in dynamic fleet")
     void testEmergencyStopAll() {
+        // Register a few vehicles via status update
+        service.updateVehicleStatus("KOMATSU-930E-001", VehicleStatus.IDLE);
+        service.updateVehicleStatus("KOMATSU-930E-002", VehicleStatus.IDLE);
+        service.updateVehicleStatus("KOMATSU-930E-003", VehicleStatus.IDLE);
+
         service.emergencyStopAll();
-        
+
         List<Vehicle> emergencyVehicles = service.getVehiclesByStatus(VehicleStatus.EMERGENCY_STOP);
-        assertEquals(15, emergencyVehicles.size());
+        assertEquals(3, emergencyVehicles.size());
     }
 
     @Test
@@ -225,24 +229,27 @@ class FleetManagementServiceTest {
     }
 
     @Test
-    @DisplayName("Should not update status for non-existent vehicle")
+    @DisplayName("Should auto-register when updating status for unknown vehicle")
     void testUpdateNonExistentVehicleStatus() {
-        // Should log warning but not throw exception
-        assertDoesNotThrow(() -> 
+        // Should auto-register and not throw exception
+        assertDoesNotThrow(() ->
             service.updateVehicleStatus("NON-EXISTENT", VehicleStatus.HAULING)
         );
+        List<Vehicle> haulingVehicles = service.getVehiclesByStatus(VehicleStatus.HAULING);
+        assertTrue(haulingVehicles.stream().anyMatch(v -> v.getVehicleId().equals("NON-EXISTENT")));
     }
 
     @Test
-    @DisplayName("Should not update telemetry for non-existent vehicle")
+    @DisplayName("Should auto-register when updating telemetry for unknown vehicle")
     void testUpdateNonExistentVehicleTelemetry() {
-        VehicleTelemetry telemetry = VehicleTelemetry.builder()
-            .vehicleId("NON-EXISTENT")
-            .build();
+        VehicleTelemetry telemetry = new VehicleTelemetry();
+        telemetry.setVehicleId("NON-EXISTENT");
             
-        // Should log warning but not throw exception
-        assertDoesNotThrow(() -> 
+        // Should auto-register and not throw exception
+        assertDoesNotThrow(() ->
             service.updateVehicleTelemetry("NON-EXISTENT", telemetry)
         );
+        Optional<VehicleTelemetry> retrieved = service.getVehicleTelemetry("NON-EXISTENT");
+        assertTrue(retrieved.isPresent());
     }
 }
