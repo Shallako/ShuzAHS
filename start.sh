@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Komatsu AHS Platform Startup Script
-# Starts all 14 containers (13 services, flink-taskmanager has 2 replicas)
+# Starts all core services. Hazelcast Jet runs embedded in the telemetry processor (no Flink cluster).
 
 set -e
 
@@ -25,17 +25,17 @@ echo "📦 Building project..."
 echo "✅ Build complete"
 echo ""
 
-# Start Docker Compose services (all 14 containers)
-echo "🚀 Starting all 14 containers..."
+# Start Docker Compose services
+echo "🚀 Starting containers..."
 docker-compose up -d
 
 echo ""
 echo "⏳ Waiting for services to be ready..."
 sleep 15
 
-# Check service health - All 14 containers
+# Check service health
 echo ""
-echo "🔍 Container Status (14 Total):"
+echo "🔍 Container Status:"
 echo "================================"
 echo ""
 
@@ -80,20 +80,8 @@ else
     echo "  ❌ [5/13] Kafka UI: Not running"
 fi
 
-# 6. Flink JobManager (UI)
-if docker ps --format '{{.Names}}' | grep -q "ahs-flink-ui"; then
-    echo "  ✅ [6/13] Flink UI: http://localhost:8081"
-else
-    echo "  ❌ [6/13] Flink UI: Not running"
-fi
-
-# 7-8. Flink TaskManagers (2 replicas)
-TASKMANAGER_COUNT=$(docker ps --format '{{.Names}}' | grep -c "flink-taskmanager" || echo "0")
-if [ "$TASKMANAGER_COUNT" -eq 2 ]; then
-    echo "  ✅ [7-8/13] Flink TaskManagers: 2 workers running"
-else
-    echo "  ❌ [7-8/13] Flink TaskManagers: $TASKMANAGER_COUNT/2 running"
-fi
+# 6. Hazelcast Embedded (no separate UI here)
+echo "  ℹ️  Hazelcast Jet: Embedded inside Telemetry Processor (no separate UI)"
 
 # 9. Prometheus UI
 if docker ps --format '{{.Names}}' | grep -q "ahs-prometheus-ui"; then
@@ -112,50 +100,44 @@ fi
 echo ""
 echo "⚙️  Application Services:"
 
-# 11. Telemetry Processor (Flink Job)
+# 11. Telemetry Processor (Hazelcast Jet embedded)
 if docker ps --format '{{.Names}}' | grep -q "ahs-telemetry-processor"; then
-    echo "  ✅ [11/14] Telemetry Processor: Flink job submitter"
+    echo "  ✅ [11/11] Telemetry Processor: Running (Jet embedded)"
 else
-    echo "  ❌ [11/14] Telemetry Processor: Not running"
+    echo "  ❌ [11/11] Telemetry Processor: Not running"
 fi
 
 # 12. Data Generator
 if docker ps --format '{{.Names}}' | grep -q "ahs-data-generator"; then
-    echo "  ✅ [12/14] Data Generator: Running on localhost:8082"
+    echo "  ✅ Data Generator: Running on localhost:8082"
 else
-    echo "  ❌ [12/14] Data Generator: Not running"
+    echo "  ❌ Data Generator: Not running"
 fi
 
 # 13. Fleet Management
 if docker ps --format '{{.Names}}' | grep -q "ahs-fleet-management"; then
-    echo "  ✅ [13/14] Fleet Management API: http://localhost:8083"
+    echo "  ✅ Fleet Management API: http://localhost:8083"
 else
-    echo "  ❌ [13/14] Fleet Management: Not running"
+    echo "  ❌ Fleet Management: Not running"
 fi
 
-# 14. Vehicle Service
 if docker ps --format '{{.Names}}' | grep -q "ahs-vehicle-service"; then
-    echo "  ✅ [14/14] Vehicle Service API: http://localhost:8084"
+    echo "  ✅ Vehicle Service API: http://localhost:8084"
 else
-    echo "  ❌ [14/14] Vehicle Service: Not running"
+    echo "  ❌ Vehicle Service: Not running"
 fi
 
 
-# Count running containers
-RUNNING=$(docker ps --format '{{.Names}}' | grep -E "ahs-|flink-taskmanager" | wc -l | tr -d ' ')
+# Count running containers (ahs-* only)
+RUNNING=$(docker ps --format '{{.Names}}' | grep -E "^ahs-" | wc -l | tr -d ' ')
 
 echo ""
 echo "========================================="
-if [ "$RUNNING" -eq 14 ]; then
-    echo " ✅ All 14 Containers Running!"
-else
-    echo " ⚠️  $RUNNING/14 Containers Running"
-fi
+echo " ⚙️  $RUNNING containers with ahs-* prefix running"
 echo "========================================="
 echo ""
 echo "🌐 Access Points:"
 echo "  • Kafka UI:           http://localhost:8080"
-echo "  • Flink Dashboard:    http://localhost:8081"
 echo "  • Data Generator:     http://localhost:8082"
 echo "  • Fleet Management:   http://localhost:8083"
 echo "  • Vehicle Service:    http://localhost:8084"
