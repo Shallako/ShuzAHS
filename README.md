@@ -83,7 +83,7 @@ A production-ready implementation of a real-time telemetry processing and fleet 
 
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
-| **Stream Processing** | Apache Flink 1.18.0 | Real-time telemetry processing, CEP, windowed aggregations |
+| **Stream Processing** | Hazelcast Jet 5.6.0 (embedded) | Real-time telemetry processing, CEP, windowed aggregations |
 | **Message Broker** | Apache Kafka 3.6.0 | Event streaming, decoupling services |
 | **RPC Framework** | Apache Thrift 0.22.0 | Cross-service communication, API definitions |
 | **Backend Framework** | Spring Boot 3.2.0 | REST APIs, dependency injection, auto-configuration |
@@ -94,7 +94,7 @@ A production-ready implementation of a real-time telemetry processing and fleet 
 ### Data Flow
 
 1. **Generation**: Data generator simulates autonomous trucks publishing telemetry to Kafka (topic `vehicle-telemetry`)
-2. **Ingestion**: Flink consumes telemetry from Kafka topic `vehicle-telemetry`
+2. **Ingestion**: Telemetry Processor (Hazelcast Jet, embedded) consumes telemetry from Kafka topic `vehicle-telemetry`
 3. **Processing**:
    - CEP patterns detect anomalies (rapid deceleration, overheating, low fuel)
    - Windowed aggregations compute per-vehicle metrics every minute
@@ -126,7 +126,7 @@ ShuzAHS/
 │   ├── generator/                  # TelemetryDataGenerator, VehicleSimulator
 │   └── kafka/                      # KafkaTelemetryProducer
 │
-├── ahs-telemetry-processor/        # Flink stream processor
+├── ahs-telemetry-processor/        # Telemetry processor (Hazelcast Jet, embedded)
 │   ├── function/                   # Map/FlatMap functions, CEP patterns
 │   └── model/                      # TelemetryAlert, VehicleMetrics
 │
@@ -152,10 +152,10 @@ ahs-common
     ↓
 ├─→ ahs-thrift-api
 ├─→ ahs-data-generator → Kafka
-├─→ ahs-telemetry-processor → Flink + Kafka
+├─→ ahs-telemetry-processor → Hazelcast Jet + Kafka
 ├─→ ahs-fleet-management → Spring Boot + Kafka
 ├─→ ahs-vehicle-service → Spring Boot + Thrift
-└─→ ahs-stream-analytics → Flink
+└─→ ahs-stream-analytics → Stream analytics (optional)
 ```
 
 ---
@@ -295,7 +295,7 @@ Open separate terminals for each service:
 java -jar ahs-data-generator/build/libs/ahs-data-generator.jar -v 15 -i 5000
 ```
 
-**Terminal 2 - Flink Telemetry Processor:**
+**Terminal 2 - Telemetry Processor:**
 ```bash
 ./gradlew :ahs-telemetry-processor:run
 ```
@@ -328,9 +328,9 @@ docker exec -it $(docker ps -qf "name=kafka") kafka-console-consumer \
 
 ## 🐳 Docker Deployment (Full Stack)
 
-### All 13 Containers
+### All 11 Containers
 
-The complete platform runs **13 containers** (12 services, with Flink TaskManager having 2 replicas):
+The complete platform runs **11 containers**:
 
 | # | Container Name | Service | Port | Description |
 |---|----------------|---------|------|-------------|
@@ -341,27 +341,26 @@ The complete platform runs **13 containers** (12 services, with Flink TaskManage
 | 4 | `ahs-redis` | Redis | 6379 | Cache & session store |
 | **Web UIs** |
 | 5 | `ahs-kafka-ui` | Kafka UI | 8080 | Kafka management interface |
-| 6 | `ahs-flink-ui` | Flink JobManager | 8081 | Flink dashboard |
-| 7-8 | `flink-taskmanager` (x2) | Flink Workers | - | Stream processing workers |
-| 9 | `ahs-prometheus-ui` | Prometheus | 9090 | Metrics collection |
-| 10 | `ahs-grafana-ui` | Grafana | 3000 | Metrics visualization |
+| 6 | `ahs-prometheus-ui` | Prometheus | 9090 | Metrics collection |
+| 7 | `ahs-grafana-ui` | Grafana | 3000 | Metrics visualization |
 | **Application Services** |
-| 11 | `ahs-data-generator` | Data Generator | 8082 | Vehicle simulation |
-| 12 | `ahs-fleet-management` | Fleet Management API | 8083 | Fleet operations |
-| 13 | `ahs-vehicle-service` | Vehicle Service API | 8084 | Vehicle CRUD |
+| 8 | `ahs-data-generator` | Data Generator | 8082 | Vehicle simulation |
+| 9 | `ahs-telemetry-processor` | Telemetry Processor (Hazelcast Jet, embedded) | - | Real-time stream processing |
+| 10 | `ahs-fleet-management` | Fleet Management API | 8083 | Fleet operations |
+| 11 | `ahs-vehicle-service` | Vehicle Service API | 8084 | Vehicle CRUD |
 
 ### Quick Start with Docker
 
 **Option 1: Using start.sh (Recommended)**
 ```bash
-# Build and start all 13 containers
+# Build and start all containers
 ./start.sh
 ```
 
 The script will:
 1. ✅ Verify Docker is running
 2. 📦 Build the project with Gradle
-3. 🚀 Start all 13 containers
+3. 🚀 Start all containers
 4. 🔍 Verify each container status
 5. 🌐 Display all access points
 
@@ -373,8 +372,8 @@ The script will:
 # Start all services
 docker-compose up -d
 
-# Verify all 13 containers are running
-docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "ahs-|flink"
+# Verify all containers are running
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "ahs-"
 ```
 
 ### Web UI Access Points
@@ -382,7 +381,6 @@ docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "ahs-|f
 | Service | URL | Credentials |
 |---------|-----|-------------|
 | Kafka UI | http://localhost:8080 | - |
-| Flink Dashboard | http://localhost:8081 | - |
 | Prometheus | http://localhost:9090 | - |
 | Grafana | http://localhost:3000 | admin / admin |
 | Data Generator | http://localhost:8082 | - |
@@ -411,8 +409,8 @@ docker-compose down -v
 ### Verify Container Health
 
 ```bash
-# Count running AHS containers (should be 13)
-docker ps --format '{{.Names}}' | grep -E "ahs-|flink-taskmanager" | wc -l
+# Count running AHS containers
+docker ps --format '{{.Names}}' | grep -E "ahs-" | wc -l
 
 # Check individual service health
 curl http://localhost:8083/actuator/health  # Fleet Management
@@ -555,7 +553,7 @@ java -jar ahs-data-generator/build/libs/ahs-data-generator.jar \
 12:35:06.856 [pool-1-thread-2] INFO  c.k.a.g.DataGeneratorApp -   KOMATSU-930E-001 [HAULING] - Cycle: 1, Remaining: 54s
 ```
 
-#### 4. Run Flink Telemetry Processor
+#### 4. Run Telemetry Processor
 
 ```bash
 ./gradlew :ahs-telemetry-processor:run
@@ -563,9 +561,9 @@ java -jar ahs-data-generator/build/libs/ahs-data-generator.jar \
 
 **Expected Output:**
 ```
-INFO  o.a.f.r.d.DispatcherRestEndpoint - Web frontend listening at http://localhost:8081
-INFO  c.k.a.t.TelemetryProcessorJob - Starting Telemetry Processing Job
-INFO  o.a.f.r.l.s.StandaloneSessionClusterEntrypoint - Creating streaming environment
+INFO  c.k.a.t.JetTelemetryProcessorJob - Starting Telemetry Processing Job
+INFO  c.k.a.t.JetTelemetryProcessorJob - Subscribed to Kafka topic(s)
+INFO  c.k.a.t.JetTelemetryProcessorJob - Processing pipeline initialized
 ```
 
 #### 5. Run Fleet Management Service
@@ -607,10 +605,6 @@ docker exec -it $(docker ps -qf "name=kafka") kafka-console-consumer \
   --topic vehicle-metrics
 ```
 
-**Check Flink Web UI:**
-```
-http://localhost:8081
-```
 
 **Test REST APIs:**
 ```bash
@@ -892,38 +886,6 @@ Run with profile:
 ./gradlew :ahs-fleet-management:bootRun --args='--spring.profiles.active=prod'
 ```
 
-### Flink Configuration
-
-**Location:** `ahs-telemetry-processor/src/main/resources/flink-conf.yaml`
-
-```yaml
-# JobManager config
-jobmanager:
-  memory:
-    process:
-      size: 1600m
-
-# TaskManager config
-taskmanager:
-  memory:
-    process:
-      size: 1728m
-  numberOfTaskSlots: 2
-
-# Checkpointing
-execution:
-  checkpointing:
-    interval: 10s
-    mode: EXACTLY_ONCE
-```
-
-**Runtime parameters:**
-```bash
-./gradlew :ahs-telemetry-processor:run \
-  -Djobmanager.memory.process.size=2g \
-  -Dtaskmanager.memory.process.size=2g \
-  -Dparallelism.default=4
-```
 
 ### Kafka Configuration
 
@@ -988,8 +950,7 @@ curl http://localhost:8080/api/v1/fleet/statistics
 # Simulate 100 vehicles, 2-second interval, 30 minutes
 java -jar ahs-data-generator.jar -v 100 -i 2000 -d 30
 
-# Monitor Flink UI
-open http://localhost:8081
+# (optional) Monitor services via their logs and Grafana/Prometheus
 
 # Monitor fleet API
 watch -n 5 'curl -s http://localhost:8080/api/v1/fleet/statistics | jq'
@@ -1005,7 +966,7 @@ watch -n 5 'curl -s http://localhost:8080/api/v1/fleet/statistics | jq'
 # 1. Start normal load
 java -jar ahs-data-generator.jar -v 20 -i 5000 &
 
-# 2. Kill Flink processor
+# 2. Kill telemetry processor
 pkill -f TelemetryProcessorJob
 
 # 3. Wait 30 seconds, restart
@@ -1047,15 +1008,6 @@ docker exec -it $(docker ps -qf "name=kafka") kafka-console-consumer \
 ./gradlew clean build -x test --refresh-dependencies
 ```
 
-**Problem:** Cannot resolve dependency `org.apache.flink:flink-connector-kafka:1.18.0`
-
-**Cause:** Starting with Flink 1.15, connectors are versioned independently from core Flink. The Kafka connector for Flink 1.18.x uses the pattern `3.x.y-1.18`.
-
-**Solution:** Use a compatible Kafka connector version, for example:
-```gradle
-implementation "org.apache.flink:flink-connector-kafka:${flinkKafkaConnectorVersion}" // e.g., 3.2.0-1.18
-```
-and do not force an explicit `org.apache.kafka:kafka-clients` version that may conflict; the connector brings the right client transitively.
 
 **Problem:** Out of memory during build
 
@@ -1096,30 +1048,6 @@ docker exec -it $(docker ps -qf "name=kafka") kafka-topics \
   --partitions 3 --replication-factor 1
 ```
 
-### Flink Issues
-
-**Problem:** Flink job fails to start
-
-**Solution:**
-```bash
-# Check Flink logs
-tail -f ~/.flink/log/flink-*-taskexecutor-*.log
-
-# Increase memory
-./gradlew :ahs-telemetry-processor:run \
-  -Djobmanager.memory.process.size=2g
-```
-
-**Problem:** Backpressure / slow processing
-
-**Solution:**
-```bash
-# Increase parallelism
-# Edit flink-conf.yaml: parallelism.default: 4
-
-# Or in code:
-env.setParallelism(4);
-```
 
 ### Fleet Management Issues
 
@@ -1170,7 +1098,6 @@ java -jar ahs-data-generator.jar -v 1 -i 1000
 - [Data Generator Guide](ahs-data-generator/README.md)
 - [Quick Reference](QUICK_REFERENCE.md)
 - [System Diagrams](DIAGRAMS.md)
-- [Apache Flink Documentation](https://flink.apache.org)
 - [Spring Boot Documentation](https://spring.io/projects/spring-boot)
 - [Apache Kafka Documentation](https://kafka.apache.org/documentation/)
 

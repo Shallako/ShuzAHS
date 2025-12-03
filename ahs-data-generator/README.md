@@ -131,9 +131,9 @@ Docker Compose is configured to include `--lidar-interval 15000` on the `data-ge
 
 The generated data is published to Kafka and can be consumed by:
 
-1. **ahs-telemetry-processor** - Flink job for real-time stream processing
+1. **ahs-telemetry-processor** - Telemetry Processor (Hazelcast Jet, embedded) for real-time stream processing
 2. **ahs-fleet-management** - Fleet management service for tracking vehicle state
-3. **ahs-stream-analytics** - Analytics processing
+3. **ahs-stream-analytics** - Analytics processing (optional)
 
 ## Example Scenario: Load Testing
 
