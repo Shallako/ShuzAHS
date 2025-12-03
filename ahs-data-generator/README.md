@@ -9,6 +9,7 @@ Realistic telemetry data generator for testing the Komatsu Autonomous Haulage Sy
 - **Mixed Fleet**: Automatically creates a realistic mix of Komatsu 930E (67%) and 980E (33%) trucks
 - **Kafka Integration**: Publishes telemetry events to Kafka topics
 - **CLI Interface**: Easy-to-use command-line interface with sensible defaults
+- **LIDAR Point Cloud (JME Ray Casting)**: Headless LIDAR simulation using JMonkeyEngine’s collision system to ray-cast thousands of beams and export a point cloud (CSV)
 
 ## Vehicle Lifecycle
 
@@ -71,6 +72,45 @@ java -jar ahs-data-generator/build/libs/ahs-data-generator.jar \
 | `--duration` | `-d` | Duration to run (minutes, 0=infinite) | `0` |
 | `--help` | `-h` | Show help message | - |
 | `--version` | `-V` | Show version | - |
+| `--lidar` |  | Run a one-shot LIDAR scan and exit | - |
+| `--lidar-output` |  | Output CSV path for LIDAR points | - |
+| `--lidar-h-samples` |  | Horizontal rays count (default 1440) | `1440` |
+| `--lidar-v-samples` |  | Vertical rays count (default 1 = planar) | `1` |
+| `--lidar-range` |  | Max LIDAR range in meters (default 120) | `120` |
+| `--lidar-interval` |  | Continuous LIDAR scan interval in ms during normal run | `15000` |
+| `--lidar-disable` |  | Disable continuous LIDAR scanning during normal run | - |
+| `--lidar-continuous-h-samples` |  | Horizontal rays for continuous scans | `720` |
+| `--lidar-continuous-v-samples` |  | Vertical rays for continuous scans | `1` |
+
+### LIDAR Point Cloud Generation (Headless)
+
+The generator can produce a point cloud by simulating a LIDAR sensor with JMonkeyEngine’s collision system. It ray-casts against a simple built-in scene (in-memory, no graphics required) and writes hit points to CSV.
+
+Example (writes a CSV with `x,y,z`):
+
+```bash
+./gradlew :ahs-data-generator:run --args="--lidar \
+  --lidar-output build/lidar/scan.csv \
+  --lidar-h-samples 2000 \
+  --lidar-v-samples 1 \
+  --lidar-range 120"
+```
+
+Notes:
+- This uses JME’s headless collision (no window). Dependency: `jme3-core` only.
+- Default scene includes a flat ground and a few boxes; replace with your own scene graph if needed.
+- Increase `--lidar-h-samples`/`--lidar-v-samples` for denser scans; performance scales linearly with rays.
+- CSV header is `x,y,z`. You can import into tools like CloudCompare, Meshlab, or Python for visualization.
+
+### Continuous LIDAR (Always On)
+
+When the data generator runs normally (not in one-shot `--lidar` mode), it now performs continuous headless LIDAR scans using JME’s collision system at a fixed interval to ensure JME is exercised continuously.
+
+- Default interval: `--lidar-interval 15000` (every 15 seconds)
+- Default continuous resolution: `--lidar-continuous-h-samples 720` (0.5°), `--lidar-continuous-v-samples 1`
+- Disable continuous scans if needed with `--lidar-disable`.
+
+Docker Compose is configured to include `--lidar-interval 15000` on the `data-generator` service so JME runs continuously when you start the stack.
 
 ## Example Output
 

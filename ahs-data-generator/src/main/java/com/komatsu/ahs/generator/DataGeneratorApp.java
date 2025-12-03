@@ -6,12 +6,20 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import com.jme3.math.Quaternion;
+import com.jme3.math.Vector3f;
+import com.komatsu.ahs.generator.lidar.LidarConfig;
+import com.komatsu.ahs.generator.lidar.LidarEnvironmentBuilder;
+import com.komatsu.ahs.generator.lidar.LidarPointCloudWriter;
+import com.komatsu.ahs.generator.lidar.LidarSimulator;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.io.File;
 
 @Command(name = "ahs-data-generator",
         mixinStandardHelpOptions = true,
@@ -49,6 +57,35 @@ public class DataGeneratorApp implements Callable<Integer> {
     private ScheduledExecutorService scheduler;
     private GeneratorConfig config;
 
+    // LIDAR options
+    @Option(names = {"--lidar"}, description = "Run a LIDAR scan and export a point cloud (CSV)")
+    private boolean lidarEnabled = false;
+
+    @Option(names = {"--lidar-output"}, description = "Output CSV path for LIDAR point cloud")
+    private File lidarOutputFile;
+
+    @Option(names = {"--lidar-h-samples"}, description = "LIDAR horizontal samples (default: 1440)")
+    private Integer lidarHorizontalSamples;
+
+    @Option(names = {"--lidar-v-samples"}, description = "LIDAR vertical samples (default: 1)")
+    private Integer lidarVerticalSamples;
+
+    @Option(names = {"--lidar-range"}, description = "LIDAR max range meters (default: 120)")
+    private Float lidarRange;
+
+    // Continuous LIDAR options (always-on scanning during normal run)
+    @Option(names = {"--lidar-interval"}, description = "Continuous LIDAR scan interval in ms (default: 15000)")
+    private Long lidarIntervalMs;
+
+    @Option(names = {"--lidar-disable"}, description = "Disable continuous LIDAR scanning during normal run")
+    private boolean lidarDisable = false;
+
+    @Option(names = {"--lidar-continuous-h-samples"}, description = "Continuous LIDAR horizontal samples (default: 720)")
+    private Integer lidarContinuousHSamples;
+
+    @Option(names = {"--lidar-continuous-v-samples"}, description = "Continuous LIDAR vertical samples (default: 1)")
+    private Integer lidarContinuousVSamples;
+
     @Override
     public Integer call() throws Exception {
         config = new GeneratorConfig();
@@ -64,10 +101,20 @@ public class DataGeneratorApp implements Callable<Integer> {
         LOG.info("Configuration: vehicles={}, interval={}ms, topic={}, bootstrap={}",
                 vehicleCount, publishInterval, topic, bootstrapServers);
 
+        // Optional LIDAR one-shot mode
+        if (lidarEnabled) {
+            if (lidarOutputFile == null) {
+                LOG.error("--lidar requires --lidar-output to specify a CSV file path");
+                return 2;
+            }
+            return runLidarOnce();
+        }
+
         // Initialize
         initializeVehicles();
         producer = new KafkaTelemetryProducer(bootstrapServers);
-        scheduler = Executors.newScheduledThreadPool(2);
+        // Telemetry, state updates, status print, and continuous LIDAR
+        scheduler = Executors.newScheduledThreadPool(4);
 
         // Schedule telemetry publishing
         scheduler.scheduleAtFixedRate(
@@ -93,6 +140,13 @@ public class DataGeneratorApp implements Callable<Integer> {
             TimeUnit.SECONDS
         );
 
+        // Continuous, headless LIDAR scanning to ensure JME is exercised during normal run
+        if (!lidarDisable) {
+            scheduleContinuousLidar();
+        } else {
+            LOG.info("Continuous LIDAR scanning disabled via --lidar-disable");
+        }
+
         // Run for specified duration or until interrupted
         if (durationMinutes > 0) {
             LOG.info("Running for {} minutes...", durationMinutes);
@@ -105,6 +159,76 @@ public class DataGeneratorApp implements Callable<Integer> {
         }
 
         return 0;
+    }
+
+    private int runLidarOnce() {
+        try {
+            // Build simple default scene (ground + obstacles)
+            var root = LidarEnvironmentBuilder.buildDefaultScene();
+
+            // Configure LIDAR
+            LidarConfig lc = new LidarConfig();
+            if (lidarHorizontalSamples != null) lc.setHorizontalSamples(lidarHorizontalSamples);
+            if (lidarVerticalSamples != null) lc.setVerticalSamples(lidarVerticalSamples);
+            if (lidarRange != null) lc.setMaxRange(lidarRange);
+
+            // Place vehicle at origin with slight height and identity rotation
+            Vector3f vehiclePos = new Vector3f(0, 2.0f, 0);
+            Quaternion vehicleRot = new Quaternion();
+
+            LidarSimulator simulator = new LidarSimulator(root, lc);
+            var points = simulator.scan(vehiclePos, vehicleRot);
+
+            LidarPointCloudWriter.writeCsv(points, lidarOutputFile);
+            LOG.info("LIDAR scan complete: {} points written to {}", points.size(), lidarOutputFile.getAbsolutePath());
+            return 0;
+        } catch (Exception e) {
+            LOG.error("LIDAR scan failed", e);
+            return 1;
+        }
+    }
+
+    private void scheduleContinuousLidar() {
+        // Defaults tuned for low overhead but regular JME usage
+        long interval = (lidarIntervalMs != null && lidarIntervalMs > 0) ? lidarIntervalMs : 15000L; // 15s
+
+        // Build simple default scene once (ground + obstacles)
+        var root = LidarEnvironmentBuilder.buildDefaultScene();
+
+        // Configure continuous LIDAR
+        LidarConfig lc = new LidarConfig();
+        // Use lighter defaults for continuous scans
+        if (lidarContinuousHSamples != null) {
+            lc.setHorizontalSamples(lidarContinuousHSamples);
+        } else {
+            lc.setHorizontalSamples(720); // 0.5° resolution by default
+        }
+        if (lidarContinuousVSamples != null) {
+            lc.setVerticalSamples(lidarContinuousVSamples);
+        } else {
+            lc.setVerticalSamples(1);
+        }
+        if (lidarRange != null) {
+            lc.setMaxRange(lidarRange);
+        }
+
+        final LidarSimulator simulator = new LidarSimulator(root, lc);
+
+        // Static vehicle pose for periodic scans
+        final Vector3f vehiclePos = new Vector3f(0, 2.0f, 0);
+        final Quaternion vehicleRot = new Quaternion();
+
+        LOG.info("Scheduling continuous LIDAR scans: interval={}ms, hSamples={}, vSamples={}, range={}m",
+                interval, lc.getHorizontalSamples(), lc.getVerticalSamples(), lc.getMaxRange());
+
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                var points = simulator.scan(vehiclePos, vehicleRot);
+                LOG.debug("LIDAR scan produced {} points", points.size());
+            } catch (Exception e) {
+                LOG.warn("Continuous LIDAR scan failed: {}", e.getMessage());
+            }
+        }, 0, interval, TimeUnit.MILLISECONDS);
     }
 
     private void initializeVehicles() {
