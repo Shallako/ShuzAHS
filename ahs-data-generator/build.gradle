@@ -32,6 +32,9 @@ dependencies {
     // Logging
     implementation 'org.slf4j:slf4j-api:2.0.9'
     implementation 'ch.qos.logback:logback-classic:1.4.14'
+
+    // JMonkeyEngine core (math, scenegraph, collision) for headless ray casting
+    implementation 'org.jmonkeyengine:jme3-core:3.6.1-stable'
 }
 
 application {

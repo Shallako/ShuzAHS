@@ -17,7 +17,7 @@ This document contains comprehensive diagrams documenting the system architectur
 6. [Class Diagrams](#6-class-diagrams)
 7. [Infrastructure Deployment](#7-infrastructure-deployment)
 8. [Kafka Topics and Partitions](#8-kafka-topics-and-partitions)
-9. [Flink Processing Pipeline](#9-flink-processing-pipeline)
+9. [Hazelcast Jet Processing Pipeline](#9-hazelcast-jet-processing-pipeline)
 10. [Component Interaction](#10-component-interaction)
 
 ---
@@ -37,11 +37,11 @@ graph TB
         KT3[vehicle-metrics Topic]
     end
     
-    subgraph "Stream Processing - Apache Flink"
-        FS[Flink Source<br/>Kafka Consumer]
+    subgraph "Stream Processing - Hazelcast Jet (embedded)"
+        FS[Jet Source<br/>Kafka Consumer]
         AF[Alert Function<br/>Rule-Based Detection]
         WA[Window Aggregator<br/>1-min Tumbling Windows]
-        FK[Flink Sink<br/>Kafka Producer]
+        FK[Jet Sink<br/>Kafka Producer]
     end
     
     subgraph "Application Layer"
@@ -93,7 +93,7 @@ sequenceDiagram
     participant VS as Vehicle Simulator
     participant TDG as Telemetry Generator
     participant K as Kafka
-    participant F as Flink Processor
+    participant F as Telemetry Processor (Hazelcast Jet)
     participant FM as Fleet Management
     participant DB as PostgreSQL
     
@@ -469,12 +469,11 @@ classDiagram
     TelemetryDataGenerator ..> VehicleStatus : uses
 ```
 
-### 6.3 Flink Processing Classes
+### 6.3 Telemetry Processing Classes (Hazelcast Jet)
 
 ```mermaid
 classDiagram
     class TelemetryAlertFunction {
-        <<FlatMapFunction>>
         +flatMap(VehicleTelemetry, Collector) void
         -checkSpeed(VehicleTelemetry, Collector) void
         -checkFuelLevel(VehicleTelemetry, Collector) void
@@ -512,7 +511,6 @@ classDiagram
     }
     
     class TelemetryWindowAggregator {
-        <<AggregateFunction>>
         +createAccumulator() VehicleMetrics
         +add(VehicleTelemetry, VehicleMetrics) VehicleMetrics
         +getResult(VehicleMetrics) VehicleMetrics
@@ -520,12 +518,11 @@ classDiagram
     }
     
     class TelemetryDeserializer {
-        <<DeserializationSchema>>
         -ObjectMapper objectMapper
-        +open(InitializationContext) void
+        +init() void
         +deserialize(byte[]) VehicleTelemetry
         +isEndOfStream(VehicleTelemetry) boolean
-        +getProducedType() TypeInformation
+        +producedType() Type
     }
     
     TelemetryAlertFunction ..> TelemetryAlert : produces
@@ -552,9 +549,7 @@ graph TB
         end
         
         subgraph "Stream Processing"
-            JM[Flink JobManager<br/>Port: 8081<br/>Cluster Coordinator]
-            TM1[Flink TaskManager 1<br/>4 Task Slots]
-            TM2[Flink TaskManager 2<br/>4 Task Slots]
+            TP[Telemetry Processor<br/>Hazelcast Jet - embedded]
         end
         
         subgraph "Data Layer"
@@ -628,11 +623,10 @@ graph TB
                 KP3[Kafka Pod 3<br/>PVC: kafka-data-3]
             end
             
-            subgraph "Flink Deployment"
-                JMP[JobManager Pod<br/>Deployment: 1 replica]
-                TMP1[TaskManager Pod 1<br/>Deployment: 3 replicas]
-                TMP2[TaskManager Pod 2]
-                TMP3[TaskManager Pod 3]
+            subgraph "Telemetry Processor Deployment"
+                TPP1[Telemetry Processor Pod 1<br/>Deployment: 3 replicas]
+                TPP2[Telemetry Processor Pod 2]
+                TPP3[Telemetry Processor Pod 3]
             end
             
             subgraph "Application Deployments"
@@ -649,7 +643,7 @@ graph TB
         
         subgraph "Services & Ingress"
             KS[Kafka Service<br/>ClusterIP]
-            FJS[Flink JobManager Service<br/>LoadBalancer]
+            TPS[Telemetry Processor Service<br/>ClusterIP]
             FMS[Fleet Management Service<br/>ClusterIP]
             VSS[Vehicle Service<br/>ClusterIP]
             PGS[PostgreSQL Service<br/>ClusterIP]
@@ -660,7 +654,7 @@ graph TB
         
         subgraph "ConfigMaps & Secrets"
             CM1[Kafka Config]
-            CM2[Flink Config]
+            CM2[Telemetry Processor Config]
             SEC1[DB Credentials]
             SEC2[API Keys]
         end
@@ -678,10 +672,9 @@ graph TB
     KP2 --> KS
     KP3 --> KS
     
-    JMP --> FJS
-    TMP1 --> FJS
-    TMP2 --> FJS
-    TMP3 --> FJS
+    TPP1 --> TPS
+    TPP2 --> TPS
+    TPP3 --> TPS
     
     FMP --> FMS
     VSP --> VSS
@@ -690,7 +683,7 @@ graph TB
     
     ING --> FMS
     ING --> VSS
-    ING --> FJS
+    ING --> TPS
     
     KP1 -.->|uses| PV1
     KP2 -.->|uses| PV2
@@ -698,7 +691,7 @@ graph TB
     PGP -.->|uses| PV4
     RDP -.->|uses| PV5
     
-    JMP -.->|reads| CM2
+    TPP1 -.->|reads| CM2
     KP1 -.->|reads| CM1
     FMP -.->|reads| SEC1
     
@@ -843,8 +836,8 @@ graph TB
     
     subgraph "Consumers"
         subgraph "Consumer Group: telemetry-processors"
-            C1[Flink Task 1<br/>Assigned: P0, P1]
-            C2[Flink Task 2<br/>Assigned: P2]
+            C1[Telemetry Processor 1<br/>Assigned: P0, P1]
+            C2[Telemetry Processor 2<br/>Assigned: P2]
         end
         
         subgraph "Consumer Group: alert-processors"
@@ -883,8 +876,8 @@ sequenceDiagram
     participant P0 as Partition 0
     participant P1 as Partition 1
     participant P2 as Partition 2
-    participant F1 as Flink Task 1
-    participant F2 as Flink Task 2
+    participant TP1 as Telemetry Processor 1
+    participant TP2 as Telemetry Processor 2
     
     Note over DG: Vehicle: KOMATSU-930E-001
     DG->>K: produce(key="930E-001", telemetry)
@@ -902,21 +895,21 @@ sequenceDiagram
     K->>P2: append to partition 2
     
     par Consumer Group: telemetry-processors
-        P0->>F1: poll(offset=1234)
-        P1->>F1: poll(offset=5678)
-        P2->>F2: poll(offset=9012)
+        P0->>TP1: poll(offset=1234)
+        P1->>TP1: poll(offset=5678)
+        P2->>TP2: poll(offset=9012)
     end
     
-    Note over F1,F2: Process in parallel<br/>Maintain ordering per vehicle
+    Note over TP1,TP2: Process in parallel<br/>Maintain ordering per vehicle
     
-    F1->>K: commit offset P0:1235
-    F1->>K: commit offset P1:5679
-    F2->>K: commit offset P2:9013
+    TP1->>K: commit offset P0:1235
+    TP1->>K: commit offset P1:5679
+    TP2->>K: commit offset P2:9013
 ```
 
 ---
 
-## 9. Flink Processing Pipeline
+## 9. Hazelcast Jet Processing Pipeline
 
 ### 9.1 Detailed Processing Pipeline
 
@@ -1072,7 +1065,7 @@ sequenceDiagram
     participant Cache as Redis
     participant DB as PostgreSQL
     participant K as Kafka
-    participant F as Flink Processor
+    participant F as Telemetry Processor (Hazelcast Jet)
     
     Note over UI: User requests fleet status
     UI->>LB: GET /api/v1/fleet/statistics
@@ -1109,14 +1102,14 @@ sequenceDiagram
 graph TB
     subgraph "Error Detection"
         E1[Kafka Connection Lost]
-        E2[Flink Job Failure]
+        E2[Telemetry Processor Failure]
         E3[Database Timeout]
         E4[Invalid Telemetry Data]
     end
     
     subgraph "Recovery Mechanisms"
         R1[Kafka Auto-Reconnect<br/>Retry: 3 attempts<br/>Backoff: exponential]
-        R2[Flink Checkpoint<br/>Restart Strategy: fixed-delay<br/>Attempts: 5]
+        R2[Jet Snapshot<br/>Restart Strategy: fixed-delay<br/>Attempts: 5]
         R3[Connection Pool<br/>Min: 5, Max: 20<br/>Timeout: 30s]
         R4[Data Validation<br/>Filter invalid records<br/>DLQ: dead-letter-topic]
     end

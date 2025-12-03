@@ -158,12 +158,12 @@ The generated data flows through the complete system:
 ▼                     ▼                      ▼
 Telemetry          Fleet              Stream
 Processor         Management        Analytics
-(Flink)           (Spring Boot)      (Flink)
+(Hazelcast Jet)   (Spring Boot)     (optional)
 ```
 
 ### Downstream Consumers
 
-1. **ahs-telemetry-processor** (Flink)
+1. **ahs-telemetry-processor** (Hazelcast Jet, embedded)
    - Real-time stream processing
    - Windowed aggregations
    - Alert detection
@@ -173,7 +173,7 @@ Processor         Management        Analytics
    - Fleet statistics
    - REST API
 
-3. **ahs-stream-analytics** (Flink)
+3. **ahs-stream-analytics** (optional)
    - Complex event processing
    - Metrics calculation
    - Anomaly detection
@@ -200,7 +200,7 @@ java -jar ahs-data-generator.jar -v 3 -i 3000
 # Simulate large fleet
 java -jar ahs-data-generator.jar -v 100 -i 1000 -d 10
 ```
-**Validates:** Kafka throughput, Flink processing capacity, backpressure handling
+**Validates:** Kafka throughput, telemetry processing capacity, backpressure handling
 
 ### Scenario 4: Long Running Stability
 ```bash
@@ -233,7 +233,7 @@ java -jar ahs-data-generator.jar -v 50 -i 5000 -d 1440
 
 4. **Start Consumers**:
    ```bash
-   # Terminal 1: Flink processor
+   # Terminal 1: Telemetry Processor
    ./gradlew :ahs-telemetry-processor:run
    
    # Terminal 2: Fleet management

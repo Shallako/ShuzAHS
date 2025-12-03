@@ -16,9 +16,9 @@
 java -jar ahs-data-generator/build/libs/ahs-data-generator.jar -v 50 -i 2000 -d 30
 ```
 
-### Run Flink Telemetry Processor
+### Run Telemetry Processor (Hazelcast Jet, embedded)
 ```bash
-./gradlew :ahs-telemetry-processor:run
+./gradlew :ahs-telemetry-processor:runTelemetryProcessor
 ```
 
 ### Run Fleet Management Service
@@ -67,10 +67,9 @@ curl http://localhost:8080/api/v1/fleet/vehicles/KOMATSU-930E-001
 |--------|---------|------------|
 | ahs-domain | Core models | POJOs, Lombok |
 | ahs-data-generator | Test data | Java 17, Kafka |
-| ahs-telemetry-processor | Stream processing | Apache Flink |
+| ahs-telemetry-processor | Stream processing | Hazelcast Jet (embedded) |
 | ahs-fleet-management | Fleet API | Spring Boot |
 | ahs-vehicle-service | Vehicle API | Spring Boot, Thrift |
-| ahs-stream-analytics | Analytics | Apache Flink |
 
 ## Key Files
 
@@ -87,14 +86,9 @@ curl http://localhost:8080/api/v1/fleet/vehicles/KOMATSU-930E-001
 ./gradlew clean build -x test
 ```
 
-### Flink Kafka connector resolution
-- For Flink ≥ 1.15, connectors are versioned independently from core Flink.
-- With Flink 1.18.x use `org.apache.flink:flink-connector-kafka:3.x.y-1.18`.
-- Example (Gradle):
-```gradle
-implementation "org.apache.flink:flink-connector-kafka:${flinkKafkaConnectorVersion}" // e.g., 3.2.0-1.18
-```
-Do not force a separate `org.apache.kafka:kafka-clients` version; the connector brings the correct client transitively.
+### Hazelcast Jet notes
+- Jet runs embedded inside the telemetry processor; no separate cluster is required.
+- Kafka topics remain the same; ensure Kafka and Zookeeper are running.
 
 ### Kafka not running
 ```bash
@@ -110,8 +104,8 @@ docker-compose up -d kafka zookeeper
 ## Success Indicators
 
 ✅ BUILD SUCCESSFUL
-✅ All 8 modules compile
-✅ Data flows: Generator → Kafka → Flink → Fleet Management
+✅ All modules compile
+✅ Data flows: Generator → Kafka → Jet (embedded) → Fleet Management
 ✅ REST APIs respond
 ✅ Realistic telemetry data generated
 
