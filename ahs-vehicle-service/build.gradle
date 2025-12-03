@@ -1,14 +1,10 @@
 dependencies {
     implementation project(':ahs-domain')
     implementation project(':ahs-common')
-    implementation project(':ahs-thrift-api')
     
     // Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    
-    // Thrift
-    implementation "org.apache.thrift:libthrift:${thriftVersion}"
     
     // Kafka
     implementation 'org.springframework.kafka:spring-kafka'

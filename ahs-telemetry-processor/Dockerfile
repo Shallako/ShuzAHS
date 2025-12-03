@@ -14,14 +14,12 @@ COPY settings.gradle .
 # Copy all module build files
 COPY ahs-common/build.gradle ahs-common/
 COPY ahs-domain/build.gradle ahs-domain/
-COPY ahs-thrift-api/build.gradle ahs-thrift-api/
 COPY ahs-proto/build.gradle ahs-proto/
 COPY ahs-telemetry-processor/build.gradle ahs-telemetry-processor/
 
 # Copy source code
 COPY ahs-common/src ahs-common/src
 COPY ahs-domain/src ahs-domain/src
-COPY ahs-thrift-api/src ahs-thrift-api/src
 COPY ahs-proto/src ahs-proto/src
 COPY ahs-telemetry-processor/src ahs-telemetry-processor/src
 

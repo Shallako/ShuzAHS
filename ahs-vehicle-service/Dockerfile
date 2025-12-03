@@ -10,11 +10,10 @@ COPY gradle ./gradle
 # Copy all module sources
 COPY ahs-common ./ahs-common
 COPY ahs-domain ./ahs-domain
-COPY ahs-thrift-api ./ahs-thrift-api
 COPY ahs-vehicle-service ./ahs-vehicle-service
 
-# Build the application (skip thrift compilation issues)
-RUN gradle :ahs-vehicle-service:bootJar -x :ahs-thrift-api:compileJava --no-daemon
+# Build the application
+RUN gradle :ahs-vehicle-service:bootJar --no-daemon
 
 # Runtime stage
 FROM eclipse-temurin:17-jre-jammy

@@ -7,7 +7,6 @@ dependencies {
     // Project dependencies
     implementation project(':ahs-common')
     implementation project(':ahs-domain')
-    implementation project(':ahs-thrift-api')
     implementation project(':ahs-proto')
     
     // Hazelcast (Jet embedded) dependencies
@@ -25,8 +24,7 @@ dependencies {
     // Protobuf runtime
     implementation 'com.google.protobuf:protobuf-java:3.25.3'
     
-    // Thrift
-    implementation "org.apache.thrift:libthrift:${thriftVersion}"
+    // Thrift removed
     
     // Testing (JUnit etc. defined in root); Flink test deps removed
 }

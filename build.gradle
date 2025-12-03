@@ -25,7 +25,7 @@ subprojects {
     targetCompatibility = JavaVersion.VERSION_17
     
     // Library or non-Spring-Boot runnable modules - disable bootJar, enable jar
-    def libraryModules = ['ahs-common', 'ahs-domain', 'ahs-thrift-api', 'ahs-proto']
+    def libraryModules = ['ahs-common', 'ahs-domain', 'ahs-proto']
     // Streaming processor uses a fat JAR (Shadow) and is not a Spring Boot app
     def processingModules = ['ahs-telemetry-processor']
     if (libraryModules.contains(project.name) || processingModules.contains(project.name)) {
@@ -43,7 +43,6 @@ subprojects {
     
     ext {
         springBootVersion = '3.2.0'
-        thriftVersion = '0.22.0'
         kafkaVersion = '3.6.0'
         lombokVersion = '1.18.30'
         slf4jVersion = '2.0.9'
