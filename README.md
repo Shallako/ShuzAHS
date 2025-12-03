@@ -27,21 +27,21 @@ A production-ready implementation of a real-time telemetry processing and fleet 
 ### System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                      DATA GENERATION LAYER                       │
+┌────────────────────────────────────────────────────────────────┐
+│                      DATA GENERATION LAYER                     │
 │  ┌────────────────────────────────────────────────────────┐    │
 │  │ ahs-data-generator (CLI Application)                   │    │
 │  │ • Simulates 15-1000+ autonomous haul trucks            │    │
-│  │ • Komatsu 930E (300-ton) & 980E (400-ton)             │    │
+│  │ • Komatsu 930E (300-ton) & 980E (400-ton)              │    │
 │  │ • Realistic state machine: IDLE → ROUTING → LOADING    │    │
 │  │   → HAULING → DUMPING → repeat                         │    │
 │  │ • Generates telemetry: GPS, speed, load, fuel, etc.    │    │
 │  └────────────────────────┬───────────────────────────────┘    │
-└─────────────────────────────┼───────────────────────────────────┘
+└─────────────────────────────┼──────────────────────────────────┘
                               │
                               ▼ Kafka Topic: vehicle-telemetry
-┌─────────────────────────────────────────────────────────────────┐
-│                   STREAM PROCESSING LAYER                        │
+┌────────────────────────────────────────────────────────────────┐
+│                   STREAM PROCESSING LAYER                      │
 │  ┌────────────────────────────────────────────────────────┐    │
 │  │ ahs-telemetry-processor (Hazelcast Jet, embedded)      │    │
 │  │ • Real-time telemetry ingestion from Kafka             │    │
@@ -49,7 +49,7 @@ A production-ready implementation of a real-time telemetry processing and fleet 
 │  │ • Windowed aggregations (1-min tumbling windows)       │    │
 │  │ • Outputs: alerts & metrics to Kafka                   │    │
 │  └────────────────────────┬───────────────────────────────┘    │
-└─────────────────────────────┼───────────────────────────────────┘
+└─────────────────────────────┼──────────────────────────────────┘
                               │
           ┌───────────────────┼───────────────────┐
           │                   │                   │
@@ -57,26 +57,25 @@ A production-ready implementation of a real-time telemetry processing and fleet 
     Kafka: telemetry-   Kafka: vehicle-    Kafka: vehicle-
            alerts               metrics             telemetry
           │                   │                   │
-┌─────────┴───────────────────┴───────────────────┴───────────────┐
-│                    APPLICATION LAYER                              │
+┌─────────┴───────────────────┴───────────────────┴──────────────┐
+│                    APPLICATION LAYER                           │
 │  ┌────────────────────────────────────────────────────────┐    │
 │  │ ahs-fleet-management (Spring Boot REST API)            │    │
 │  │ Port: 8080 (context-path: /)                           │    │
 │  │ Base API: /api/v1/fleet                                │    │
 │  │ • Consumes telemetry events via Kafka                  │    │
 │  │ • Tracks real-time vehicle state & location            │    │
-│  │ • Fleet-wide statistics & monitoring                    │    │
+│  │ • Fleet-wide statistics & monitoring                   │    │
 │  │ • REST endpoints for external integration              │    │
 │  └────────────────────────────────────────────────────────┘    │
-│                                                                   │
+│                                                                │
 │  ┌────────────────────────────────────────────────────────┐    │
-│  │ ahs-vehicle-service (Spring Boot + Thrift)             │    │
-│  │ Port: 8080 (REST), Thrift RPC: 9090                    │    │
-│  │ • Vehicle CRUD operations                               │    │
-│  │ • Thrift RPC services for cross-service communication  │    │
+│  │ ahs-vehicle-service (Spring Boot)                      │    │
+│  │ Port: 8080 (REST)                                      │    │
+│  │ • Vehicle CRUD operations                              │    │
 │  │ • Integration with DISPATCH FMS (simulated)            │    │
 │  └────────────────────────────────────────────────────────┘    │
-└───────────────────────────────────────────────────────────────────┘
+└────────────────────────────────────────────────────────────────┘
 ```
 
 ### Technology Stack
@@ -85,7 +84,6 @@ A production-ready implementation of a real-time telemetry processing and fleet 
 |-----------|-----------|---------|
 | **Stream Processing** | Hazelcast Jet 5.6.0 (embedded) | Real-time telemetry processing, CEP, windowed aggregations |
 | **Message Broker** | Apache Kafka 3.6.0 | Event streaming, decoupling services |
-| **RPC Framework** | Apache Thrift 0.22.0 | Cross-service communication, API definitions |
 | **Backend Framework** | Spring Boot 3.2.0 | REST APIs, dependency injection, auto-configuration |
 | **Serialization** | Jackson 2.16.0 | JSON processing for events and APIs |
 | **Build Tool** | Gradle 8.4 | Multi-module build, dependency management |
@@ -119,9 +117,6 @@ ShuzAHS/
 ├── ahs-common/                     # Shared utilities
 │   └── util/                       # Common helper classes
 │
-├── ahs-thrift-api/                 # Thrift service definitions
-│   └── thrift/                     # .thrift IDL files
-│
 ├── ahs-data-generator/             # CLI data generator
 │   ├── generator/                  # TelemetryDataGenerator, VehicleSimulator
 │   └── kafka/                      # KafkaTelemetryProducer
@@ -137,7 +132,6 @@ ShuzAHS/
 │
 ├── ahs-vehicle-service/            # Vehicle CRUD service
 │   ├── service/                    # Vehicle operations
-│   └── thrift/                     # Thrift service implementations
 │
 └── ahs-stream-analytics/           # Additional stream analytics
     └── analytics/                  # Custom analytics jobs
@@ -150,11 +144,10 @@ ahs-domain (base)
     ↓
 ahs-common
     ↓
-├─→ ahs-thrift-api
 ├─→ ahs-data-generator → Kafka
 ├─→ ahs-telemetry-processor → Hazelcast Jet + Kafka
 ├─→ ahs-fleet-management → Spring Boot + Kafka
-├─→ ahs-vehicle-service → Spring Boot + Thrift
+├─→ ahs-vehicle-service → Spring Boot
 └─→ ahs-stream-analytics → Stream analytics (optional)
 ```
 
@@ -181,12 +174,6 @@ ahs-common
   ```bash
   docker --version
   docker-compose --version
-  ```
-
-- **Apache Thrift Compiler** (optional, for regenerating Thrift code)
-  ```bash
-  brew install thrift  # macOS
-  # or download from https://thrift.apache.org
   ```
 
 ### Infrastructure
