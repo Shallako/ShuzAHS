@@ -1,10 +1,10 @@
 # Komatsu Autonomous Haulage System (AHS) - Streaming Platform
 
-A production-ready implementation of a real-time telemetry processing and fleet management system for Komatsu's autonomous mining trucks, built with Apache Flink, Apache Thrift, and Spring Boot.
+A production-ready implementation of a real-time telemetry processing and fleet management system for Komatsu's autonomous mining trucks, built with Hazelcast Jet (embedded), Apache Thrift, and Spring Boot.
 
 ![Java](https://img.shields.io/badge/Java-17-orange)
 ![Gradle](https://img.shields.io/badge/Gradle-8.4-blue)
-![Flink](https://img.shields.io/badge/Apache%20Flink-1.18.0-red)
+![Hazelcast Jet](https://img.shields.io/badge/Hazelcast%20Jet-5.6.0-purple)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-green)
 
 ## 📋 Table of Contents
@@ -43,11 +43,10 @@ A production-ready implementation of a real-time telemetry processing and fleet 
 ┌─────────────────────────────────────────────────────────────────┐
 │                   STREAM PROCESSING LAYER                        │
 │  ┌────────────────────────────────────────────────────────┐    │
-│  │ ahs-telemetry-processor (Apache Flink)                │    │
+│  │ ahs-telemetry-processor (Hazelcast Jet, embedded)      │    │
 │  │ • Real-time telemetry ingestion from Kafka             │    │
-│  │ • Complex Event Processing (CEP) for anomalies         │    │
+│  │ • Threshold-based alerting (low fuel, temp, pressure)  │    │
 │  │ • Windowed aggregations (1-min tumbling windows)       │    │
-│  │ • Alert detection: low fuel, overheating, rapid decel  │    │
 │  │ • Outputs: alerts & metrics to Kafka                   │    │
 │  └────────────────────────┬───────────────────────────────┘    │
 └─────────────────────────────┼───────────────────────────────────┘

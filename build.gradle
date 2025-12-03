@@ -24,11 +24,11 @@ subprojects {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
     
-    // Library modules don't have main classes - disable bootJar, enable jar
+    // Library or non-Spring-Boot runnable modules - disable bootJar, enable jar
     def libraryModules = ['ahs-common', 'ahs-domain', 'ahs-thrift-api', 'ahs-proto']
-    // Flink modules use shadow JAR or custom fat JAR, not Spring Boot bootJar
-    def flinkModules = ['ahs-stream-analytics', 'ahs-telemetry-processor']
-    if (libraryModules.contains(project.name) || flinkModules.contains(project.name)) {
+    // Streaming processor uses a fat JAR (Shadow) and is not a Spring Boot app
+    def processingModules = ['ahs-telemetry-processor']
+    if (libraryModules.contains(project.name) || processingModules.contains(project.name)) {
         bootJar {
             enabled = false
         }
@@ -43,10 +43,6 @@ subprojects {
     
     ext {
         springBootVersion = '3.2.0'
-        flinkVersion = '1.18.0'
-        // Flink connectors (since 1.15) are versioned independently from core Flink
-        // Use a Kafka connector version compatible with Flink 1.18.x
-        flinkKafkaConnectorVersion = '3.2.0-1.18'
         thriftVersion = '0.22.0'
         kafkaVersion = '3.6.0'
         lombokVersion = '1.18.30'
@@ -80,6 +76,11 @@ subprojects {
         resolutionStrategy {
             force "ch.qos.logback:logback-core:${logbackVersion}"
             force "ch.qos.logback:logback-classic:${logbackVersion}"
+            // Enforce consistent Jackson across all modules to avoid NoClassDef/ClassCast issues
+            force "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+            force "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+            force "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+            force "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         }
     }
     
