@@ -1,11 +1,26 @@
-# Komatsu Autonomous Haulage System (AHS) - Streaming Platform
+# Autonomous Haulage System (AHS) Streaming Platform
 
-A production-ready implementation of a real-time telemetry processing and fleet management system for Komatsu's autonomous mining trucks, built with Hazelcast Jet (embedded), and Spring Boot.
+A self-directed reference implementation of a real-time telemetry ingestion and fleet-management pipeline for the autonomous mining-truck domain, built with Apache Kafka, Spring Boot 3.2, and embedded Hazelcast Jet. This is a personal learning project developed to explore distributed event streaming and stream processing architectures. Autonomous haul trucks such as the Komatsu 930E and 980E, along with associated mine workflows, are used solely as realistic, illustrative domain examples for the simulation.
 
 ![Java](https://img.shields.io/badge/Java-17-orange)
 ![Gradle](https://img.shields.io/badge/Gradle-8.4-blue)
 ![Hazelcast Jet](https://img.shields.io/badge/Hazelcast%20Jet-5.6.0-purple)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-green)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
+## ⚠️ Disclaimer
+
+This project is an independent personal project and is not affiliated with, sponsored by, or endorsed by Komatsu Ltd. or Komatsu Mining Technology Solutions. All trademarks, service marks, and company names are the property of their respective owners. Vehicle specifications, operational parameters, and simulated workflows are approximations used strictly for simulation and educational purposes.
+
+## 🎯 Motivation
+
+This project was built as a self-directed initiative to explore and master key distributed systems and stream-processing patterns:
+- **Kafka topic/partition design and consumer groups**: Partitioning strategies by vehicle ID for strict sequential ordering, high-throughput ingest, and consumer group scaling.
+- **Hazelcast Jet CEP and windowed aggregations**: In-memory complex event processing (CEP) for anomaly detection, stateful stream processing, and tumbling window aggregations.
+- **Decoupled Spring Boot microservices**: Architecting clean, modular microservices communicating asynchronously over Kafka event streams with Spring Boot 3.2.
+- **Containerized observability with Prometheus/Grafana**: End-to-end telemetry monitoring, custom actuator metric scraping, and pre-provisioned Grafana visualization.
+
+---
 
 ## 📋 Table of Contents
 
@@ -1092,22 +1107,20 @@ java -jar ahs-data-generator.jar -v 1 -i 1000
 
 ## 👥 Contributing
 
-This is a demonstration project for Komatsu Mining Technology Solutions.
+This is a personal project by Shoulico Freeman. Issues and pull requests are welcome.
 
 ---
 
 ## 📄 License
 
-Proprietary - Komatsu Mining Technology Solutions
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 ## 🏆 Project Status
 
-✅ **Production Ready**
+✅ **Complete / demo-ready**
 - All modules compile successfully
 - Complete end-to-end data flow
 - Comprehensive documentation
 - Ready for demonstration
-
-**Built with ❤️ for Komatsu MTS**
