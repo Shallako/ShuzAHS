@@ -115,16 +115,16 @@ Docker Compose is configured to include `--lidar-interval 15000` on the `data-ge
 ## Example Output
 
 ```
-12:34:56.789 [main] INFO  c.k.a.g.DataGeneratorApp - Starting AHS Data Generator
-12:34:56.790 [main] INFO  c.k.a.g.DataGeneratorApp - Configuration: vehicles=15, interval=5000ms
-12:34:56.801 [main] INFO  c.k.a.g.DataGeneratorApp - Initialized 15 vehicles (10 x 930E, 5 x 980E)
-12:34:56.850 [main] INFO  c.k.a.g.KafkaTelemetryProducer - Kafka telemetry producer initialized
-12:34:56.851 [main] INFO  c.k.a.g.DataGeneratorApp - Running indefinitely. Press Ctrl+C to stop...
-12:35:06.855 [pool-1-thread-2] INFO  c.k.a.g.DataGeneratorApp - === Fleet Status ===
-12:35:06.856 [pool-1-thread-2] INFO  c.k.a.g.DataGeneratorApp -   KOMATSU-930E-001 [ROUTING] - Cycle: 0, Remaining: 54s
-12:35:06.856 [pool-1-thread-2] INFO  c.k.a.g.DataGeneratorApp -   KOMATSU-930E-002 [LOADING] - Cycle: 0, Remaining: 123s
-12:35:06.856 [pool-1-thread-2] INFO  c.k.a.g.DataGeneratorApp -   KOMATSU-930E-003 [IDLE] - Cycle: 0, Remaining: 12s
-12:35:06.857 [pool-1-thread-2] INFO  c.k.a.g.DataGeneratorApp - Total cycles completed: 0
+12:34:56.789 [main] INFO  c.s.a.g.DataGeneratorApp - Starting AHS Data Generator
+12:34:56.790 [main] INFO  c.s.a.g.DataGeneratorApp - Configuration: vehicles=15, interval=5000ms
+12:34:56.801 [main] INFO  c.s.a.g.DataGeneratorApp - Initialized 15 vehicles (10 x 930E, 5 x 980E)
+12:34:56.850 [main] INFO  c.s.a.g.KafkaTelemetryProducer - Kafka telemetry producer initialized
+12:34:56.851 [main] INFO  c.s.a.g.DataGeneratorApp - Running indefinitely. Press Ctrl+C to stop...
+12:35:06.855 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp - === Fleet Status ===
+12:35:06.856 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp -   KOMATSU-930E-001 [ROUTING] - Cycle: 0, Remaining: 54s
+12:35:06.856 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp -   KOMATSU-930E-002 [LOADING] - Cycle: 0, Remaining: 123s
+12:35:06.856 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp -   KOMATSU-930E-003 [IDLE] - Cycle: 0, Remaining: 12s
+12:35:06.857 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp - Total cycles completed: 0
 ```
 
 ## Integration with AHS Pipeline
