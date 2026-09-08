@@ -31,14 +31,6 @@ scrape_configs:
           service: 'kafka'
           component: 'message-broker'
 
-  # Flink JobManager metrics
-  - job_name: 'flink-jobmanager'
-    static_configs:
-      - targets: ['flink-jobmanager:8081']
-        labels:
-          service: 'flink'
-          component: 'jobmanager'
-
   # Fleet Management Service (Spring Boot Actuator)
   - job_name: 'fleet-management'
     metrics_path: '/actuator/prometheus'

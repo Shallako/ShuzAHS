@@ -66,14 +66,16 @@ curl http://localhost:8080/api/v1/fleet/vehicles/TITAN-300-001
 | Module | Purpose | Technology |
 |--------|---------|------------|
 | ahs-domain | Core models | POJOs, Lombok |
-| ahs-data-generator | Test data | Java 17, Kafka |
-| ahs-telemetry-processor | Stream processing | Hazelcast Jet (embedded) |
-| ahs-fleet-management | Fleet API | Spring Boot |
-| ahs-vehicle-service | Vehicle API | Spring Boot, Thrift |
+| ahs-common | Shared utilities | Java 17 |
+| ahs-proto | Protobuf definitions | Protocol Buffers (proto3) |
+| ahs-data-generator | Test data & LIDAR simulation | Java 17, Kafka, JME3 |
+| ahs-telemetry-processor | Stream processing & CEP | Hazelcast Jet (embedded) |
+| ahs-fleet-management | Fleet API & monitoring | Spring Boot 3.2, Kafka |
+| ahs-vehicle-service | Vehicle API | Spring Boot 3.2 |
 
 ## Key Files
 
-- `PROJECT_COMPLETE.md` - Complete documentation
+- `README.md` - Complete documentation
 - `DATA_GENERATOR_SUMMARY.md` - Generator details
 - `run-generator.sh` - Quick start script
 - `settings.gradle` - Module configuration

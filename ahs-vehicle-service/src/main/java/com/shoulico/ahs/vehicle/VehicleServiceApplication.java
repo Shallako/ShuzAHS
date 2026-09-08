@@ -6,7 +6,7 @@ import org.springframework.kafka.annotation.EnableKafka;
 
 /**
  * Spring Boot application for AHS Vehicle Service
- * Provides Thrift RPC and REST APIs for vehicle management
+ * Provides REST APIs for vehicle management
  */
 @SpringBootApplication
 @EnableKafka

@@ -127,15 +127,19 @@ ShuzAHS/
 │   ├── model/                      # Vehicle, Location, Telemetry, etc.
 │   └── events/                     # VehicleTelemetryEvent, VehicleCommandEvent, etc.
 │
-├── ahs-common/                     # Shared utilities
+├── ahs-common/                     # Shared utilities and constants
 │   └── util/                       # Common helper classes
 │
-├── ahs-data-generator/             # CLI data generator
+├── ahs-proto/                      # Protocol Buffers definitions (proto3)
+│   └── src/main/proto/             # telemetry.proto
+│
+├── ahs-data-generator/             # CLI data generator & LIDAR simulation
 │   ├── generator/                  # TelemetryDataGenerator, VehicleSimulator
+│   ├── lidar/                      # JME headless LIDAR ray-casting
 │   └── kafka/                      # KafkaTelemetryProducer
 │
 ├── ahs-telemetry-processor/        # Telemetry processor (Hazelcast Jet, embedded)
-│   ├── function/                   # Map/FlatMap functions, CEP patterns
+│   ├── function/                   # Deserializers, window aggregations, CEP alerts
 │   └── model/                      # TelemetryAlert, VehicleMetrics
 │
 ├── ahs-fleet-management/           # Fleet management REST API
@@ -143,11 +147,8 @@ ShuzAHS/
 │   ├── kafka/                      # Kafka consumers
 │   └── controller/                 # REST controllers
 │
-├── ahs-vehicle-service/            # Vehicle CRUD service
-│   ├── service/                    # Vehicle operations
-│
-└── ahs-stream-analytics/           # Additional stream analytics
-    └── analytics/                  # Custom analytics jobs
+└── ahs-vehicle-service/            # Vehicle CRUD service
+    └── service/                    # Vehicle operations
 ```
 
 ### Module Dependencies
@@ -155,13 +156,12 @@ ShuzAHS/
 ```
 ahs-domain (base)
     ↓
-ahs-common
+ahs-common & ahs-proto
     ↓
 ├─→ ahs-data-generator → Kafka
-├─→ ahs-telemetry-processor → Hazelcast Jet + Kafka
+├─→ ahs-telemetry-processor → Hazelcast Jet (embedded) + Kafka
 ├─→ ahs-fleet-management → Spring Boot + Kafka
-├─→ ahs-vehicle-service → Spring Boot
-└─→ ahs-stream-analytics → Stream analytics (optional)
+└─→ ahs-vehicle-service → Spring Boot
 ```
 
 ---

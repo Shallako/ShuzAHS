@@ -30,7 +30,6 @@ public final class AHSConstants {
     
     // Network Constants
     public static final String NETWORK_TYPE_PRIVATE_LTE = "PRIVATE_LTE";
-    public static final int DEFAULT_THRIFT_PORT = 9090;
     public static final int DEFAULT_KAFKA_PORT = 9092;
     
     // Kafka Topics
