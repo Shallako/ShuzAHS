@@ -548,11 +548,11 @@ java -jar ahs-data-generator/build/libs/ahs-data-generator.jar \
 
 **Expected Output:**
 ```
-12:34:56.789 [main] INFO  c.k.a.g.DataGeneratorApp - Starting AHS Data Generator
-12:34:56.790 [main] INFO  c.k.a.g.DataGeneratorApp - Configuration: vehicles=15, interval=5000ms
-12:34:56.801 [main] INFO  c.k.a.g.DataGeneratorApp - Initialized 15 vehicles (10 x 930E, 5 x 980E)
-12:35:06.855 [pool-1-thread-2] INFO  c.k.a.g.DataGeneratorApp - === Fleet Status ===
-12:35:06.856 [pool-1-thread-2] INFO  c.k.a.g.DataGeneratorApp -   KOMATSU-930E-001 [HAULING] - Cycle: 1, Remaining: 54s
+12:34:56.789 [main] INFO  c.s.a.g.DataGeneratorApp - Starting AHS Data Generator
+12:34:56.790 [main] INFO  c.s.a.g.DataGeneratorApp - Configuration: vehicles=15, interval=5000ms
+12:34:56.801 [main] INFO  c.s.a.g.DataGeneratorApp - Initialized 15 vehicles (10 x 930E, 5 x 980E)
+12:35:06.855 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp - === Fleet Status ===
+12:35:06.856 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp -   KOMATSU-930E-001 [HAULING] - Cycle: 1, Remaining: 54s
 ```
 
 #### 4. Run Telemetry Processor
@@ -563,9 +563,9 @@ java -jar ahs-data-generator/build/libs/ahs-data-generator.jar \
 
 **Expected Output:**
 ```
-INFO  c.k.a.t.JetTelemetryProcessorJob - Starting Telemetry Processing Job
-INFO  c.k.a.t.JetTelemetryProcessorJob - Subscribed to Kafka topic(s)
-INFO  c.k.a.t.JetTelemetryProcessorJob - Processing pipeline initialized
+INFO  c.s.a.t.JetTelemetryProcessorJob - Starting Telemetry Processing Job
+INFO  c.s.a.t.JetTelemetryProcessorJob - Subscribed to Kafka topic(s)
+INFO  c.s.a.t.JetTelemetryProcessorJob - Processing pipeline initialized
 ```
 
 #### 5. Run Fleet Management Service
@@ -576,9 +576,9 @@ INFO  c.k.a.t.JetTelemetryProcessorJob - Processing pipeline initialized
 
 **Expected Output:**
 ```
-INFO  c.k.a.f.FleetManagementApplication - Started FleetManagementApplication in 3.456 seconds
-INFO  c.k.a.f.s.FleetManagementService - Initialized Fleet Management Service
-INFO  c.k.a.f.s.FleetManagementService - Initialized mock fleet with 15 vehicles
+INFO  c.s.a.f.FleetManagementApplication - Started FleetManagementApplication in 3.456 seconds
+INFO  c.s.a.f.s.FleetManagementService - Initialized Fleet Management Service
+INFO  c.s.a.f.s.FleetManagementService - Initialized mock fleet with 15 vehicles
 ```
 
 #### 6. Run Vehicle Service (Optional)
@@ -860,7 +860,7 @@ kafka:
 
 logging:
   level:
-    com.komatsu.ahs: INFO
+    com.shoulico.ahs: INFO
     org.apache.kafka: WARN
 ```
 
@@ -880,7 +880,7 @@ kafka:
   
 logging:
   level:
-    com.komatsu.ahs: WARN
+    com.shoulico.ahs: WARN
 ```
 
 Run with profile:

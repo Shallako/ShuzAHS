@@ -47,7 +47,7 @@ management:
 
 logging:
   level:
-    com.komatsu.ahs: INFO
+    com.shoulico.ahs: INFO
     org.springframework.kafka: WARN
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

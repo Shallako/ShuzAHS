@@ -41,5 +41,5 @@ management:
 # Logging
 logging:
   level:
-    com.komatsu.ahs: DEBUG
+    com.shoulico.ahs: DEBUG
     org.springframework.kafka: INFO

@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-package com.komatsu.ahs.proto;
+package com.shoulico.ahs.proto;
 
 option java_multiple_files = true;
-option java_package = "com.komatsu.ahs.proto";
+option java_package = "com.shoulico.ahs.proto";
 option java_outer_classname = "TelemetryProtos";
 
 import "google/protobuf/timestamp.proto";

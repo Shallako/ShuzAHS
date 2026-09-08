@@ -6,7 +6,7 @@ plugins {
 }
 
 allprojects {
-    group = 'com.komatsu.ahs'
+    group = 'com.shoulico.ahs'
     version = '1.0.0-SNAPSHOT'
     
     repositories {

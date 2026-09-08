@@ -41,5 +41,5 @@ dependencies {
 bootJar {
     archiveBaseName = 'ahs-fleet-management'
     archiveVersion = project.version
-    mainClass = 'com.komatsu.ahs.fleet.FleetManagementApplication'
+    mainClass = 'com.shoulico.ahs.fleet.FleetManagementApplication'
 }

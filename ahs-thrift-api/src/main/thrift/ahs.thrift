@@ -1,4 +1,4 @@
-namespace java com.komatsu.ahs.thrift
+namespace java com.shoulico.ahs.thrift
 
 /**
  * GPS Coordinate structure

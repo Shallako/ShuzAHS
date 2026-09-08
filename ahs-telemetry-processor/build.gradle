@@ -30,7 +30,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'com.komatsu.ahs.telemetry.JetTelemetryProcessorJob'
+    mainClass = 'com.shoulico.ahs.telemetry.JetTelemetryProcessorJob'
 }
 
 // Create a fat JAR suitable for running the embedded Jet job
@@ -43,8 +43,8 @@ sourceSets {
     main {
         java {
             // Exclude Flink-based implementations from compilation during Jet migration
-            exclude 'com/komatsu/ahs/telemetry/TelemetryProcessorJob.java'
-            exclude 'com/komatsu/ahs/telemetry/function/**'
+            exclude 'com/shoulico/ahs/telemetry/TelemetryProcessorJob.java'
+            exclude 'com/shoulico/ahs/telemetry/function/**'
         }
     }
     test {
@@ -61,5 +61,5 @@ task runTelemetryProcessor(type: JavaExec) {
     group = 'application'
     description = 'Run the Hazelcast Jet Telemetry Processor Job'
     classpath = sourceSets.main.runtimeClasspath
-    mainClass = 'com.komatsu.ahs.telemetry.JetTelemetryProcessorJob'
+    mainClass = 'com.shoulico.ahs.telemetry.JetTelemetryProcessorJob'
 }
