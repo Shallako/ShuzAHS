@@ -8,6 +8,7 @@ A self-directed reference implementation of a real-time telemetry ingestion and 
 ![Gradle](https://img.shields.io/badge/Gradle-8.4-blue)
 ![Hazelcast Jet](https://img.shields.io/badge/Hazelcast%20Jet-5.6.0-purple)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-green)
+![Build](https://github.com/Shallako/ShuzAHS/actions/workflows/build.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ## 🎯 Motivation
@@ -31,6 +32,7 @@ This project was built as a self-directed initiative to explore and master key d
 - [API Documentation](#api-documentation)
 - [Configuration Guide](#configuration-guide)
 - [Testing Scenarios](#testing-scenarios)
+- [Production Considerations](#-production-considerations--what-i-deliberately-simplified)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -39,56 +41,54 @@ This project was built as a self-directed initiative to explore and master key d
 
 ### System Architecture
 
-```
-┌────────────────────────────────────────────────────────────────┐
-│                      DATA GENERATION LAYER                     │
-│  ┌────────────────────────────────────────────────────────┐    │
-│  │ ahs-data-generator (CLI Application)                   │    │
-│  │ • Simulates 15-1000+ autonomous haul trucks            │    │
-│  │ • Titan 300 (300-ton) & Titan 400 (400-ton)              │    │
-│  │ • Realistic state machine: IDLE → ROUTING → LOADING    │    │
-│  │   → HAULING → DUMPING → repeat                         │    │
-│  │ • Generates telemetry: GPS, speed, load, fuel, etc.    │    │
-│  └────────────────────────┬───────────────────────────────┘    │
-└─────────────────────────────┼──────────────────────────────────┘
-                              │
-                              ▼ Kafka Topic: vehicle-telemetry
-┌────────────────────────────────────────────────────────────────┐
-│                   STREAM PROCESSING LAYER                      │
-│  ┌────────────────────────────────────────────────────────┐    │
-│  │ ahs-telemetry-processor (Hazelcast Jet, embedded)      │    │
-│  │ • Real-time telemetry ingestion from Kafka             │    │
-│  │ • Threshold-based alerting (low fuel, temp, pressure)  │    │
-│  │ • Windowed aggregations (1-min tumbling windows)       │    │
-│  │ • Outputs: alerts & metrics to Kafka                   │    │
-│  └────────────────────────┬───────────────────────────────┘    │
-└─────────────────────────────┼──────────────────────────────────┘
-                              │
-          ┌───────────────────┼───────────────────┐
-          │                   │                   │
-          ▼                   ▼                   ▼
-    Kafka: telemetry-   Kafka: vehicle-    Kafka: vehicle-
-           alerts               metrics             telemetry
-          │                   │                   │
-┌─────────┴───────────────────┴───────────────────┴──────────────┐
-│                    APPLICATION LAYER                           │
-│  ┌────────────────────────────────────────────────────────┐    │
-│  │ ahs-fleet-management (Spring Boot REST API)            │    │
-│  │ Port: 8080 (context-path: /)                           │    │
-│  │ Base API: /api/v1/fleet                                │    │
-│  │ • Consumes telemetry events via Kafka                  │    │
-│  │ • Tracks real-time vehicle state & location            │    │
-│  │ • Fleet-wide statistics & monitoring                   │    │
-│  │ • REST endpoints for external integration              │    │
-│  └────────────────────────────────────────────────────────┘    │
-│                                                                │
-│  ┌────────────────────────────────────────────────────────┐    │
-│  │ ahs-vehicle-service (Spring Boot)                      │    │
-│  │ Port: 8080 (REST)                                      │    │
-│  │ • Vehicle CRUD operations                              │    │
-│  │ • Integration with simulated Fleet Dispatch System     │    │
-│  └────────────────────────────────────────────────────────┘    │
-└────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph "Data Generation"
+        generator["ahs-data-generator (CLI)"]
+    end
+
+    subgraph "Stream Processing"
+        processor["ahs-telemetry-processor (Hazelcast Jet, embedded)"]
+    end
+
+    subgraph "Kafka Topics"
+        topic_telemetry[("vehicle-telemetry")]
+        topic_alerts[("telemetry-alerts")]
+        topic_metrics[("vehicle-metrics")]
+    end
+
+    subgraph "Application Services"
+        fleet["ahs-fleet-management (Spring Boot REST)"]
+        vehicle["ahs-vehicle-service (Spring Boot CRUD)"]
+        postgres[("PostgreSQL")]
+        redis[("Redis")]
+    end
+
+    subgraph "Observability"
+        prom["Prometheus"]
+        grafana["Grafana"]
+        kafka_ui["Kafka UI"]
+    end
+
+    generator --> topic_telemetry
+    topic_telemetry --> processor
+    processor --> topic_alerts
+    processor --> topic_metrics
+
+    topic_telemetry --> fleet
+    topic_alerts --> fleet
+    topic_metrics --> fleet
+
+    fleet --> postgres
+    fleet --> redis
+    vehicle -. "Fleet dispatch integration" .-> fleet
+
+    prom -. "Scrapes" .-> fleet
+    prom -. "Scrapes" .-> vehicle
+    grafana --> prom
+    kafka_ui -. "Monitors" .-> topic_telemetry
+    kafka_ui -.-> topic_alerts
+    kafka_ui -.-> topic_metrics
 ```
 
 ### Technology Stack
@@ -153,15 +153,17 @@ ShuzAHS/
 
 ### Module Dependencies
 
-```
-ahs-domain (base)
-    ↓
-ahs-common & ahs-proto
-    ↓
-├─→ ahs-data-generator → Kafka
-├─→ ahs-telemetry-processor → Hazelcast Jet (embedded) + Kafka
-├─→ ahs-fleet-management → Spring Boot + Kafka
-└─→ ahs-vehicle-service → Spring Boot
+```mermaid
+flowchart TD
+    domain["ahs-domain"] --> common["ahs-common"]
+    domain --> proto["ahs-proto"]
+    common --> gen["ahs-data-generator"]
+    common --> proc["ahs-telemetry-processor"]
+    common --> fleet["ahs-fleet-management"]
+    common --> vehicle["ahs-vehicle-service"]
+    proto --> gen
+    proto --> proc
+    proto --> fleet
 ```
 
 ---
@@ -360,17 +362,24 @@ The complete platform runs **11 containers**:
 The script will:
 1. ✅ Verify Docker is running
 2. 📦 Build the project with Gradle
-3. 🚀 Start all containers
-4. 🔍 Verify each container status
-5. 🌐 Display all access points
+3. 🔍 Automatically detect port collisions and assign the next available port (saving to `.env`)
+4. 🚀 Start all containers with active ports
+5. 🔍 Verify each container status
+6. 🌐 Display all active access points
+
+> [!TIP]
+> If a local service or container already occupies default ports (such as `9090` for Prometheus or `3000` for Grafana), `./start.sh` and `./resolve-ports.sh` automatically detect the conflict and allocate the next free port without failing. You can also customize ports manually in `.env` (see `.env.example`).
 
 **Option 2: Manual Docker Compose**
 ```bash
 # Build the project first
 ./gradlew build -x test
 
+# Check ports and generate .env (optional if custom ports are needed)
+./resolve-ports.sh
+
 # Start all services
-docker-compose up -d
+docker compose up -d
 
 # Verify all containers are running
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "ahs-"
@@ -386,6 +395,9 @@ docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "ahs-"
 | Data Generator | http://localhost:8082 | - |
 | Fleet Management API | http://localhost:8083 | - |
 | Vehicle Service API | http://localhost:8084 | - |
+
+> [!NOTE]
+> The table lists default host ports. When starting with `./start.sh` (or `./resolve-ports.sh`), any port collisions on the host are automatically detected and resolved to the next free port, written to `.env`, and displayed in the startup summary.
 
 ### Container Management
 
@@ -923,18 +935,39 @@ export JAVA_OPTS="-Xms2g -Xmx4g -XX:+UseG1GC"
 
 ## 🧪 Testing Scenarios
 
+### Automated Unit & Integration Tests
+
+The repository includes a multi-layer test suite with unit tests and end-to-end Kafka pipeline integration tests:
+
+```bash
+# Run unit tests across all modules
+./gradlew test
+
+# Run all verification tasks (unit tests + Kafka Testcontainers integration tests)
+./gradlew check
+
+# Run Kafka integration tests directly
+./gradlew :ahs-telemetry-processor:integrationTest
+```
+
+- **Unit Tests:** Verify model logic, alert calculations, vehicle lifecycle state transitions, and simulator configuration.
+- **Kafka Integration Tests:** [TelemetryAlertPipelineIT.java](file:///Users/shoulicofreeman/Development/ShuzAHS/ahs-telemetry-processor/src/test/java/com/shoulico/ahs/telemetry/integration/TelemetryAlertPipelineIT.java) uses **Testcontainers Kafka** to spin up an isolated broker container, produces `VehicleTelemetryEvent` records to `vehicle-telemetry`, executes the Hazelcast Jet streaming pipeline, and asserts that alert events (such as high engine temperature) are generated and published to `telemetry-alerts`.
+- **Continuous Integration:** Validated on every commit and pull request via GitHub Actions CI ([.github/workflows/build.yml](file:///Users/shoulicofreeman/Development/ShuzAHS/.github/workflows/build.yml)).
+
+---
+
 ### Scenario 1: Basic Functionality Test
 
 **Objective:** Verify end-to-end data flow
 
 ```bash
 # 1. Start services
-docker-compose up -d
+./start.sh
 ./gradlew :ahs-fleet-management:bootRun &
 ./gradlew :ahs-telemetry-processor:run &
 
 # 2. Generate data (5 vehicles for 5 minutes)
-java -jar ahs-data-generator.jar -v 5 -d 5
+java -jar ahs-data-generator/build/libs/ahs-data-generator.jar -v 5 -d 5
 
 # 3. Verify
 curl http://localhost:8080/api/v1/fleet/statistics
@@ -948,7 +981,7 @@ curl http://localhost:8080/api/v1/fleet/statistics
 
 ```bash
 # Simulate 100 vehicles, 2-second interval, 30 minutes
-java -jar ahs-data-generator.jar -v 100 -i 2000 -d 30
+java -jar ahs-data-generator/build/libs/ahs-data-generator.jar -v 100 -i 2000 -d 30
 
 # (optional) Monitor services via their logs and Grafana/Prometheus
 
@@ -964,10 +997,10 @@ watch -n 5 'curl -s http://localhost:8080/api/v1/fleet/statistics | jq'
 
 ```bash
 # 1. Start normal load
-java -jar ahs-data-generator.jar -v 20 -i 5000 &
+java -jar ahs-data-generator/build/libs/ahs-data-generator.jar -v 20 -i 5000 &
 
 # 2. Kill telemetry processor
-pkill -f TelemetryProcessorJob
+pkill -f JetTelemetryProcessorJob
 
 # 3. Wait 30 seconds, restart
 ./gradlew :ahs-telemetry-processor:run &
@@ -994,6 +1027,22 @@ docker exec -it $(docker ps -qf "name=kafka") kafka-console-consumer \
 # Should see alerts like:
 # {"alertType":"LOW_FUEL","severity":"WARNING",...}
 ```
+
+---
+
+## 🏭 Production Considerations — What I Deliberately Simplified
+
+In building this reference implementation, I chose simplicity over production rigor in several architectural areas to keep local execution fast and dependencies minimal:
+
+1. **Durability**: Today, topics use a replication factor of 1 and producers use `acks=1` for single-broker local development. Production deployments require a replication factor of 3 with `min.insync.replicas=2`, `acks=all`, and `enable.idempotence=true` on all producers to eliminate data loss during broker failovers.
+
+2. **Schema Management**: Events are serialized as raw JSON via Jackson today. In production, I would enforce Avro or Protobuf backed by Confluent Schema Registry (or Apicurio) with `BACKWARD` compatibility. This guarantees strict contract validation so the telemetry schema can evolve without breaking downstream consumers.
+
+3. **Delivery Semantics**: The streaming pipeline operates at-least-once today with potential duplicate alerts during network retries or restarts. Production requires idempotent producers combined with Kafka transactions and Hazelcast Jet's exactly-once processing guarantee; duplicate alerts trigger spurious operator dispatches and corrupt haul-cycle metrics.
+
+4. **Poison Messages**: A malformed event can stall a consumer today due to unhandled deserialization errors. Production requires a dead-letter topic (`telemetry-dlq`) with an error-handling deserializer and an exponential retry/backoff policy, allowing operators to safely isolate bad payloads, debug schema drift, and replay corrected messages.
+
+5. **Operability**: The platform provides no broker-side consumer lag visibility today. Production requires consumer-lag metrics (`kafka_exporter` or Burrow) scraped by Prometheus with alerting on lag growth, paired with partition counts sized to expected horizontal consumer parallelism.
 
 ---
 

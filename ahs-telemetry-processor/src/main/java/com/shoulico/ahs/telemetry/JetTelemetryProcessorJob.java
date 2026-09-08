@@ -69,12 +69,7 @@ public class JetTelemetryProcessorJob {
         LOG.info("Starting AHS Telemetry Processor (Hazelcast Jet, embedded)");
 
         // Start embedded Hazelcast member
-        Config config = new Config();
-        // Enable Jet engine explicitly for embedded member
-        config.getJetConfig().setEnabled(true);
-        // Reduce noisy phone-home warnings during shutdown in dev/local runs
-        config.setProperty("hazelcast.phone.home.enabled", "false");
-
+        Config config = createHazelcastConfig();
         HazelcastInstance hz = Hazelcast.newHazelcastInstance(config);
         JetService jet = hz.getJet();
 
@@ -150,26 +145,43 @@ public class JetTelemetryProcessorJob {
         }
     }
 
-    private static Pipeline buildPipeline() {
+    public static Config createHazelcastConfig() {
+        Config config = new Config();
+        config.getJetConfig().setEnabled(true);
+        config.setProperty("hazelcast.phone.home.enabled", "false");
+        return config;
+    }
+
+    public static Pipeline buildPipeline() {
+        return buildPipeline(KAFKA_BOOTSTRAP_SERVERS, INPUT_TOPIC, OUTPUT_ALERTS_TOPIC, OUTPUT_METRICS_TOPIC, CONSUMER_GROUP, "latest");
+    }
+
+    public static Pipeline buildPipeline(
+            String bootstrapServers,
+            String inputTopic,
+            String alertsTopic,
+            String metricsTopic,
+            String consumerGroup,
+            String autoOffsetReset) {
         Pipeline p = Pipeline.create();
 
         // Kafka consumer properties
         Properties consumerProps = new Properties();
-        consumerProps.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_BOOTSTRAP_SERVERS);
-        consumerProps.setProperty(ConsumerConfig.GROUP_ID_CONFIG, CONSUMER_GROUP);
+        consumerProps.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        consumerProps.setProperty(ConsumerConfig.GROUP_ID_CONFIG, consumerGroup);
         consumerProps.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         consumerProps.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        consumerProps.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+        consumerProps.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffsetReset != null ? autoOffsetReset : "latest");
 
         // Kafka producer properties
         Properties producerProps = new Properties();
-        producerProps.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_BOOTSTRAP_SERVERS);
+        producerProps.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         producerProps.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         producerProps.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
         // 1) Ingest telemetry from Kafka and parse JSON
         StreamStage<VehicleTelemetry> telemetry = p.readFrom(
-                        KafkaSources.kafka(consumerProps, rec -> rec.value().toString(), INPUT_TOPIC))
+                        KafkaSources.kafka(consumerProps, rec -> rec.value().toString(), inputTopic))
                 .withoutTimestamps()
                 .map(JetTelemetryProcessorJob::parseTelemetry)
                 .filter(t -> t != null);
@@ -199,10 +211,31 @@ public class JetTelemetryProcessorJob {
                 });
 
         // 4) Write to Kafka
-        alertsRecords.writeTo(KafkaSinks.kafka(producerProps, OUTPUT_ALERTS_TOPIC));
-        metricsRecords.writeTo(KafkaSinks.kafka(producerProps, OUTPUT_METRICS_TOPIC));
+        if (alertsTopic != null && !alertsTopic.isBlank()) {
+            alertsRecords.writeTo(KafkaSinks.kafka(producerProps, alertsTopic));
+        }
+        if (metricsTopic != null && !metricsTopic.isBlank()) {
+            metricsRecords.writeTo(KafkaSinks.kafka(producerProps, metricsTopic));
+        }
 
         return p;
+    }
+
+    public static Job startJob(
+            HazelcastInstance hz,
+            String bootstrapServers,
+            String inputTopic,
+            String alertsTopic,
+            String metricsTopic) {
+        JobConfig jobConfig = new JobConfig().setName("ahs-telemetry-processor-" + java.util.UUID.randomUUID());
+        Pipeline p = buildPipeline(
+                bootstrapServers,
+                inputTopic,
+                alertsTopic,
+                metricsTopic,
+                "telemetry-processor-" + java.util.UUID.randomUUID(),
+                "earliest");
+        return hz.getJet().newJob(p, jobConfig);
     }
 
     private static VehicleTelemetry parseTelemetry(String json) {

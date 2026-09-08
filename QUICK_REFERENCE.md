@@ -7,6 +7,20 @@
 ./gradlew build -x test
 ```
 
+### Run Tests & Verification
+```bash
+# Run unit tests across all modules
+./gradlew test
+
+# Run all verification including Kafka Testcontainers integration test
+./gradlew check
+```
+
+### Start Docker Stack (Auto-resolves Port Collisions)
+```bash
+./start.sh
+```
+
 ### Run Data Generator
 ```bash
 # Default: 15 vehicles, 5 second interval
@@ -18,6 +32,8 @@ java -jar ahs-data-generator/build/libs/ahs-data-generator.jar -v 50 -i 2000 -d 
 
 ### Run Telemetry Processor (Hazelcast Jet, embedded)
 ```bash
+./gradlew :ahs-telemetry-processor:run
+# OR
 ./gradlew :ahs-telemetry-processor:runTelemetryProcessor
 ```
 
@@ -99,8 +115,9 @@ docker-compose up -d kafka zookeeper
 
 ### Port already in use
 ```bash
-# Fleet Management: Change in application.yml (default: 8080, context-path: /)
-# Vehicle Service: Change in application.yml (default: 8080)
+# Docker host port collisions (e.g. 9090, 3000):
+# Automatically resolved by ./start.sh or ./resolve-ports.sh (persisted to .env).
+# Local Spring Boot runs: Override with -Dserver.port=<port> or in application.yml
 ```
 
 ## Success Indicators

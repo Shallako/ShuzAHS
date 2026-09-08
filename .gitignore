@@ -69,3 +69,7 @@ hs_err_pid*
 # Flink checkpoints
 /checkpoints/
 /savepoints/
+
+# Environment files
+.env
+!.env.example

@@ -3,6 +3,11 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
+ext {
+    testcontainersVersion = '1.20.4'
+    awaitilityVersion = '4.2.1'
+}
+
 dependencies {
     // Project dependencies
     implementation project(':ahs-common')
@@ -13,8 +18,6 @@ dependencies {
     implementation "com.hazelcast:hazelcast:5.6.0"
     implementation "com.hazelcast.jet:hazelcast-jet-kafka:5.6.0"
     
-    // Kafka client is provided transitively by Flink Kafka connector; avoid forcing another version
-    
     // Jackson for JSON serialization (fallback path)
     implementation "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
     implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
@@ -23,10 +26,13 @@ dependencies {
 
     // Protobuf runtime
     implementation 'com.google.protobuf:protobuf-java:3.25.3'
-    
-    // Thrift removed
-    
-    // Testing (JUnit etc. defined in root); Flink test deps removed
+
+    // Testing
+    testImplementation "org.testcontainers:testcontainers:${testcontainersVersion}"
+    testImplementation "org.testcontainers:kafka:${testcontainersVersion}"
+    testImplementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
+    testImplementation "org.awaitility:awaitility:${awaitilityVersion}"
+    testImplementation "org.apache.kafka:kafka-clients:${kafkaVersion}"
 }
 
 application {
@@ -38,24 +44,44 @@ shadowJar {
     archiveClassifier.set('all')
 }
 
-// Disable legacy Flink tests in this module during migration
+// Exclude legacy Flink implementations and tests
 sourceSets {
     main {
         java {
-            // Exclude Flink-based implementations from compilation during Jet migration
             exclude 'com/shoulico/ahs/telemetry/TelemetryProcessorJob.java'
             exclude 'com/shoulico/ahs/telemetry/function/**'
         }
     }
     test {
         java {
-            setSrcDirs([])
-        }
-        resources {
-            setSrcDirs([])
+            exclude 'com/shoulico/ahs/telemetry/TelemetryAlertFunctionTest.java'
+            exclude 'com/shoulico/ahs/telemetry/function/**'
+            exclude 'com/shoulico/ahs/telemetry/integration/EndToEndIntegrationTest.java'
+            exclude 'com/shoulico/ahs/telemetry/integration/KafkaIntegrationTest.java'
+            exclude 'com/shoulico/ahs/telemetry/integration/TelemetryProcessorIntegrationTest.java'
         }
     }
 }
+
+test {
+    useJUnitPlatform()
+    exclude '**/*IT.class', '**/*IT$*.class'
+}
+
+tasks.register('integrationTest', Test) {
+    description = 'Runs Kafka integration tests with Testcontainers.'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform()
+    include '**/*IT.class', '**/*IT$*.class'
+    shouldRunAfter test
+    environment 'DOCKER_API_VERSION', '1.44'
+    systemProperty 'api.version', '1.44'
+    systemProperty 'docker.client.api.version', '1.44'
+}
+
+check.dependsOn integrationTest
 
 task runTelemetryProcessor(type: JavaExec) {
     group = 'application'
