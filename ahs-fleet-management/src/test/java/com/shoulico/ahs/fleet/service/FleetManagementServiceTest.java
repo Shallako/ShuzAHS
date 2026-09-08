@@ -56,16 +56,16 @@ class FleetManagementServiceTest {
     @DisplayName("Should get vehicle by ID after registration")
     void testGetVehicleById() {
         Vehicle newVehicle = new Vehicle();
-        newVehicle.setVehicleId("KOMATSU-930E-001");
-        newVehicle.setModel("930E");
-        newVehicle.setManufacturer("Komatsu");
+        newVehicle.setVehicleId("TITAN-300-001");
+        newVehicle.setModel("Titan 300");
+        newVehicle.setManufacturer("Titan");
         newVehicle.setCapacity(300.0);
         service.registerVehicle(newVehicle);
 
-        Optional<Vehicle> vehicle = service.getVehicle("KOMATSU-930E-001");
+        Optional<Vehicle> vehicle = service.getVehicle("TITAN-300-001");
         assertTrue(vehicle.isPresent());
-        assertEquals("KOMATSU-930E-001", vehicle.get().getVehicleId());
-        assertEquals("930E", vehicle.get().getModel());
+        assertEquals("TITAN-300-001", vehicle.get().getVehicleId());
+        assertEquals("Titan 300", vehicle.get().getModel());
     }
 
     @Test
@@ -80,8 +80,8 @@ class FleetManagementServiceTest {
     @DisplayName("Should get all active vehicles after registration")
     void testGetAllActiveVehicles() {
         // Dynamically register a couple of vehicles
-        service.updateVehicleStatus("KOMATSU-930E-001", VehicleStatus.IDLE);
-        service.updateVehicleStatus("KOMATSU-980E-001", VehicleStatus.IDLE);
+        service.updateVehicleStatus("TITAN-300-001", VehicleStatus.IDLE);
+        service.updateVehicleStatus("TITAN-400-001", VehicleStatus.IDLE);
 
         List<Vehicle> vehicles = service.getAllActiveVehicles();
         assertNotNull(vehicles);
@@ -92,8 +92,8 @@ class FleetManagementServiceTest {
     @DisplayName("Should get vehicles by status")
     void testGetVehiclesByStatus() {
         // Update some vehicles to specific status (auto-registers vehicles)
-        service.updateVehicleStatus("KOMATSU-930E-001", VehicleStatus.ROUTING);
-        service.updateVehicleStatus("KOMATSU-930E-002", VehicleStatus.ROUTING);
+        service.updateVehicleStatus("TITAN-300-001", VehicleStatus.ROUTING);
+        service.updateVehicleStatus("TITAN-300-002", VehicleStatus.ROUTING);
         
         List<Vehicle> routingVehicles = service.getVehiclesByStatus(VehicleStatus.ROUTING);
         
@@ -103,7 +103,7 @@ class FleetManagementServiceTest {
     @Test
     @DisplayName("Should update vehicle status")
     void testUpdateVehicleStatus() {
-        String vehicleId = "KOMATSU-930E-001";
+        String vehicleId = "TITAN-300-001";
         // Auto-registers and sets status
         service.updateVehicleStatus(vehicleId, VehicleStatus.MAINTENANCE);
         
@@ -115,7 +115,7 @@ class FleetManagementServiceTest {
     @Test
     @DisplayName("Should update vehicle telemetry")
     void testUpdateVehicleTelemetry() {
-        String vehicleId = "KOMATSU-930E-001";
+        String vehicleId = "TITAN-300-001";
         
         VehicleTelemetry telemetry = new VehicleTelemetry();
         telemetry.setVehicleId(vehicleId);
@@ -140,10 +140,10 @@ class FleetManagementServiceTest {
     @DisplayName("Should get fleet statistics for dynamic fleet")
     void testGetFleetStatistics() {
         // Set up some vehicles in different states (auto-registers vehicles)
-        service.updateVehicleStatus("KOMATSU-930E-001", VehicleStatus.HAULING);
-        service.updateVehicleStatus("KOMATSU-930E-002", VehicleStatus.LOADING);
-        service.updateVehicleStatus("KOMATSU-930E-003", VehicleStatus.IDLE);
-        service.updateVehicleStatus("KOMATSU-930E-004", VehicleStatus.MAINTENANCE);
+        service.updateVehicleStatus("TITAN-300-001", VehicleStatus.HAULING);
+        service.updateVehicleStatus("TITAN-300-002", VehicleStatus.LOADING);
+        service.updateVehicleStatus("TITAN-300-003", VehicleStatus.IDLE);
+        service.updateVehicleStatus("TITAN-300-004", VehicleStatus.MAINTENANCE);
         
         FleetStatistics stats = service.getFleetStatistics();
         
@@ -157,8 +157,8 @@ class FleetManagementServiceTest {
     @DisplayName("Should handle status breakdown in fleet statistics for dynamic fleet")
     void testFleetStatisticsBreakdown() {
         // Ensure we have some vehicles and statuses
-        service.updateVehicleStatus("KOMATSU-930E-001", VehicleStatus.HAULING);
-        service.updateVehicleStatus("KOMATSU-930E-002", VehicleStatus.IDLE);
+        service.updateVehicleStatus("TITAN-300-001", VehicleStatus.HAULING);
+        service.updateVehicleStatus("TITAN-300-002", VehicleStatus.IDLE);
         FleetStatistics stats = service.getFleetStatistics();
         
         assertNotNull(stats);
@@ -169,9 +169,9 @@ class FleetManagementServiceTest {
     @Test
     @DisplayName("Should count active vehicles correctly")
     void testActiveVehicleCount() {
-        service.updateVehicleStatus("KOMATSU-930E-001", VehicleStatus.HAULING);
-        service.updateVehicleStatus("KOMATSU-930E-002", VehicleStatus.LOADING);
-        service.updateVehicleStatus("KOMATSU-930E-003", VehicleStatus.IDLE);
+        service.updateVehicleStatus("TITAN-300-001", VehicleStatus.HAULING);
+        service.updateVehicleStatus("TITAN-300-002", VehicleStatus.LOADING);
+        service.updateVehicleStatus("TITAN-300-003", VehicleStatus.IDLE);
         
         FleetStatistics stats = service.getFleetStatistics();
         
@@ -192,8 +192,8 @@ class FleetManagementServiceTest {
     void testRegisterVehicle() {
         Vehicle newVehicle = new Vehicle();
         newVehicle.setVehicleId("TEST-VEHICLE-001");
-        newVehicle.setModel("930E");
-        newVehicle.setManufacturer("Komatsu");
+        newVehicle.setModel("Titan 300");
+        newVehicle.setManufacturer("Titan");
         newVehicle.setCapacity(300.0);
         
         service.registerVehicle(newVehicle);
@@ -207,9 +207,9 @@ class FleetManagementServiceTest {
     @DisplayName("Should trigger emergency stop for all vehicles in dynamic fleet")
     void testEmergencyStopAll() {
         // Register a few vehicles via status update
-        service.updateVehicleStatus("KOMATSU-930E-001", VehicleStatus.IDLE);
-        service.updateVehicleStatus("KOMATSU-930E-002", VehicleStatus.IDLE);
-        service.updateVehicleStatus("KOMATSU-930E-003", VehicleStatus.IDLE);
+        service.updateVehicleStatus("TITAN-300-001", VehicleStatus.IDLE);
+        service.updateVehicleStatus("TITAN-300-002", VehicleStatus.IDLE);
+        service.updateVehicleStatus("TITAN-300-003", VehicleStatus.IDLE);
 
         service.emergencyStopAll();
 
@@ -220,9 +220,9 @@ class FleetManagementServiceTest {
     @Test
     @DisplayName("Should track idle vehicles")
     void testIdleVehicles() {
-        service.updateVehicleStatus("KOMATSU-930E-001", VehicleStatus.IDLE);
-        service.updateVehicleStatus("KOMATSU-930E-002", VehicleStatus.IDLE);
-        service.updateVehicleStatus("KOMATSU-930E-003", VehicleStatus.IDLE);
+        service.updateVehicleStatus("TITAN-300-001", VehicleStatus.IDLE);
+        service.updateVehicleStatus("TITAN-300-002", VehicleStatus.IDLE);
+        service.updateVehicleStatus("TITAN-300-003", VehicleStatus.IDLE);
         
         FleetStatistics stats = service.getFleetStatistics();
         assertTrue(stats.getIdleVehicles() >= 3);

@@ -2,7 +2,7 @@ package com.shoulico.ahs.stream.cep;
 
 /**
  * Configuration class for CEP alert thresholds
- * Based on Komatsu 930E and 980E haul truck specifications
+ * Based on Titan 300 and Titan 400 haul truck specifications
  */
 public final class AlertThresholds {
     
@@ -43,7 +43,7 @@ public final class AlertThresholds {
     public static final double ENGINE_MIN_IDLE_RPM = 650.0;
     
     // ==================== TIRE PRESSURE THRESHOLDS ====================
-    /** Minimum tire pressure warning (PSI) - for Komatsu haul trucks */
+    /** Minimum tire pressure warning (PSI) - for Titan haul trucks */
     public static final double TIRE_PRESSURE_MIN_WARNING_PSI = 95.0;
     /** Critical low tire pressure (PSI) */
     public static final double TIRE_PRESSURE_CRITICAL_PSI = 85.0;
@@ -71,10 +71,10 @@ public final class AlertThresholds {
     public static final double HYDRAULIC_TEMP_CRITICAL_CELSIUS = 95.0;
     
     // ==================== PAYLOAD THRESHOLDS ====================
-    /** Maximum payload for 930E (tons) */
-    public static final double MAX_PAYLOAD_930E_TONS = 320.0;
-    /** Maximum payload for 980E (tons) */
-    public static final double MAX_PAYLOAD_980E_TONS = 400.0;
+    /** Maximum payload for Titan 300 (tons) */
+    public static final double MAX_PAYLOAD_TITAN_300_TONS = 320.0;
+    /** Maximum payload for Titan 400 (tons) */
+    public static final double MAX_PAYLOAD_TITAN_400_TONS = 400.0;
     /** Overload warning threshold (percent over max) */
     public static final double OVERLOAD_WARNING_PERCENT = 105.0;
     

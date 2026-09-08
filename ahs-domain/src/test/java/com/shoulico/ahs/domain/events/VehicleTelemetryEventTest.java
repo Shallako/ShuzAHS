@@ -18,7 +18,7 @@ class VehicleTelemetryEventTest {
         Instant now = Instant.now();
         
         VehicleTelemetry telemetry = VehicleTelemetry.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .speedKph(35.5)
             .fuelLevelPercent(75.0)
             .location(GpsCoordinate.builder()
@@ -29,11 +29,11 @@ class VehicleTelemetryEventTest {
             .timestamp(now)
             .build();
         
-        VehicleTelemetryEvent event = new VehicleTelemetryEvent("KOMATSU-930E-001", telemetry);
+        VehicleTelemetryEvent event = new VehicleTelemetryEvent("TITAN-300-001", telemetry);
         
         assertNotNull(event);
         assertNotNull(event.getEventId());
-        assertEquals("KOMATSU-930E-001", event.getVehicleId());
+        assertEquals("TITAN-300-001", event.getVehicleId());
         assertEquals(VehicleTelemetryEvent.EventType.TELEMETRY_UPDATE, event.getEventType());
         assertNotNull(event.getTelemetry());
         assertNotNull(event.getTimestamp());
@@ -64,11 +64,11 @@ class VehicleTelemetryEventTest {
     @DisplayName("Should create position update event")
     void testPositionUpdateEvent() {
         VehicleTelemetry telemetry = VehicleTelemetry.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .build();
             
         VehicleTelemetryEvent event = new VehicleTelemetryEvent(
-            "KOMATSU-930E-001", 
+            "TITAN-300-001", 
             telemetry,
             VehicleTelemetryEvent.EventType.POSITION_UPDATE
         );
@@ -80,11 +80,11 @@ class VehicleTelemetryEventTest {
     @DisplayName("Should create status change event")
     void testStatusChangeEvent() {
         VehicleTelemetry telemetry = VehicleTelemetry.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .build();
             
         VehicleTelemetryEvent event = new VehicleTelemetryEvent(
-            "KOMATSU-930E-001",
+            "TITAN-300-001",
             telemetry,
             VehicleTelemetryEvent.EventType.STATUS_CHANGE
         );
@@ -96,11 +96,11 @@ class VehicleTelemetryEventTest {
     @DisplayName("Should create alert event")
     void testAlertEvent() {
         VehicleTelemetry telemetry = VehicleTelemetry.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .build();
             
         VehicleTelemetryEvent event = new VehicleTelemetryEvent(
-            "KOMATSU-930E-001",
+            "TITAN-300-001",
             telemetry,
             VehicleTelemetryEvent.EventType.ALERT
         );
@@ -114,10 +114,10 @@ class VehicleTelemetryEventTest {
     @DisplayName("Should support equality based on eventId")
     void testEventEquality() {
         VehicleTelemetry telemetry = VehicleTelemetry.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .build();
             
-        VehicleTelemetryEvent event1 = new VehicleTelemetryEvent("KOMATSU-930E-001", telemetry);
+        VehicleTelemetryEvent event1 = new VehicleTelemetryEvent("TITAN-300-001", telemetry);
         String eventId = event1.getEventId();
         
         VehicleTelemetryEvent event2 = new VehicleTelemetryEvent("DIFFERENT-VEHICLE", telemetry);
@@ -133,10 +133,10 @@ class VehicleTelemetryEventTest {
         Instant before = Instant.now();
         
         VehicleTelemetry telemetry = VehicleTelemetry.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .build();
             
-        VehicleTelemetryEvent event = new VehicleTelemetryEvent("KOMATSU-930E-001", telemetry);
+        VehicleTelemetryEvent event = new VehicleTelemetryEvent("TITAN-300-001", telemetry);
         
         Instant after = Instant.now();
         
@@ -149,10 +149,10 @@ class VehicleTelemetryEventTest {
     @DisplayName("Should track event source")
     void testEventSource() {
         VehicleTelemetry telemetry = VehicleTelemetry.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .build();
             
-        VehicleTelemetryEvent event = new VehicleTelemetryEvent("KOMATSU-930E-001", telemetry);
+        VehicleTelemetryEvent event = new VehicleTelemetryEvent("TITAN-300-001", telemetry);
         event.setSource("vehicle-embedded-system");
         
         assertEquals("vehicle-embedded-system", event.getSource());
@@ -162,11 +162,11 @@ class VehicleTelemetryEventTest {
     @DisplayName("Should auto-generate unique event IDs")
     void testUniqueEventIds() {
         VehicleTelemetry telemetry = VehicleTelemetry.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .build();
             
-        VehicleTelemetryEvent event1 = new VehicleTelemetryEvent("KOMATSU-930E-001", telemetry);
-        VehicleTelemetryEvent event2 = new VehicleTelemetryEvent("KOMATSU-930E-001", telemetry);
+        VehicleTelemetryEvent event1 = new VehicleTelemetryEvent("TITAN-300-001", telemetry);
+        VehicleTelemetryEvent event2 = new VehicleTelemetryEvent("TITAN-300-001", telemetry);
         
         assertNotNull(event1.getEventId());
         assertNotNull(event2.getEventId());
@@ -177,10 +177,10 @@ class VehicleTelemetryEventTest {
     @DisplayName("Should have toString method")
     void testToString() {
         VehicleTelemetry telemetry = VehicleTelemetry.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .build();
             
-        VehicleTelemetryEvent event = new VehicleTelemetryEvent("KOMATSU-930E-001", telemetry);
+        VehicleTelemetryEvent event = new VehicleTelemetryEvent("TITAN-300-001", telemetry);
         
         String str = event.toString();
         assertNotNull(str);

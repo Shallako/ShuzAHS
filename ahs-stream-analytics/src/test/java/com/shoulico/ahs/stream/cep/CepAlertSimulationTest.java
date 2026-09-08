@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CepAlertSimulationTest {
     
     private StreamExecutionEnvironment env;
-    private static final String TEST_VEHICLE_ID = "TRUCK-930E-001";
+    private static final String TEST_VEHICLE_ID = "TITAN-300-001";
     
     @BeforeEach
     void setUp() {

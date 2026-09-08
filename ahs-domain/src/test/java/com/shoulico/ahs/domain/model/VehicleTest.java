@@ -12,17 +12,17 @@ class VehicleTest {
     @DisplayName("Should create vehicle with builder")
     void testVehicleBuilder() {
         Vehicle vehicle = Vehicle.builder()
-            .vehicleId("KOMATSU-930E-001")
-            .model("930E")
-            .manufacturer("Komatsu")
+            .vehicleId("TITAN-300-001")
+            .model("Titan 300")
+            .manufacturer("Titan")
             .capacity(300.0)
             .status(VehicleStatus.IDLE)
             .build();
         
         assertNotNull(vehicle);
-        assertEquals("KOMATSU-930E-001", vehicle.getVehicleId());
-        assertEquals("930E", vehicle.getModel());
-        assertEquals("Komatsu", vehicle.getManufacturer());
+        assertEquals("TITAN-300-001", vehicle.getVehicleId());
+        assertEquals("Titan 300", vehicle.getModel());
+        assertEquals("Titan", vehicle.getManufacturer());
         assertEquals(300.0, vehicle.getCapacity());
         assertEquals(VehicleStatus.IDLE, vehicle.getStatus());
     }
@@ -57,28 +57,28 @@ class VehicleTest {
     @DisplayName("Should support equality based on vehicleId")
     void testVehicleEquality() {
         Vehicle vehicle1 = Vehicle.builder()
-            .vehicleId("KOMATSU-930E-001")
-            .model("930E")
+            .vehicleId("TITAN-300-001")
+            .model("Titan 300")
             .build();
         
         Vehicle vehicle2 = Vehicle.builder()
-            .vehicleId("KOMATSU-930E-001")
-            .model("930E-DIFFERENT")
+            .vehicleId("TITAN-300-001")
+            .model("Titan 300-DIFFERENT")
             .build();
         
         // Lombok @Data generates equals/hashCode based on all fields
         // For testing, just verify the objects are created correctly
-        assertEquals("KOMATSU-930E-001", vehicle1.getVehicleId());
-        assertEquals("KOMATSU-930E-001", vehicle2.getVehicleId());
+        assertEquals("TITAN-300-001", vehicle1.getVehicleId());
+        assertEquals("TITAN-300-001", vehicle2.getVehicleId());
     }
 
     @Test
-    @DisplayName("Should create 930E vehicle")
-    void test930EVehicle() {
+    @DisplayName("Should create Titan 300 vehicle")
+    void testTitan300Vehicle() {
         Vehicle vehicle = Vehicle.builder()
-            .vehicleId("KOMATSU-930E-001")
-            .model("930E")
-            .manufacturer("Komatsu")
+            .vehicleId("TITAN-300-001")
+            .model("Titan 300")
+            .manufacturer("Titan")
             .capacity(300.0)
             .maxPayloadTons(300)
             .maxSpeedKph(60.0)
@@ -89,12 +89,12 @@ class VehicleTest {
     }
 
     @Test
-    @DisplayName("Should create 980E vehicle")
-    void test980EVehicle() {
+    @DisplayName("Should create Titan 400 vehicle")
+    void testTitan400Vehicle() {
         Vehicle vehicle = Vehicle.builder()
-            .vehicleId("KOMATSU-980E-001")
-            .model("980E")
-            .manufacturer("Komatsu")
+            .vehicleId("TITAN-400-001")
+            .model("Titan 400")
+            .manufacturer("Titan")
             .capacity(400.0)
             .maxPayloadTons(400)
             .maxSpeedKph(60.0)
@@ -108,7 +108,7 @@ class VehicleTest {
     @DisplayName("Should support autonomous mode flag")
     void testAutonomousMode() {
         Vehicle vehicle = Vehicle.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .autonomousModeEnabled(true)
             .operationalStatus(true)
             .build();
@@ -121,7 +121,7 @@ class VehicleTest {
     @DisplayName("Should support safety envelope dimensions")
     void testSafetyEnvelope() {
         Vehicle vehicle = Vehicle.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .safetyEnvelopeFront(5.0)
             .safetyEnvelopeRear(5.0)
             .safetyEnvelopeSides(3.0)
@@ -136,7 +136,7 @@ class VehicleTest {
     @DisplayName("Should support route assignment")
     void testRouteAssignment() {
         Vehicle vehicle = Vehicle.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .assignedRouteId("ROUTE-001")
             .currentLocationId("LOAD-POINT-1")
             .destinationId("DUMP-POINT-1")

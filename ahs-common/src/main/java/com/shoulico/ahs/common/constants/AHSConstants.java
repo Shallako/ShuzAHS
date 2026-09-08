@@ -10,9 +10,8 @@ public final class AHSConstants {
     }
     
     // Vehicle Types
-    public static final String VEHICLE_TYPE_930E = "930E";
-    public static final String VEHICLE_TYPE_980E = "980E";
-    public static final String VEHICLE_TYPE_HD785 = "HD785-7";
+    public static final String VEHICLE_TYPE_TITAN_300 = "Titan 300";
+    public static final String VEHICLE_TYPE_TITAN_400 = "Titan 400";
     
     // Vehicle States
     public static final String STATE_IDLE = "IDLE";

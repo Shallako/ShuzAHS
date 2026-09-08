@@ -38,7 +38,7 @@ class AlertConsumerTest {
     void testCriticalSeverityAlert() {
         String alertJson = """
             {
-                "vehicleId": "KOMATSU-930E-001",
+                "vehicleId": "TITAN-300-001",
                 "alertType": "OVERHEATING",
                 "severity": "CRITICAL",
                 "message": "Engine overheating: 98.5°C sustained for 2 minutes"
@@ -57,7 +57,7 @@ class AlertConsumerTest {
     void testEmergencySeverityAlert() {
         String alertJson = """
             {
-                "vehicleId": "KOMATSU-930E-002",
+                "vehicleId": "TITAN-300-002",
                 "alertType": "COLLISION_WARNING",
                 "severity": "EMERGENCY",
                 "message": "Potential collision detected"
@@ -76,7 +76,7 @@ class AlertConsumerTest {
     void testWarningSeverityAlert() {
         String alertJson = """
             {
-                "vehicleId": "KOMATSU-930E-003",
+                "vehicleId": "TITAN-300-003",
                 "alertType": "RAPID_DECELERATION",
                 "severity": "WARNING",
                 "message": "Rapid deceleration detected: 55.0 kph to 8.0 kph in 5 seconds"
@@ -95,7 +95,7 @@ class AlertConsumerTest {
     void testErrorSeverityAlert() {
         String alertJson = """
             {
-                "vehicleId": "KOMATSU-980E-001",
+                "vehicleId": "TITAN-400-001",
                 "alertType": "SENSOR_MALFUNCTION",
                 "severity": "ERROR",
                 "message": "GPS sensor not responding"
@@ -114,7 +114,7 @@ class AlertConsumerTest {
     void testLowFuelAlert() {
         String alertJson = """
             {
-                "vehicleId": "KOMATSU-930E-004",
+                "vehicleId": "TITAN-300-004",
                 "alertType": "LOW_FUEL",
                 "severity": "WARNING",
                 "message": "Low fuel level: 12.5%"
@@ -131,7 +131,7 @@ class AlertConsumerTest {
     void testCriticalLowFuelAlert() {
         String alertJson = """
             {
-                "vehicleId": "KOMATSU-930E-005",
+                "vehicleId": "TITAN-300-005",
                 "alertType": "LOW_FUEL",
                 "severity": "CRITICAL",
                 "message": "Low fuel level: 3.2%"
@@ -148,7 +148,7 @@ class AlertConsumerTest {
     void testRapidDecelerationCepAlert() {
         String alertJson = """
             {
-                "vehicleId": "KOMATSU-980E-002",
+                "vehicleId": "TITAN-400-002",
                 "alertType": "RAPID_DECELERATION",
                 "severity": "WARNING",
                 "message": "Rapid deceleration detected: 52.3 kph to 5.1 kph in 5 seconds"
@@ -165,7 +165,7 @@ class AlertConsumerTest {
     void testOverheatingCepAlert() {
         String alertJson = """
             {
-                "vehicleId": "KOMATSU-930E-006",
+                "vehicleId": "TITAN-300-006",
                 "alertType": "OVERHEATING",
                 "severity": "CRITICAL",
                 "message": "Engine overheating: 97.2°C sustained for 2 minutes"
@@ -182,7 +182,7 @@ class AlertConsumerTest {
     void testLowercaseSeverity() {
         String alertJson = """
             {
-                "vehicleId": "KOMATSU-930E-007",
+                "vehicleId": "TITAN-300-007",
                 "alertType": "TIRE_PRESSURE_LOW",
                 "severity": "warning",
                 "message": "Tire pressure low: front-left at 85 PSI"
@@ -199,7 +199,7 @@ class AlertConsumerTest {
     void testUnknownSeverity() {
         String alertJson = """
             {
-                "vehicleId": "KOMATSU-930E-008",
+                "vehicleId": "TITAN-300-008",
                 "alertType": "UNKNOWN_TYPE",
                 "severity": "INFO",
                 "message": "Informational message"
@@ -233,7 +233,7 @@ class AlertConsumerTest {
     void testMissingFields() {
         String alertJson = """
             {
-                "vehicleId": "KOMATSU-930E-009"
+                "vehicleId": "TITAN-300-009"
             }
             """;
         
@@ -251,7 +251,7 @@ class AlertConsumerTest {
     void testMultipleAlerts() {
         String criticalAlert = """
             {
-                "vehicleId": "KOMATSU-930E-010",
+                "vehicleId": "TITAN-300-010",
                 "alertType": "OVERHEATING",
                 "severity": "CRITICAL",
                 "message": "Critical overheating"
@@ -260,7 +260,7 @@ class AlertConsumerTest {
         
         String warningAlert = """
             {
-                "vehicleId": "KOMATSU-930E-011",
+                "vehicleId": "TITAN-300-011",
                 "alertType": "LOW_FUEL",
                 "severity": "WARNING",
                 "message": "Low fuel warning"

@@ -18,12 +18,12 @@ class VehicleCommandEventTest {
     @Test
     void testConstructorWithParameters() {
         VehicleCommandEvent event = new VehicleCommandEvent(
-            "KOMATSU-930E-001",
+            "TITAN-300-001",
             VehicleCommandEvent.CommandType.ROUTE_ASSIGNMENT,
             "{\"routeId\": \"ROUTE-001\"}"
         );
         
-        assertEquals("KOMATSU-930E-001", event.getVehicleId());
+        assertEquals("TITAN-300-001", event.getVehicleId());
         assertEquals(VehicleCommandEvent.CommandType.ROUTE_ASSIGNMENT, event.getCommandType());
         assertEquals("{\"routeId\": \"ROUTE-001\"}", event.getCommandPayload());
     }
@@ -72,7 +72,7 @@ class VehicleCommandEventTest {
     @Test
     void testToString() {
         VehicleCommandEvent event = new VehicleCommandEvent(
-            "KOMATSU-930E-001",
+            "TITAN-300-001",
             VehicleCommandEvent.CommandType.EMERGENCY_STOP,
             ""
         );
@@ -80,7 +80,7 @@ class VehicleCommandEventTest {
         
         String toString = event.toString();
         assertTrue(toString.contains("VehicleCommandEvent"));
-        assertTrue(toString.contains("KOMATSU-930E-001"));
+        assertTrue(toString.contains("TITAN-300-001"));
         assertTrue(toString.contains("EMERGENCY_STOP"));
         assertTrue(toString.contains("CRITICAL"));
     }

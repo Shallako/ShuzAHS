@@ -72,14 +72,14 @@ class TelemetryDeserializerTest {
             .build();
         
         // Create event with vehicleId at wrapper level
-        VehicleTelemetryEvent event = new VehicleTelemetryEvent("KOMATSU-930E-TEST", telemetry);
+        VehicleTelemetryEvent event = new VehicleTelemetryEvent("TITAN-300-TEST", telemetry);
         
         byte[] jsonBytes = objectMapper.writeValueAsBytes(event);
         
         VehicleTelemetry deserialized = deserializer.deserialize(jsonBytes);
         
         assertNotNull(deserialized);
-        assertEquals("KOMATSU-930E-TEST", deserialized.getVehicleId());
+        assertEquals("TITAN-300-TEST", deserialized.getVehicleId());
     }
 
     @Test
@@ -123,7 +123,7 @@ class TelemetryDeserializerTest {
     void testDeserializeWithUnknownProperties() throws Exception {
         String jsonWithExtraFields = """
             {
-                "vehicleId": "KOMATSU-930E-001",
+                "vehicleId": "TITAN-300-001",
                 "speedKph": 45.5,
                 "unknownField": "should be ignored",
                 "anotherUnknown": 12345
@@ -133,13 +133,13 @@ class TelemetryDeserializerTest {
         VehicleTelemetry result = deserializer.deserialize(jsonWithExtraFields.getBytes());
         
         assertNotNull(result);
-        assertEquals("KOMATSU-930E-001", result.getVehicleId());
+        assertEquals("TITAN-300-001", result.getVehicleId());
         assertEquals(45.5, result.getSpeedKph());
     }
 
     private VehicleTelemetry createSampleTelemetry() {
         return VehicleTelemetry.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .speedKph(45.5)
             .fuelLevelPercent(75.0)
             .batteryLevelPercent(80.0)

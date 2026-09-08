@@ -16,7 +16,7 @@ class VehicleMetricsTest {
         Instant now = Instant.now();
         
         VehicleMetrics metrics = VehicleMetrics.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .windowStart(now.minusSeconds(60))
             .windowEnd(now)
             .avgSpeedKph(35.5)
@@ -29,7 +29,7 @@ class VehicleMetricsTest {
             .build();
         
         assertNotNull(metrics);
-        assertEquals("KOMATSU-930E-001", metrics.getVehicleId());
+        assertEquals("TITAN-300-001", metrics.getVehicleId());
         assertEquals(35.5, metrics.getAvgSpeedKph());
         assertEquals(42.0, metrics.getMaxSpeedKph());
         assertEquals(28.0, metrics.getMinSpeedKph());
@@ -40,7 +40,7 @@ class VehicleMetricsTest {
     @DisplayName("Should validate speed ranges")
     void testSpeedRanges() {
         VehicleMetrics metrics = VehicleMetrics.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .avgSpeedKph(35.0)
             .maxSpeedKph(45.0)
             .minSpeedKph(25.0)
@@ -54,7 +54,7 @@ class VehicleMetricsTest {
     @DisplayName("Should track temperature metrics")
     void testTemperatureMetrics() {
         VehicleMetrics metrics = VehicleMetrics.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .avgEngineTempCelsius(85.0)
             .maxEngineTempCelsius(95.0)
             .build();
@@ -68,7 +68,7 @@ class VehicleMetricsTest {
     @DisplayName("Should track fuel level metrics")
     void testFuelMetrics() {
         VehicleMetrics metrics = VehicleMetrics.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .avgFuelLevelPercent(75.0)
             .build();
         
@@ -84,7 +84,7 @@ class VehicleMetricsTest {
         Instant end = Instant.now();
         
         VehicleMetrics metrics = VehicleMetrics.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .windowStart(start)
             .windowEnd(end)
             .build();
@@ -98,7 +98,7 @@ class VehicleMetricsTest {
     @DisplayName("Should count total events")
     void testEventCounting() {
         VehicleMetrics metrics = VehicleMetrics.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .recordCount(150L)
             .build();
         
@@ -110,7 +110,7 @@ class VehicleMetricsTest {
     @DisplayName("Should handle high event counts")
     void testHighEventCounts() {
         VehicleMetrics metrics = VehicleMetrics.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .recordCount(10000L)
             .build();
         
@@ -118,36 +118,36 @@ class VehicleMetricsTest {
     }
 
     @Test
-    @DisplayName("Should create metrics for 930E truck")
-    void test930EMetrics() {
+    @DisplayName("Should create metrics for Titan 300 truck")
+    void testTitan300Metrics() {
         VehicleMetrics metrics = VehicleMetrics.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .avgSpeedKph(32.0)
             .maxSpeedKph(40.0)  // Loaded speed limit
             .build();
         
-        assertEquals("KOMATSU-930E-001", metrics.getVehicleId());
-        assertTrue(metrics.getMaxSpeedKph() <= 40.0);  // 930E loaded max
+        assertEquals("TITAN-300-001", metrics.getVehicleId());
+        assertTrue(metrics.getMaxSpeedKph() <= 40.0);  // Titan 300 loaded max
     }
 
     @Test
-    @DisplayName("Should create metrics for 980E truck")
-    void test980EMetrics() {
+    @DisplayName("Should create metrics for Titan 400 truck")
+    void testTitan400Metrics() {
         VehicleMetrics metrics = VehicleMetrics.builder()
-            .vehicleId("KOMATSU-980E-001")
+            .vehicleId("TITAN-400-001")
             .avgSpeedKph(30.0)
             .maxSpeedKph(38.0)  // Loaded speed limit
             .build();
         
-        assertEquals("KOMATSU-980E-001", metrics.getVehicleId());
-        assertTrue(metrics.getMaxSpeedKph() <= 40.0);  // 980E loaded max
+        assertEquals("TITAN-400-001", metrics.getVehicleId());
+        assertTrue(metrics.getMaxSpeedKph() <= 40.0);  // Titan 400 loaded max
     }
 
     @Test
     @DisplayName("Should track payload metrics")
     void testPayloadMetrics() {
         VehicleMetrics metrics = VehicleMetrics.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .avgPayloadTons(285.0)
             .maxPayloadTons(300.0)
             .loadedPercentage(0.75)
@@ -162,7 +162,7 @@ class VehicleMetricsTest {
     @DisplayName("Should track battery metrics")
     void testBatteryMetrics() {
         VehicleMetrics metrics = VehicleMetrics.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .avgBatteryLevelPercent(85.0)
             .build();
         
@@ -175,7 +175,7 @@ class VehicleMetricsTest {
     @DisplayName("Should convert to JSON")
     void testToJson() {
         VehicleMetrics metrics = VehicleMetrics.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .avgSpeedKph(35.5)
             .recordCount(100L)
             .build();
@@ -183,7 +183,7 @@ class VehicleMetricsTest {
         String json = metrics.toJson();
         
         assertNotNull(json);
-        assertTrue(json.contains("KOMATSU-930E-001"));
+        assertTrue(json.contains("TITAN-300-001"));
         assertTrue(json.contains("avg_speed_kph"));
     }
 

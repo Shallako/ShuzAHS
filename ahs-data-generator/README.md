@@ -1,12 +1,12 @@
 # AHS Data Generator
 
-Realistic telemetry data generator for testing the Komatsu Autonomous Haulage System (AHS) streaming pipeline.
+Realistic telemetry data generator for testing the Titan Autonomous Haulage System (AHS) streaming pipeline.
 
 ## Features
 
 - **Realistic Vehicle Simulation**: Simulates autonomous haul truck lifecycle (IDLE → ROUTING → LOADING → HAULING → DUMPING)
 - **Configurable Fleet Size**: Simulate 1 to hundreds of vehicles
-- **Mixed Fleet**: Automatically creates a realistic mix of Komatsu 930E (67%) and 980E (33%) trucks
+- **Mixed Fleet**: Automatically creates a realistic mix of Titan 300 (67%) and Titan 400 (33%) trucks
 - **Kafka Integration**: Publishes telemetry events to Kafka topics
 - **CLI Interface**: Easy-to-use command-line interface with sensible defaults
 - **LIDAR Point Cloud (JME Ray Casting)**: Headless LIDAR simulation using JMonkeyEngine’s collision system to ray-cast thousands of beams and export a point cloud (CSV)
@@ -117,13 +117,13 @@ Docker Compose is configured to include `--lidar-interval 15000` on the `data-ge
 ```
 12:34:56.789 [main] INFO  c.s.a.g.DataGeneratorApp - Starting AHS Data Generator
 12:34:56.790 [main] INFO  c.s.a.g.DataGeneratorApp - Configuration: vehicles=15, interval=5000ms
-12:34:56.801 [main] INFO  c.s.a.g.DataGeneratorApp - Initialized 15 vehicles (10 x 930E, 5 x 980E)
+12:34:56.801 [main] INFO  c.s.a.g.DataGeneratorApp - Initialized 15 vehicles (10 x Titan 300, 5 x Titan 400)
 12:34:56.850 [main] INFO  c.s.a.g.KafkaTelemetryProducer - Kafka telemetry producer initialized
 12:34:56.851 [main] INFO  c.s.a.g.DataGeneratorApp - Running indefinitely. Press Ctrl+C to stop...
 12:35:06.855 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp - === Fleet Status ===
-12:35:06.856 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp -   KOMATSU-930E-001 [ROUTING] - Cycle: 0, Remaining: 54s
-12:35:06.856 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp -   KOMATSU-930E-002 [LOADING] - Cycle: 0, Remaining: 123s
-12:35:06.856 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp -   KOMATSU-930E-003 [IDLE] - Cycle: 0, Remaining: 12s
+12:35:06.856 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp -   TITAN-300-001 [ROUTING] - Cycle: 0, Remaining: 54s
+12:35:06.856 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp -   TITAN-300-002 [LOADING] - Cycle: 0, Remaining: 123s
+12:35:06.856 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp -   TITAN-300-003 [IDLE] - Cycle: 0, Remaining: 12s
 12:35:06.857 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp - Total cycles completed: 0
 ```
 

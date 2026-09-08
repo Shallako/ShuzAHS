@@ -70,10 +70,10 @@ class FleetMetricsIntegrationTest {
     @DisplayName("Should update vehicle count metrics when status changes")
     void testVehicleCountMetricsUpdate() {
         // Update some vehicles to specific statuses
-        fleetService.updateVehicleStatus("KOMATSU-930E-001", VehicleStatus.HAULING);
-        fleetService.updateVehicleStatus("KOMATSU-930E-002", VehicleStatus.LOADING);
-        fleetService.updateVehicleStatus("KOMATSU-930E-003", VehicleStatus.IDLE);
-        fleetService.updateVehicleStatus("KOMATSU-930E-004", VehicleStatus.IDLE);
+        fleetService.updateVehicleStatus("TITAN-300-001", VehicleStatus.HAULING);
+        fleetService.updateVehicleStatus("TITAN-300-002", VehicleStatus.LOADING);
+        fleetService.updateVehicleStatus("TITAN-300-003", VehicleStatus.IDLE);
+        fleetService.updateVehicleStatus("TITAN-300-004", VehicleStatus.IDLE);
         
         // Update metrics (simulating scheduled update)
         updateFleetMetrics();
@@ -86,9 +86,9 @@ class FleetMetricsIntegrationTest {
     @DisplayName("Should track emergency stop vehicles")
     void testEmergencyStopMetrics() {
         // Register some vehicles first, then trigger emergency stop for all
-        fleetService.updateVehicleStatus("KOMATSU-930E-001", VehicleStatus.IDLE);
-        fleetService.updateVehicleStatus("KOMATSU-930E-002", VehicleStatus.IDLE);
-        fleetService.updateVehicleStatus("KOMATSU-980E-001", VehicleStatus.IDLE);
+        fleetService.updateVehicleStatus("TITAN-300-001", VehicleStatus.IDLE);
+        fleetService.updateVehicleStatus("TITAN-300-002", VehicleStatus.IDLE);
+        fleetService.updateVehicleStatus("TITAN-400-001", VehicleStatus.IDLE);
         
         // Trigger emergency stop for all vehicles
         fleetService.emergencyStopAll();
@@ -123,11 +123,11 @@ class FleetMetricsIntegrationTest {
     @DisplayName("Should track vehicle status distribution")
     void testVehicleStatusDistribution() {
         // Set various vehicle statuses
-        fleetService.updateVehicleStatus("KOMATSU-930E-001", VehicleStatus.HAULING);
-        fleetService.updateVehicleStatus("KOMATSU-930E-002", VehicleStatus.HAULING);
-        fleetService.updateVehicleStatus("KOMATSU-930E-003", VehicleStatus.LOADING);
-        fleetService.updateVehicleStatus("KOMATSU-930E-004", VehicleStatus.DUMPING);
-        fleetService.updateVehicleStatus("KOMATSU-930E-005", VehicleStatus.ROUTING);
+        fleetService.updateVehicleStatus("TITAN-300-001", VehicleStatus.HAULING);
+        fleetService.updateVehicleStatus("TITAN-300-002", VehicleStatus.HAULING);
+        fleetService.updateVehicleStatus("TITAN-300-003", VehicleStatus.LOADING);
+        fleetService.updateVehicleStatus("TITAN-300-004", VehicleStatus.DUMPING);
+        fleetService.updateVehicleStatus("TITAN-300-005", VehicleStatus.ROUTING);
         
         // Get fleet statistics
         var stats = fleetService.getFleetStatistics();
@@ -140,7 +140,7 @@ class FleetMetricsIntegrationTest {
     @Test
     @DisplayName("Should handle telemetry updates with location data")
     void testTelemetryWithLocation() {
-        String vehicleId = "KOMATSU-930E-001";
+        String vehicleId = "TITAN-300-001";
         
         VehicleTelemetry telemetry = VehicleTelemetry.builder()
             .vehicleId(vehicleId)
@@ -167,40 +167,40 @@ class FleetMetricsIntegrationTest {
     void testMixedVehicleModels() {
         // Register a mix of vehicle models
         fleetService.registerVehicle(Vehicle.builder()
-            .vehicleId("KOMATSU-930E-101")
-            .model("930E")
-            .manufacturer("Komatsu")
+            .vehicleId("TITAN-300-101")
+            .model("Titan 300")
+            .manufacturer("Titan")
             .capacity(300.0)
             .build());
 
         fleetService.registerVehicle(Vehicle.builder()
-            .vehicleId("KOMATSU-980E-201")
-            .model("980E")
-            .manufacturer("Komatsu")
+            .vehicleId("TITAN-400-201")
+            .model("Titan 400")
+            .manufacturer("Titan")
             .capacity(360.0)
             .build());
 
         List<Vehicle> vehicles = fleetService.getAllActiveVehicles();
 
-        // Should have mix of 930E and 980E (1 each)
-        long count930E = vehicles.stream()
-            .filter(v -> v.getModel().equals("930E"))
+        // Should have mix of Titan 300 and Titan 400 (1 each)
+        long countTitan300 = vehicles.stream()
+            .filter(v -> v.getModel().equals("Titan 300"))
             .count();
-        long count980E = vehicles.stream()
-            .filter(v -> v.getModel().equals("980E"))
+        long countTitan400 = vehicles.stream()
+            .filter(v -> v.getModel().equals("Titan 400"))
             .count();
         
-        assertEquals(1, count930E);
-        assertEquals(1, count980E);
+        assertEquals(1, countTitan300);
+        assertEquals(1, countTitan400);
     }
 
     @Test
     @DisplayName("Should register new vehicle and include in metrics")
     void testNewVehicleRegistration() {
         Vehicle newVehicle = Vehicle.builder()
-            .vehicleId("KOMATSU-930E-TEST")
-            .model("930E")
-            .manufacturer("Komatsu")
+            .vehicleId("TITAN-300-TEST")
+            .model("Titan 300")
+            .manufacturer("Titan")
             .capacity(300.0)
             .build();
         

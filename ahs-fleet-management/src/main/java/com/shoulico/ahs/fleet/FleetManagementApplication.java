@@ -13,9 +13,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * - Real-time fleet monitoring and control
  * - Route optimization and assignment
  * - Load/dump location management
- * - Integration with DISPATCH Fleet Management System
+ * - Integration with simulated Fleet Dispatch System
  * 
- * @author Komatsu MTS Team
+ * @author Titan AHS Team
  */
 @SpringBootApplication(scanBasePackages = {
     "com.shoulico.ahs.fleet",

@@ -41,7 +41,7 @@ class AlertConsumerIntegrationTest {
     void testCriticalAlertMetricsIntegration() {
         String criticalAlert = """
             {
-                "vehicleId": "KOMATSU-930E-001",
+                "vehicleId": "TITAN-300-001",
                 "alertType": "OVERHEATING",
                 "severity": "CRITICAL",
                 "message": "Engine overheating: 98.5°C sustained for 2 minutes",
@@ -61,16 +61,16 @@ class AlertConsumerIntegrationTest {
     @DisplayName("Should track multiple alert severities independently")
     void testMultipleSeverityMetrics() {
         // Send critical alert
-        alertConsumer.consumeAlert(createAlertJson("KOMATSU-930E-001", "OVERHEATING", "CRITICAL"));
-        alertConsumer.consumeAlert(createAlertJson("KOMATSU-930E-002", "COLLISION", "CRITICAL"));
+        alertConsumer.consumeAlert(createAlertJson("TITAN-300-001", "OVERHEATING", "CRITICAL"));
+        alertConsumer.consumeAlert(createAlertJson("TITAN-300-002", "COLLISION", "CRITICAL"));
         
         // Send warning alerts
-        alertConsumer.consumeAlert(createAlertJson("KOMATSU-930E-003", "LOW_FUEL", "WARNING"));
-        alertConsumer.consumeAlert(createAlertJson("KOMATSU-930E-004", "RAPID_DECELERATION", "WARNING"));
-        alertConsumer.consumeAlert(createAlertJson("KOMATSU-930E-005", "TIRE_PRESSURE_LOW", "WARNING"));
+        alertConsumer.consumeAlert(createAlertJson("TITAN-300-003", "LOW_FUEL", "WARNING"));
+        alertConsumer.consumeAlert(createAlertJson("TITAN-300-004", "RAPID_DECELERATION", "WARNING"));
+        alertConsumer.consumeAlert(createAlertJson("TITAN-300-005", "TIRE_PRESSURE_LOW", "WARNING"));
         
         // Send error alert
-        alertConsumer.consumeAlert(createAlertJson("KOMATSU-980E-001", "SENSOR_FAILURE", "ERROR"));
+        alertConsumer.consumeAlert(createAlertJson("TITAN-400-001", "SENSOR_FAILURE", "ERROR"));
         
         // Verify all counters (using correct metric names)
         assertEquals(2.0, meterRegistry.find("ahs_fleet_alerts_critical_total").counter().count());

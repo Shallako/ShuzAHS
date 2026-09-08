@@ -22,7 +22,7 @@ class VehicleTelemetryTest {
             .build();
         
         VehicleTelemetry telemetry = VehicleTelemetry.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .timestamp(now)
             .location(coordinate)
             .speedKph(35.5)
@@ -41,7 +41,7 @@ class VehicleTelemetryTest {
             .hydraulicPressurePsi(2400.0)
             .build();
         
-        assertEquals("KOMATSU-930E-001", telemetry.getVehicleId());
+        assertEquals("TITAN-300-001", telemetry.getVehicleId());
         assertEquals(35.5, telemetry.getSpeedKph());
         assertEquals(285.0, telemetry.getPayloadTons());
         assertTrue(telemetry.isLoaded());
@@ -52,7 +52,7 @@ class VehicleTelemetryTest {
     @DisplayName("Should create telemetry for loaded vehicle")
     void testLoadedVehicleTelemetry() {
         VehicleTelemetry telemetry = VehicleTelemetry.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .payloadTons(285.0)
             .isLoaded(true)
             .build();
@@ -65,7 +65,7 @@ class VehicleTelemetryTest {
     @DisplayName("Should create telemetry for empty vehicle")
     void testEmptyVehicleTelemetry() {
         VehicleTelemetry telemetry = VehicleTelemetry.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .payloadTons(0.0)
             .isLoaded(false)
             .build();
@@ -118,7 +118,7 @@ class VehicleTelemetryTest {
             .build();
         
         VehicleTelemetry telemetry = VehicleTelemetry.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .location(coordinate)
             .build();
         

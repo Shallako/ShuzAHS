@@ -40,15 +40,15 @@ public class TelemetryDataGenerator {
   private static final double MIN_ALTITUDE = 2800.0;
   private static final double MAX_ALTITUDE = 3200.0;
 
-  // Operational parameters for Komatsu 930E/980E trucks
+  // Operational parameters for Titan 300/Titan 400 trucks
   private static final double MIN_SPEED = 0.0;
   private static final double MAX_SPEED_LOADED = 40.0; // km/h loaded
   private static final double MAX_SPEED_EMPTY = 60.0; // km/h empty
   private static final double MIN_FUEL = 5.0;
   private static final double MAX_FUEL = 100.0;
   private static final double MIN_LOAD = 0.0;
-  private static final double MAX_LOAD_930E = 300.0; // tons
-  private static final double MAX_LOAD_980E = 400.0; // tons
+  private static final double MAX_LOAD_TITAN_300 = 300.0; // tons
+  private static final double MAX_LOAD_TITAN_400 = 400.0; // tons
   
   // ==================== ANOMALY INJECTION RATES ====================
   // Safety Alerts (higher rates for safety-critical patterns)
@@ -135,7 +135,7 @@ public class TelemetryDataGenerator {
         } else {
           speed = randomDouble(20.0, MAX_SPEED_LOADED);
         }
-        double maxLoad = vehicleId.contains("980E") ? MAX_LOAD_980E : MAX_LOAD_930E;
+        double maxLoad = vehicleId.contains("400") ? MAX_LOAD_TITAN_400 : MAX_LOAD_TITAN_300;
         telemetry.setPayloadTons(randomDouble(maxLoad * 0.8, maxLoad));
         telemetry.setLoaded(true);
         break;

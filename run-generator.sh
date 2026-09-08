@@ -2,7 +2,7 @@
 
 # Quick start script for AHS Data Generator
 
-echo "=== Komatsu AHS Data Generator ==="
+echo "=== Titan AHS Data Generator ==="
 echo ""
 echo "Building..."
 ./gradlew :ahs-data-generator:build -x test

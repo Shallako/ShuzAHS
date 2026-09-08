@@ -82,7 +82,7 @@ class TelemetryProcessorIntegrationTest {
         
         // Create data for 5 different vehicles
         for (int i = 1; i <= 5; i++) {
-            String vehicleId = String.format("KOMATSU-930E-%03d", i);
+            String vehicleId = String.format("TITAN-300-%03d", i);
             multiVehicleData.addAll(createTelemetryForVehicle(vehicleId, 10));
         }
 
@@ -107,8 +107,8 @@ class TelemetryProcessorIntegrationTest {
         List<VehicleTelemetry> highSpeedData = new ArrayList<>();
         
         // Create telemetry with excessive speed (>60 km/h)
-        highSpeedData.add(createTelemetry("KOMATSU-930E-001", 75.0, 50.0, 90.0));
-        highSpeedData.add(createTelemetry("KOMATSU-930E-002", 80.0, 45.0, 88.0));
+        highSpeedData.add(createTelemetry("TITAN-300-001", 75.0, 50.0, 90.0));
+        highSpeedData.add(createTelemetry("TITAN-300-002", 80.0, 45.0, 88.0));
 
         DataStream<TelemetryAlert> alerts = env.fromCollection(highSpeedData)
             .flatMap(new TelemetryAlertFunction());
@@ -127,8 +127,8 @@ class TelemetryProcessorIntegrationTest {
         List<VehicleTelemetry> lowFuelData = new ArrayList<>();
         
         // Create telemetry with low fuel (<15%)
-        lowFuelData.add(createTelemetry("KOMATSU-930E-001", 30.0, 12.0, 85.0));
-        lowFuelData.add(createTelemetry("KOMATSU-930E-002", 25.0, 8.0, 82.0));
+        lowFuelData.add(createTelemetry("TITAN-300-001", 30.0, 12.0, 85.0));
+        lowFuelData.add(createTelemetry("TITAN-300-002", 25.0, 8.0, 82.0));
 
         DataStream<TelemetryAlert> alerts = env.fromCollection(lowFuelData)
             .flatMap(new TelemetryAlertFunction());
@@ -147,8 +147,8 @@ class TelemetryProcessorIntegrationTest {
         List<VehicleTelemetry> overheatingData = new ArrayList<>();
         
         // Create telemetry with high engine temp (>100°C)
-        overheatingData.add(createTelemetry("KOMATSU-930E-001", 35.0, 50.0, 105.0));
-        overheatingData.add(createTelemetry("KOMATSU-930E-002", 40.0, 48.0, 110.0));
+        overheatingData.add(createTelemetry("TITAN-300-001", 35.0, 50.0, 105.0));
+        overheatingData.add(createTelemetry("TITAN-300-002", 40.0, 48.0, 110.0));
 
         DataStream<TelemetryAlert> alerts = env.fromCollection(overheatingData)
             .flatMap(new TelemetryAlertFunction());
@@ -186,7 +186,7 @@ class TelemetryProcessorIntegrationTest {
         
         // Create 1000 telemetry records for 10 vehicles
         for (int v = 1; v <= 10; v++) {
-            String vehicleId = String.format("KOMATSU-930E-%03d", v);
+            String vehicleId = String.format("TITAN-300-%03d", v);
             largeDataset.addAll(createTelemetryForVehicle(vehicleId, 100));
         }
 
@@ -204,9 +204,9 @@ class TelemetryProcessorIntegrationTest {
 
     private List<VehicleTelemetry> createTestTelemetryData() {
         List<VehicleTelemetry> data = new ArrayList<>();
-        data.add(createTelemetry("KOMATSU-930E-001", 35.5, 75.0, 88.0));
-        data.add(createTelemetry("KOMATSU-930E-002", 42.0, 68.0, 91.0));
-        data.add(createTelemetry("KOMATSU-930E-003", 28.5, 82.0, 85.0));
+        data.add(createTelemetry("TITAN-300-001", 35.5, 75.0, 88.0));
+        data.add(createTelemetry("TITAN-300-002", 42.0, 68.0, 91.0));
+        data.add(createTelemetry("TITAN-300-003", 28.5, 82.0, 85.0));
         return data;
     }
 

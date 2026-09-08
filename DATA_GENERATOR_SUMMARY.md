@@ -1,15 +1,15 @@
-# 🚛 Komatsu AHS Data Generator - Complete
+# 🚛 Titan AHS Data Generator - Complete
 
 ## ✅ What Was Created
 
-A complete, production-ready data generator module for testing the Komatsu Autonomous Haulage System streaming pipeline.
+A complete, production-ready data generator module for testing the Titan Autonomous Haulage System streaming pipeline.
 
 ### 📦 Module: `ahs-data-generator`
 
 #### Core Components
 
 **1. TelemetryDataGenerator.java**
-- Generates realistic telemetry data for Komatsu 930E and 980E haul trucks
+- Generates realistic telemetry data for Titan 300 and Titan 400 haul trucks
 - Simulates GPS coordinates within mine site boundaries
 - Generates state-appropriate metrics:
   - Speed (0-60 km/h depending on state)
@@ -53,12 +53,12 @@ Each telemetry event published to Kafka:
 ```json
 {
   "eventId": "uuid",
-  "vehicleId": "KOMATSU-930E-001",
+  "vehicleId": "TITAN-300-001",
   "timestamp": "2025-11-28T12:34:56.789Z",
   "source": "data-generator",
   "eventType": "TELEMETRY_UPDATE",
   "telemetry": {
-    "vehicleId": "KOMATSU-930E-001",
+    "vehicleId": "TITAN-300-001",
     "timestamp": "2025-11-28T12:34:56.789Z",
     "location": {
       "latitude": -23.42,
@@ -251,8 +251,8 @@ java -jar ahs-data-generator.jar -v 50 -i 5000 -d 1440
 
 ## ✨ Features Highlights
 
-- ✅ **Realistic Data**: Mimics actual Komatsu 930E/980E truck behavior
-- ✅ **Mixed Fleet**: Automatically creates 67% 930E, 33% 980E trucks
+- ✅ **Realistic Data**: Mimics actual haul truck behavior (Titan 300/400 class)
+- ✅ **Mixed Fleet**: Automatically creates 67% Titan 300, 33% Titan 400 trucks
 - ✅ **State Machine**: Full vehicle lifecycle simulation
 - ✅ **Configurable**: CLI parameters for all aspects
 - ✅ **Production Ready**: Proper logging, error handling, graceful shutdown

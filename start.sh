@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Komatsu AHS Platform Startup Script
+# Titan AHS Platform Startup Script
 # Starts all core services. Hazelcast Jet runs embedded in the telemetry processor (no Flink cluster).
 
 set -e
 
 echo "========================================="
-echo " Komatsu AHS Streaming Platform"
+echo " Titan AHS Streaming Platform"
 echo "========================================="
 echo ""
 

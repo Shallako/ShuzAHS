@@ -14,7 +14,7 @@ class VehicleSimulatorTest {
 
     @BeforeEach
     void setUp() {
-        simulator = new VehicleSimulator("KOMATSU-930E-001");
+        simulator = new VehicleSimulator("TITAN-300-001");
     }
 
     @Test
@@ -159,6 +159,6 @@ class VehicleSimulatorTest {
     @Test
     @DisplayName("Should track vehicle ID correctly")
     void testVehicleId() {
-        assertEquals("KOMATSU-930E-001", simulator.getVehicleId());
+        assertEquals("TITAN-300-001", simulator.getVehicleId());
     }
 }

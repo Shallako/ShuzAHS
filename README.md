@@ -1,16 +1,14 @@
-# Autonomous Haulage System (AHS) Streaming Platform
+# Titan Autonomous Haulage System (AHS) Streaming Platform
 
-A self-directed reference implementation of a real-time telemetry ingestion and fleet-management pipeline for the autonomous mining-truck domain, built with Apache Kafka, Spring Boot 3.2, and embedded Hazelcast Jet. This is a personal learning project developed to explore distributed event streaming and stream processing architectures. Autonomous haul trucks such as the Komatsu 930E and 980E, along with associated mine workflows, are used solely as realistic, illustrative domain examples for the simulation.
+A self-directed reference implementation of a real-time telemetry ingestion and fleet-management pipeline for the autonomous mining-truck domain, built with Apache Kafka, Spring Boot 3.2, and embedded Hazelcast Jet. This is a personal learning project developed to explore distributed event streaming and stream processing architectures.
+
+> **About the vehicle data.** Titan and the Titan 300 / Titan 400 are fictional. Their payload classes, telemetry ranges, and duty cycle (idle → routing → loading → hauling → dumping) are loosely modeled on production 300- and 400-ton-class autonomous mining haul trucks. No real manufacturer's data, software, or trademarks are used.
 
 ![Java](https://img.shields.io/badge/Java-17-orange)
 ![Gradle](https://img.shields.io/badge/Gradle-8.4-blue)
 ![Hazelcast Jet](https://img.shields.io/badge/Hazelcast%20Jet-5.6.0-purple)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-green)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-
-## ⚠️ Disclaimer
-
-This project is an independent personal project and is not affiliated with, sponsored by, or endorsed by Komatsu Ltd. or Komatsu Mining Technology Solutions. All trademarks, service marks, and company names are the property of their respective owners. Vehicle specifications, operational parameters, and simulated workflows are approximations used strictly for simulation and educational purposes.
 
 ## 🎯 Motivation
 
@@ -47,7 +45,7 @@ This project was built as a self-directed initiative to explore and master key d
 │  ┌────────────────────────────────────────────────────────┐    │
 │  │ ahs-data-generator (CLI Application)                   │    │
 │  │ • Simulates 15-1000+ autonomous haul trucks            │    │
-│  │ • Komatsu 930E (300-ton) & 980E (400-ton)              │    │
+│  │ • Titan 300 (300-ton) & Titan 400 (400-ton)              │    │
 │  │ • Realistic state machine: IDLE → ROUTING → LOADING    │    │
 │  │   → HAULING → DUMPING → repeat                         │    │
 │  │ • Generates telemetry: GPS, speed, load, fuel, etc.    │    │
@@ -88,7 +86,7 @@ This project was built as a self-directed initiative to explore and master key d
 │  │ ahs-vehicle-service (Spring Boot)                      │    │
 │  │ Port: 8080 (REST)                                      │    │
 │  │ • Vehicle CRUD operations                              │    │
-│  │ • Integration with DISPATCH FMS (simulated)            │    │
+│  │ • Integration with simulated Fleet Dispatch System     │    │
 │  └────────────────────────────────────────────────────────┘    │
 └────────────────────────────────────────────────────────────────┘
 ```
@@ -447,7 +445,7 @@ Key provisioning files:
   - Marks Prometheus as the default datasource
 - Dashboard provider: `grafana/provisioning/dashboards/dashboard.yml`
   - Loads dashboards from `/var/lib/grafana/dashboards`
-  - Places them under Grafana folder: `Komatsu AHS`
+  - Places them under Grafana folder: `Titan AHS`
 
 ### Bundled dashboards
 
@@ -455,7 +453,7 @@ Key provisioning files:
   - High-level KPIs: total vehicles active, alerts per minute, throughput
   - Panels for telemetry rates, windowed metrics, and alert trends
 
-After containers start, open Grafana → Dashboards → Browse → Folder `Komatsu AHS` to see the imported dashboards.
+After containers start, open Grafana → Dashboards → Browse → Folder `Titan AHS` to see the imported dashboards.
 
 ### Importing dashboards manually (if needed)
 
@@ -484,7 +482,7 @@ If auto-provisioning hasn’t loaded dashboards (e.g., first run before volumes 
   - Verify the datasource exists in Grafana: Settings → Data sources → Prometheus (URL should be `http://prometheus:9090`)
   - Make sure the data generator and processing jobs are running so metrics/alerts are emitted
 - Dashboards missing:
-  - In Grafana, check Dashboards → Browse → Folder `Komatsu AHS`
+  - In Grafana, check Dashboards → Browse → Folder `Titan AHS`
   - If empty, re-import from `grafana/dashboards/*.json` or restart Grafana container to re-trigger provisioning
 - Provisioning files not applied:
   - Remove Grafana volume to force a clean start: `docker-compose down -v` then `docker-compose up -d`
@@ -550,9 +548,9 @@ java -jar ahs-data-generator/build/libs/ahs-data-generator.jar \
 ```
 12:34:56.789 [main] INFO  c.s.a.g.DataGeneratorApp - Starting AHS Data Generator
 12:34:56.790 [main] INFO  c.s.a.g.DataGeneratorApp - Configuration: vehicles=15, interval=5000ms
-12:34:56.801 [main] INFO  c.s.a.g.DataGeneratorApp - Initialized 15 vehicles (10 x 930E, 5 x 980E)
+12:34:56.801 [main] INFO  c.s.a.g.DataGeneratorApp - Initialized 15 vehicles (10 x Titan 300, 5 x Titan 400)
 12:35:06.855 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp - === Fleet Status ===
-12:35:06.856 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp -   KOMATSU-930E-001 [HAULING] - Cycle: 1, Remaining: 54s
+12:35:06.856 [pool-1-thread-2] INFO  c.s.a.g.DataGeneratorApp -   TITAN-300-001 [HAULING] - Cycle: 1, Remaining: 54s
 ```
 
 #### 4. Run Telemetry Processor
@@ -617,7 +615,7 @@ curl http://localhost:8080/api/v1/fleet/statistics | jq
 curl http://localhost:8080/api/v1/fleet/vehicles | jq
 
 # Get specific vehicle
-curl http://localhost:8080/api/v1/fleet/vehicles/KOMATSU-930E-001 | jq
+curl http://localhost:8080/api/v1/fleet/vehicles/TITAN-300-001 | jq
 ```
 
 ---
@@ -660,16 +658,16 @@ GET /api/v1/fleet/vehicles
 ```json
 [
   {
-    "vehicleId": "KOMATSU-930E-001",
-    "model": "930E",
-    "manufacturer": "Komatsu",
+    "vehicleId": "TITAN-300-001",
+    "model": "Titan 300",
+    "manufacturer": "Titan",
     "capacity": 300.0,
     "status": "HAULING"
   },
   {
-    "vehicleId": "KOMATSU-980E-001",
-    "model": "980E",
-    "manufacturer": "Komatsu",
+    "vehicleId": "TITAN-400-001",
+    "model": "Titan 400",
+    "manufacturer": "Titan",
     "capacity": 400.0,
     "status": "LOADING"
   }
@@ -684,15 +682,15 @@ GET /api/v1/fleet/vehicles/{vehicleId}
 
 **Example:**
 ```bash
-curl http://localhost:8080/api/v1/fleet/vehicles/KOMATSU-930E-001
+curl http://localhost:8080/api/v1/fleet/vehicles/TITAN-300-001
 ```
 
 **Response:**
 ```json
 {
-  "vehicleId": "KOMATSU-930E-001",
-  "model": "930E",
-  "manufacturer": "Komatsu",
+  "vehicleId": "TITAN-300-001",
+  "model": "Titan 300",
+  "manufacturer": "Titan",
   "capacity": 300.0,
   "status": "HAULING",
   "telemetry": {
@@ -738,12 +736,12 @@ curl http://localhost:8080/api/v1/fleet/vehicles/status/HAULING
 ```json
 {
   "eventId": "abc-123-def-456",
-  "vehicleId": "KOMATSU-930E-001",
+  "vehicleId": "TITAN-300-001",
   "timestamp": "2025-11-28T12:34:56.789Z",
   "source": "data-generator",
   "eventType": "TELEMETRY_UPDATE",
   "telemetry": {
-    "vehicleId": "KOMATSU-930E-001",
+    "vehicleId": "TITAN-300-001",
     "timestamp": "2025-11-28T12:34:56.789Z",
     "location": {
       "latitude": -23.42,
@@ -775,7 +773,7 @@ curl http://localhost:8080/api/v1/fleet/vehicles/status/HAULING
 ```json
 {
   "alertId": "alert-789",
-  "vehicleId": "KOMATSU-930E-001",
+  "vehicleId": "TITAN-300-001",
   "timestamp": "2025-11-28T12:35:00.000Z",
   "alertType": "LOW_FUEL",
   "severity": "WARNING",

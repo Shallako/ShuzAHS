@@ -1,6 +1,6 @@
-# Komatsu AHS System Architecture Diagrams
+# Titan AHS System Architecture Diagrams
 
-**Project**: Komatsu Autonomous Haulage System (AHS) Streaming Platform  
+**Project**: Titan Autonomous Haulage System (AHS) Streaming Platform  
 **Date**: December 2, 2025
 
 This document contains comprehensive diagrams documenting the system architecture, data flows, and component interactions.
@@ -27,7 +27,7 @@ This document contains comprehensive diagrams documenting the system architectur
 ```mermaid
 graph TB
     subgraph "Data Generation Layer"
-        VG[Vehicle Simulator<br/>930E & 980E Trucks]
+        VG[Vehicle Simulator<br/>Titan 300 & Titan 400 Trucks]
         TDG[Telemetry Data Generator<br/>State-Based Telemetry]
     end
     
@@ -101,7 +101,7 @@ sequenceDiagram
     VS->>TDG: getCurrentStatus() -> HAULING
     TDG->>TDG: generateTelemetry(vehicleId, HAULING)
     
-    Note over TDG: Generate realistic data:<br/>Speed: 30-40 kph<br/>Payload: 240-300 tons (930E)<br/>Engine: 80-95°C
+    Note over TDG: Generate realistic data:<br/>Speed: 30-40 kph<br/>Payload: 240-300 tons (Titan 300)<br/>Engine: 80-95°C
     
     TDG->>K: publish(vehicle-telemetry topic)
     K-->>F: consume telemetry event
@@ -182,7 +182,7 @@ sequenceDiagram
     participant OP as Operations Team
     
     T->>AF: VehicleTelemetry Event
-    Note over T: vehicleId: KOMATSU-930E-001<br/>speed: 75 kph<br/>engineTemp: 105°C<br/>fuelLevel: 8%
+    Note over T: vehicleId: TITAN-300-001<br/>speed: 75 kph<br/>engineTemp: 105°C<br/>fuelLevel: 8%
     
     AF->>AF: checkSpeedThreshold()
     alt Speed > 60 kph
@@ -280,8 +280,8 @@ stateDiagram-v2
     
     note right of HAULING
         Speed: 20-40 kph
-        Payload: 240-300 tons (930E)
-        Payload: 320-400 tons (980E)
+        Payload: 240-300 tons (Titan 300)
+        Payload: 320-400 tons (Titan 400)
         Duration: 120-180 sec
     end note
     
@@ -456,7 +456,7 @@ classDiagram
     class TelemetryDataGenerator {
         -Random random
         +generateTelemetry(String, VehicleStatus) VehicleTelemetry
-        -is930E(String) boolean
+        -isTitan400(String) boolean
         -generateSpeed(VehicleStatus) double
         -generatePayload(String, VehicleStatus) double
         -generateLocation(VehicleStatus) GpsCoordinate
@@ -879,18 +879,18 @@ sequenceDiagram
     participant TP1 as Telemetry Processor 1
     participant TP2 as Telemetry Processor 2
     
-    Note over DG: Vehicle: KOMATSU-930E-001
-    DG->>K: produce(key="930E-001", telemetry)
+    Note over DG: Vehicle: TITAN-300-001
+    DG->>K: produce(key="TITAN-300-001", telemetry)
     K->>K: hash(key) % 3 = 0
     K->>P0: append to partition 0
     
-    Note over DG: Vehicle: KOMATSU-930E-002
-    DG->>K: produce(key="930E-002", telemetry)
+    Note over DG: Vehicle: TITAN-300-002
+    DG->>K: produce(key="TITAN-300-002", telemetry)
     K->>K: hash(key) % 3 = 1
     K->>P1: append to partition 1
     
-    Note over DG: Vehicle: KOMATSU-980E-001
-    DG->>K: produce(key="980E-001", telemetry)
+    Note over DG: Vehicle: TITAN-400-001
+    DG->>K: produce(key="TITAN-400-001", telemetry)
     K->>K: hash(key) % 3 = 2
     K->>P2: append to partition 2
     
@@ -1014,9 +1014,9 @@ sequenceDiagram
 ```mermaid
 graph TB
     subgraph "Data Generator Application"
-        VS1[Vehicle Simulator 1<br/>KOMATSU-930E-001]
-        VS2[Vehicle Simulator 2<br/>KOMATSU-930E-002]
-        VS3[Vehicle Simulator 3<br/>KOMATSU-980E-001]
+        VS1[Vehicle Simulator 1<br/>TITAN-300-001]
+        VS2[Vehicle Simulator 2<br/>TITAN-300-002]
+        VS3[Vehicle Simulator 3<br/>TITAN-400-001]
         
         TDG[Telemetry Data Generator]
         
@@ -1034,9 +1034,9 @@ graph TB
     SM3 -->|getStatus| TDG
     
     subgraph "Telemetry Generation"
-        TDG -->|generates| T1[Telemetry 1<br/>Speed: 35 kph<br/>Payload: 270 tons<br/>930E]
-        TDG -->|generates| T2[Telemetry 2<br/>Speed: 0 kph<br/>Payload: 180 tons<br/>930E]
-        TDG -->|generates| T3[Telemetry 3<br/>Speed: 55 kph<br/>Payload: 0 tons<br/>980E]
+        TDG -->|generates| T1[Telemetry 1<br/>Speed: 35 kph<br/>Payload: 270 tons<br/>Titan 300]
+        TDG -->|generates| T2[Telemetry 2<br/>Speed: 0 kph<br/>Payload: 180 tons<br/>Titan 300]
+        TDG -->|generates| T3[Telemetry 3<br/>Speed: 55 kph<br/>Payload: 0 tons<br/>Titan 400]
     end
     
     T1 --> KP

@@ -191,7 +191,7 @@ class KafkaIntegrationTest {
 
     private VehicleTelemetry createTestTelemetry() {
         return VehicleTelemetry.builder()
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .timestamp(Instant.now())
             .speedKph(35.5)
             .fuelLevelPercent(75.0)

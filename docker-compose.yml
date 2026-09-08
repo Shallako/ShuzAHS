@@ -1,4 +1,4 @@
-# Docker Compose for Komatsu AHS Streaming Platform
+# Docker Compose for Titan AHS Streaming Platform
 # Comprehensive infrastructure setup for local development
 
 services:

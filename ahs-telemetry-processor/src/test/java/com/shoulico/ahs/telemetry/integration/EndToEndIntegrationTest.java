@@ -89,7 +89,7 @@ class EndToEndIntegrationTest {
         
         // 10 vehicles, 50 data points each = 500 total records
         for (int v = 1; v <= 10; v++) {
-            String vehicleId = String.format("KOMATSU-930E-%03d", v);
+            String vehicleId = String.format("TITAN-300-%03d", v);
             for (int i = 0; i < 50; i++) {
                 multiVehicleData.add(createRandomTelemetry(vehicleId));
             }
@@ -121,21 +121,21 @@ class EndToEndIntegrationTest {
         
         // Normal data
         for (int i = 0; i < 20; i++) {
-            mixedData.add(createNormalTelemetry("KOMATSU-930E-001"));
+            mixedData.add(createNormalTelemetry("TITAN-300-001"));
         }
         
         // Anomalous data - high speed
-        mixedData.add(createTelemetry("KOMATSU-930E-001", 75.0, 50.0, 88.0));
+        mixedData.add(createTelemetry("TITAN-300-001", 75.0, 50.0, 88.0));
         
         // Anomalous data - low fuel
-        mixedData.add(createTelemetry("KOMATSU-930E-001", 30.0, 8.0, 85.0));
+        mixedData.add(createTelemetry("TITAN-300-001", 30.0, 8.0, 85.0));
         
         // Anomalous data - overheating
-        mixedData.add(createTelemetry("KOMATSU-930E-001", 35.0, 50.0, 108.0));
+        mixedData.add(createTelemetry("TITAN-300-001", 35.0, 50.0, 108.0));
         
         // More normal data
         for (int i = 0; i < 20; i++) {
-            mixedData.add(createNormalTelemetry("KOMATSU-930E-001"));
+            mixedData.add(createNormalTelemetry("TITAN-300-001"));
         }
 
         DataStream<VehicleTelemetry> stream = env.fromCollection(mixedData);
@@ -159,7 +159,7 @@ class EndToEndIntegrationTest {
         
         // Create data with varying time gaps
         for (int i = 0; i < 20; i++) {
-            VehicleTelemetry telemetry = createNormalTelemetry("KOMATSU-930E-001");
+            VehicleTelemetry telemetry = createNormalTelemetry("TITAN-300-001");
             // Varying gaps: 1s, 5s, 10s, 30s
             int gap = (i % 4 + 1) * (i % 4 == 3 ? 10 : 1);
             telemetry.setTimestamp(baseTime.plusSeconds(i * gap));
@@ -179,16 +179,16 @@ class EndToEndIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should handle both 930E and 980E vehicles")
+    @DisplayName("Should handle both Titan 300 and Titan 400 vehicles")
     void testMultipleVehicleModels() throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(2);
 
         List<VehicleTelemetry> multiModelData = new ArrayList<>();
         
-        // 5x 930E vehicles (300 ton capacity)
+        // 5x Titan 300 vehicles (300 ton capacity)
         for (int i = 1; i <= 5; i++) {
-            String vehicleId = String.format("KOMATSU-930E-%03d", i);
+            String vehicleId = String.format("TITAN-300-%03d", i);
             for (int j = 0; j < 20; j++) {
                 VehicleTelemetry telemetry = createNormalTelemetry(vehicleId);
                 telemetry.setPayloadTons(240.0 + Math.random() * 60.0); // 240-300 tons
@@ -196,9 +196,9 @@ class EndToEndIntegrationTest {
             }
         }
         
-        // 3x 980E vehicles (400 ton capacity)
+        // 3x Titan 400 vehicles (400 ton capacity)
         for (int i = 1; i <= 3; i++) {
-            String vehicleId = String.format("KOMATSU-980E-%03d", i);
+            String vehicleId = String.format("TITAN-400-%03d", i);
             for (int j = 0; j < 20; j++) {
                 VehicleTelemetry telemetry = createNormalTelemetry(vehicleId);
                 telemetry.setPayloadTons(320.0 + Math.random() * 80.0); // 320-400 tons
@@ -225,7 +225,7 @@ class EndToEndIntegrationTest {
         env.setParallelism(1);
 
         List<VehicleTelemetry> cycleData = new ArrayList<>();
-        String vehicleId = "KOMATSU-930E-001";
+        String vehicleId = "TITAN-300-001";
         Instant time = Instant.now();
         
         // IDLE state (5 records)
@@ -273,7 +273,7 @@ class EndToEndIntegrationTest {
 
     private List<VehicleTelemetry> createDiverseTelemetryData() {
         List<VehicleTelemetry> data = new ArrayList<>();
-        String[] vehicles = {"KOMATSU-930E-001", "KOMATSU-930E-002", "KOMATSU-980E-001"};
+        String[] vehicles = {"TITAN-300-001", "TITAN-300-002", "TITAN-400-001"};
         
         for (String vehicleId : vehicles) {
             for (int i = 0; i < 15; i++) {

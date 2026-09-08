@@ -1,4 +1,4 @@
-# Prometheus Configuration for Komatsu AHS
+# Prometheus Configuration for Titan AHS
 
 global:
   scrape_interval: 15s

@@ -1,6 +1,6 @@
 {
-  "title": "Komatsu AHS - Fleet Overview",
-  "tags": ["ahs", "fleet", "komatsu", "cep", "alerts"],
+  "title": "Titan AHS - Fleet Overview",
+  "tags": ["ahs", "fleet", "titan", "cep", "alerts"],
   "timezone": "browser",
   "schemaVersion": 39,
   "version": 4,

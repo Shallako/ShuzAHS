@@ -1,4 +1,4 @@
-# 🚀 Komatsu AHS Quick Reference
+# 🚀 Titan AHS Quick Reference
 
 ## Build & Run Commands
 
@@ -58,7 +58,7 @@ curl http://localhost:8080/api/v1/fleet/statistics
 curl http://localhost:8080/api/v1/fleet/vehicles
 
 # Get vehicle by ID
-curl http://localhost:8080/api/v1/fleet/vehicles/KOMATSU-930E-001
+curl http://localhost:8080/api/v1/fleet/vehicles/TITAN-300-001
 ```
 
 ## Project Modules

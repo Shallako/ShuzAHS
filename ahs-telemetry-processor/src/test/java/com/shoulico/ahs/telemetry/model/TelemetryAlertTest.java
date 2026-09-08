@@ -15,7 +15,7 @@ class TelemetryAlertTest {
     void testHighTemperatureAlert() {
         TelemetryAlert alert = TelemetryAlert.builder()
             .alertId("ALERT-001")
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .timestamp(Instant.now())
             .alertType(TelemetryAlert.AlertType.HIGH_TEMPERATURE)
             .severity(TelemetryAlert.AlertSeverity.WARNING)
@@ -36,7 +36,7 @@ class TelemetryAlertTest {
     void testLowFuelAlert() {
         TelemetryAlert alert = TelemetryAlert.builder()
             .alertId("ALERT-002")
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .timestamp(Instant.now())
             .alertType(TelemetryAlert.AlertType.LOW_FUEL)
             .severity(TelemetryAlert.AlertSeverity.CRITICAL)
@@ -104,7 +104,7 @@ class TelemetryAlertTest {
     void testRapidDecelerationAlert() {
         TelemetryAlert alert = TelemetryAlert.builder()
             .alertId("ALERT-003")
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .timestamp(Instant.now())
             .alertType(TelemetryAlert.AlertType.RAPID_DECELERATION)
             .severity(TelemetryAlert.AlertSeverity.WARNING)
@@ -121,7 +121,7 @@ class TelemetryAlertTest {
     void testOverheatingAlert() {
         TelemetryAlert alert = TelemetryAlert.builder()
             .alertId("ALERT-004")
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .timestamp(Instant.now())
             .alertType(TelemetryAlert.AlertType.OVERHEATING)
             .severity(TelemetryAlert.AlertSeverity.CRITICAL)
@@ -142,7 +142,7 @@ class TelemetryAlertTest {
         
         TelemetryAlert alert = TelemetryAlert.builder()
             .alertId("ALERT-005")
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .timestamp(now)
             .alertType(TelemetryAlert.AlertType.LOW_FUEL)
             .severity(TelemetryAlert.AlertSeverity.WARNING)
@@ -157,7 +157,7 @@ class TelemetryAlertTest {
     void testBrakePressureAlert() {
         TelemetryAlert alert = TelemetryAlert.builder()
             .alertId("ALERT-006")
-            .vehicleId("KOMATSU-930E-001")
+            .vehicleId("TITAN-300-001")
             .alertType(TelemetryAlert.AlertType.BRAKE_PRESSURE_LOW)
             .severity(TelemetryAlert.AlertSeverity.CRITICAL)
             .message("Brake pressure critically low")

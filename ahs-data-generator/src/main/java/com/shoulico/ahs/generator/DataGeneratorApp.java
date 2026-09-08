@@ -24,7 +24,7 @@ import java.io.File;
 @Command(name = "ahs-data-generator",
         mixinStandardHelpOptions = true,
         version = "1.0",
-        description = "Generate telemetry data for Komatsu AHS testing")
+        description = "Generate telemetry data for Titan AHS testing")
 public class DataGeneratorApp implements Callable<Integer> {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataGeneratorApp.class);
@@ -234,22 +234,22 @@ public class DataGeneratorApp implements Callable<Integer> {
     private void initializeVehicles() {
         vehicles = new ArrayList<>();
 
-        // Create mix of 930E and 980E trucks
-        int num930E = (int) (vehicleCount * 0.67);  // 67% are 930E
-        int num980E = vehicleCount - num930E;        // 33% are 980E
+        // Create mix of Titan 300 and Titan 400 trucks
+        int numTitan300 = (int) (vehicleCount * 0.67);  // 67% are Titan 300
+        int numTitan400 = vehicleCount - numTitan300;   // 33% are Titan 400
 
-        for (int i = 1; i <= num930E; i++) {
-            String vehicleId = "KOMATSU-930E-" + String.format("%03d", i);
+        for (int i = 1; i <= numTitan300; i++) {
+            String vehicleId = "TITAN-300-" + String.format("%03d", i);
             vehicles.add(new VehicleSimulator(vehicleId));
         }
 
-        for (int i = 1; i <= num980E; i++) {
-            String vehicleId = "KOMATSU-980E-" + String.format("%03d", i);
+        for (int i = 1; i <= numTitan400; i++) {
+            String vehicleId = "TITAN-400-" + String.format("%03d", i);
             vehicles.add(new VehicleSimulator(vehicleId));
         }
 
-        LOG.info("Initialized {} vehicles ({} x 930E, {} x 980E)",
-                vehicleCount, num930E, num980E);
+        LOG.info("Initialized {} vehicles ({} x Titan 300, {} x Titan 400)",
+                vehicleCount, numTitan300, numTitan400);
     }
 
     private void updateVehicleStates() {
